@@ -1,0 +1,5 @@
+graph {
+
+  A -- {A B C D}
+  test -- A
+}

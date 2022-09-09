@@ -1,0 +1,28 @@
+Prof: Meloni
+Cours: ?
+
+Résumé:
+  L'objectif de ce cours est d'introduire les outils
+  de bases de la conception des compilateurs ainsi
+  que les notions classiques de théorie des langages.
+  Nous nous intéresserons principalement à l'analyse
+  lexicale et syntaxique des langages ainsi qu'aux
+  outils flex et bison.
+
+Sujets de TP:
+
+  Makefile
+
+  Traducteur d'expressions arithmétiques
+
+  La bibliothèques C regex
+
+  Automates
+
+  Flex
+
+  Bison
+
+  Calculatrice en Flex et Bison
+
+  Compilateur Algo - Machine RAM en Flex et Bison

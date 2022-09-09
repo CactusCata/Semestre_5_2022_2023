@@ -1,0 +1,34 @@
+Tuto: 
+- https://www.youtube.com/watch?v=LpVufkH4gog
+- https://www.youtube.com/watch?v=54bo1qaHAfk
+- https://www.developpez.net/forums/d1314282/c-cpp/outils-c-cpp/generateurs-compilateur/presentation-flex-bison-cpp/
+repo Git: https://github.com/westes/flex
+Installation: http://gnuwin32.sourceforge.net/packages/flex.htm
+
+
+How to do:
+
+Créer un fichier fichier.l et écrire dedans:
+- la section des définitions (includes et variables globales)
+- la section des règles (règles des pattern)
+
+executer la commande $flex fichier.l
+executer la commande $gcc .\lex.yy.c -o output
+
+
+===================
+How to do with C++
+===================
+
+
+%{
+#include <iostream>
+#define YY_DECL extern "C" int yylex()
+%}
+ 
+
+========================
+print le text d'entrée:
+========================
+
+[0-9]+,[0-9]+ { std::cout << "Nombre à virgule : " << yytext << std::endl; }

@@ -1,0 +1,40 @@
+Prof: Langevin
+Cours: http://langevin.univ-tln.fr/cours/graphe/graphe.html
+
+Pré-requis:
+
+  Definitions du domaine de la théorie des graphes
+  Manipulation de GDB
+  Utilisation des outils graphviz, flex, bison, tag
+
+Programme:
+
+  Introduction
+  Pile et graphe eulerien
+  Complexité du parcours eulerien
+  Cycle Hamiltonien
+  Complexité du problème du cycle hamiltonien
+  Quelques problèmes sur les graphes
+  Réduction algorithmique
+  Ensembles disjoints et connexité
+  Arbre couvrant minimal
+  Voyageur de commerce
+  Complexité de TSP
+  Approximation
+  Tri topologique
+  Fonction de Grundy
+  Connexité forte
+  Une élégante réduction du problème 2-SAT
+
+Sujets de TP:
+
+  Entrées/Sorties pour les graphes.
+  Parcours en profondeur, calcul des composantes connexes.
+  Implantation des piles, parcours eulérien
+  Ensemble disjoints, expérience numérique sur la connexité, composante géante.
+  Arbre couvrant, 2-approximation du problème du voyageur de commerce
+  Tri toplogique, fonction de Grundy.
+  Backtracking : Reines sur l'échiquier.
+  Ensemble stable.
+  Cycle Hamiltonien.
+  Coloriage des sommets.

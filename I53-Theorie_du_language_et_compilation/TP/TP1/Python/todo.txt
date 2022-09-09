@@ -1,0 +1,3 @@
+Terminer l'analyse des instructions en assembleur de la question 1.4.
+
+Continuer la suite du TP.
