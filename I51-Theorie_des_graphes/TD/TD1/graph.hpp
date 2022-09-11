@@ -11,14 +11,14 @@ typedef struct {
     char **matriceAdjacence;
 } Graph;
 
-Graph init(unsigned int n);
+Graph init(const unsigned int &n);
 
-Graph readGraph(std::string fileName);
+Graph readGraph(const std::string &fileName);
 
-void printGraph(Graph g);
+void printGraph(const Graph &g);
 
-int getConnexeComposantesAmount(Graph g);
+int getConnexeComposantesAmount(const Graph &g);
 
-void reachNeighbor(int s, Graph g);
+void reachNeighbor(const unsigned int &s, const Graph &g);
 
 #endif

@@ -2,7 +2,7 @@
 
 char *reached;
 
-Graph init(unsigned int n) {
+Graph init(const unsigned int &n) {
     Graph g;
     g.ordre = n;
     char **matriceAdjacence = new char*[n];
@@ -17,7 +17,7 @@ Graph init(unsigned int n) {
     return g;
 }
 
-Graph readGraph(std::string fileName) {
+Graph readGraph(const std::string &fileName) {
     std::ifstream file;
     file.open(fileName, std::ios::in);
 
@@ -30,10 +30,14 @@ Graph readGraph(std::string fileName) {
     std::string line;
     while (getline(file, line)) {
         if (line.substr(0, 4) == "nbs=") {
-            int ordre;
+            unsigned int ordre;
             sscanf(line.c_str(), "nbs=%d", &ordre);
             g = init(ordre);
         } else if (line[0] >= '0' && line[0] <= '9') {
+            if (g.matriceAdjacence == nullptr) {
+                std::cerr << "Veuillez préciser le nombre de sommet." << std::endl;
+                exit(1);
+            }
             int l, r;
             sscanf(line.c_str(), "%d %d", &l, &r);
             g.matriceAdjacence[l][r] = 1;
@@ -45,7 +49,7 @@ Graph readGraph(std::string fileName) {
     return g;
 }
 
-void printGraph(Graph g) {
+void printGraph(const Graph &g) {
     std::cout << "Ordre de g: " << g.ordre << std::endl;
     for (unsigned int i = 0; i < g.ordre; i++) {
         for (unsigned int j = 0; j < g.ordre; j++) {
@@ -56,7 +60,7 @@ void printGraph(Graph g) {
     }
 }
 
-int getConnexeComposantesAmount(Graph g) {
+int getConnexeComposantesAmount(const Graph &g) {
     reached = new char[g.ordre];
     for (unsigned int i = 0; i < g.ordre; i++) {
         reached[i] = 0;
@@ -73,7 +77,7 @@ int getConnexeComposantesAmount(Graph g) {
     return connexeComposantesAmount;
 }
 
-void reachNeighbor(int s, Graph g) {
+void reachNeighbor(const unsigned int &s, const Graph &g) {
     if (!reached[s]) {
         reached[s] = '1';
         for (unsigned int i = s + 1; i < g.ordre; i++) {
