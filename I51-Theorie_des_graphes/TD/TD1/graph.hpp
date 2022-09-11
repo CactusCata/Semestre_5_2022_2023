@@ -17,7 +17,7 @@ Graph readGraph(const std::string &fileName);
 
 void printGraph(const Graph &g);
 
-int getConnexeComposantesAmount(const Graph &g);
+unsigned int getConnexeComposantesAmount(const Graph &g);
 
 void reachNeighbor(const unsigned int &s, const Graph &g);
 

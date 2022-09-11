@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
 
     printGraph(g);
 
-    std::string fileName = "graph1.txt";
+    std::string fileName("graph1.txt");
     g = readGraph(fileName);
     printGraph(g);
     std::cout << "Le nombre de composantes connexes de g est: " << getConnexeComposantesAmount(g) << std::endl;

@@ -60,15 +60,15 @@ void printGraph(const Graph &g) {
     }
 }
 
-int getConnexeComposantesAmount(const Graph &g) {
+unsigned int getConnexeComposantesAmount(const Graph &g) {
     reached = new char[g.ordre];
     for (unsigned int i = 0; i < g.ordre; i++) {
-        reached[i] = 0;
+        reached[i] = '0';
     }
 
-    int connexeComposantesAmount = 0;
+    unsigned int connexeComposantesAmount = 0;
     for (unsigned int s = 0; s < g.ordre; s++) {
-        if (!reached[s]) {
+        if (reached[s] == '0') {
             connexeComposantesAmount++;
             reachNeighbor(s, g);
         }
@@ -78,9 +78,9 @@ int getConnexeComposantesAmount(const Graph &g) {
 }
 
 void reachNeighbor(const unsigned int &s, const Graph &g) {
-    if (!reached[s]) {
+    if (reached[s] == '0') {
         reached[s] = '1';
-        for (unsigned int i = s + 1; i < g.ordre; i++) {
+        for (unsigned int i = 0; i < g.ordre; i++) {
             if (g.matriceAdjacence[s][i]) {
                 reachNeighbor(i, g);
             }
