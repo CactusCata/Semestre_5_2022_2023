@@ -11,5 +11,7 @@ int main(int argc, char *argv[]) {
     printGraph(g);
     std::cout << "Le nombre de composantes connexes de g est: " << getConnexeComposantesAmount(g) << std::endl;
 
+    std::cout << "Le graph est connexe: " << isConnexe(g) << std::endl;
+    std::cout << "Le graph est eulerien: " << isEulerien(g) << std::endl;
     return 0;
 }

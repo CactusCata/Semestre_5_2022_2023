@@ -1,0 +1,27 @@
+1.1:
+
+P := {
+	EXP -> 	  EXP+EXP
+		| EXP-EXP
+		| 0|1|2|3|4|5|6|7|8|9
+}
+
+Implémentation de l'associativité à gauche ( a op b op c = (a op b) op c ):
+On ajoute un non-terminale
+
+P := {
+	EXP -> 	  EXP+NB
+		| EXP-NB
+	
+	NB  ->  0|1|2|3|4|5|6|7|8|9
+}
+
+Suppression de la récursivité à gauche:
+
+P := {
+	EXP ->	  NBEXP'
+	EXP' ->   +NBEXP'
+		| -NBEXP'
+		| epsilon
+	NB ->	  0|1|2|3|4|5|6|7|8|9
+}

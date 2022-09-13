@@ -21,4 +21,8 @@ unsigned int getConnexeComposantesAmount(const Graph &g);
 
 void reachNeighbor(const unsigned int &s, const Graph &g);
 
+bool isConnexe(const Graph &g);
+
+bool isEulerien(const Graph &g);
+
 #endif

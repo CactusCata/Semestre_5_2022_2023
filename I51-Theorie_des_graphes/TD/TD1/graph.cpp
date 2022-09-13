@@ -87,3 +87,51 @@ void reachNeighbor(const unsigned int &s, const Graph &g) {
         }
     }
 }
+
+bool isConnexe(const Graph &g) {
+    reached = new char[g.ordre];
+    for (unsigned int i = 0; i < g.ordre; i++) {
+        reached[i] = '0';
+    }
+
+    reachNeighbor(0, g);
+
+    for (unsigned int i = 0; i < g.ordre; i++) {
+        if (reached[i] == '0') {
+            delete reached;
+            return false;
+        }
+    }
+
+    delete reached;
+    return true;
+}
+
+bool isEulerien(const Graph &g) {
+    reached = new char[g.ordre];
+    for (unsigned int i = 0; i < g.ordre; i++) {
+        reached[i] = '0';
+    }
+
+    if (!isConnexe(g)) {
+        delete reached;
+        return false;
+    }
+
+    for (unsigned int s = 0; s < g.ordre; s++) {
+        unsigned int edgeAmount = 0;
+        for (unsigned int col = 0; col < g.ordre; col++) {
+            if (g.matriceAdjacence[s][col] == 1) {
+                edgeAmount++;
+            }
+        }
+        
+        if (edgeAmount & 1) {
+            delete reached;
+            return false;
+        }
+    }
+
+    delete reached;
+    return true;
+}
