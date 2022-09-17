@@ -1,7 +1,7 @@
 CC=g++
 FLAGS=-Wall
 
-program.exe: main.o synthaxAnalyser.o
+program.exe: main.o synthaxAnalyser.o stack.o
 	$(CC) $(FLAGS) -o $@ $^
 
 main.o: main.cpp main.hpp
@@ -10,6 +10,8 @@ main.o: main.cpp main.hpp
 synthaxAnalyser.o: synthaxAnalyser.cpp synthaxAnalyser.hpp
 	$(CC) $(FLAGS) -c $<
 
+stack.o: stack.cpp stack.hpp
+	$(CC) $(FLAGS) -c $<
+
 clean:
-	rm *.o
-	rm *.exe
+	rm -f *.o *.exe *~

@@ -3,8 +3,7 @@
 char *cc;
 int ccPoint = 0;
 
-bool findError = false;
-int ccPointError = -1;
+Stack instructionsStack;
 
 void EXP_1() {
     NB();
@@ -19,7 +18,7 @@ void EXP_2() {
         ccPoint++;
         NB();
         EXP_2();
-        std::cout << op;
+        instructionsStack.push(op);
     }
 }
 
@@ -32,16 +31,13 @@ void NB() {
         if (cc[ccPoint] == digits[i]) {
             //std::cout << "[NB] Le nombre " << digits[i] << " a été trouvé." << std::endl;
             finded = true;
-            std::cout << cc[ccPoint];
+            instructionsStack.push(cc[ccPoint]);
             ccPoint++;
         }
     }
 
     if (!finded) {
-        if (!findError) {
-            findError = true;
-            ccPointError = ccPoint;
-        }
+        throwSyntaxError();
         //std::cout << "[NB] N'a pas trouve de nombre: " << ccPoint << std::endl;
     }
 }
@@ -49,11 +45,15 @@ void NB() {
 void isCorrect(char *cc1) {
     cc = cc1;
     EXP_1();
-    if (findError) {
-        std::cout << "Une erreur a ete trouvee a la lecture du caractere " << cc[ccPointError] << " (col " << ccPointError << ")" << std::endl;
-    } else if (cc[ccPoint] != '\0') {
+    if (cc[ccPoint] != '\0') {
         std::cout << "Une erreur a ete trouvee a la lecture du caractere " << cc[ccPoint] << " (col " << ccPoint << ")" << std::endl;
     } else {
         std::cout << "Expression correcte" << std::endl;
+        instructionsStack.print();
     }
+}
+
+void throwSyntaxError() {
+    std::cout << "Une erreur a ete trouvee a la lecture du caractere " << cc[ccPoint] << " (col " << ccPoint << ")" << std::endl;
+    exit(0);
 }

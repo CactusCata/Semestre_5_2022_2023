@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "synthaxAnalyser.hpp"
+#include "stack.hpp"
 
 int main(int argc, char *argv[]);
 
