@@ -6,4 +6,6 @@
 
 int main(int argc, char *argv[]);
 
+void exo4Bis();
+
 #endif

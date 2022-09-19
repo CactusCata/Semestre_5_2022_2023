@@ -31,7 +31,12 @@ class Complexe {
         Complexe operator -(const Complexe &z) const;
         Complexe operator *(const Complexe &z) const;
         Complexe operator /(const Complexe &z) const;
-        bool equals(const Complexe &z) const;
+        bool operator ==(const Complexe &z) const;
+
+        void Sum1(const Complexe& z);
+        Complexe Sum2(const Complexe& z);
+        Complexe Sum3(const Complexe& z);
+        Complexe& Sum4(const Complexe& z);
 
 };
 

@@ -98,6 +98,27 @@ Complexe Complexe::operator /(const Complexe &z) const {
 }
 
 
-bool Complexe::equals(const Complexe &z) const {
+bool Complexe::operator ==(const Complexe &z) const {
     return this->getReal() == z.getReal() && this->getImaginary() == z.getImaginary();
+}
+
+void Complexe::Sum1(const Complexe& z) {
+    m_real = m_real + z.m_real;
+    m_imaginary = m_imaginary + z.m_imaginary;
+}
+
+Complexe Complexe::Sum2(const Complexe& z) {
+    return Complexe(m_real + z.m_real, m_imaginary + z.m_imaginary);
+}
+
+Complexe Complexe::Sum3(const Complexe& z) {
+    m_real = m_real + z.m_real;
+    m_imaginary = m_imaginary + z.m_imaginary;
+    return *this;
+}
+
+Complexe& Complexe::Sum4(const Complexe& z) {
+    m_real = m_real + z.m_real;
+    m_imaginary = m_imaginary + z.m_imaginary;
+    return *this;
 }
