@@ -7,7 +7,10 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    char *arithmeticSentence = argv[1];
-    isCorrect(arithmeticSentence);
+    std::string lexicalAnalyse = analex(argv[1], 5);
+    std::cout << "Résultat: " << lexicalAnalyse << std::endl;
+
+    //char *arithmeticSentence = argv[1];
+    //isCorrect(arithmeticSentence);
 
 }

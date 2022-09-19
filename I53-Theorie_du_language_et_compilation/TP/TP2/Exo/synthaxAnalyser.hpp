@@ -3,10 +3,14 @@
 
 #include <iostream>
 #include "stack.hpp"
+#include "lexiconPart.hpp"
 
-void Z();
-void EXP_1();
-void EXP_2();
+void axiom();
+void E_1();
+void E_2();
+void T_1();
+void T_2();
+void P();
 void NB();
 
 void isCorrect(char *cc);

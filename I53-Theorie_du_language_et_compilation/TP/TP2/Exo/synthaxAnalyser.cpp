@@ -5,46 +5,68 @@ int ccPoint = 0;
 
 Stack instructionsStack;
 
-void EXP_1() {
-    NB();
-    EXP_2();
+void E_1() {
+    T_1();
+    E_2();
 }
 
-void EXP_2() {
-    //std::cout << "[E2] Recherche de + ou - " << std::endl;
+void E_2() {
     char op = cc[ccPoint];
     if (op == '+' || op == '-') {
-        //std::cout << "[E2] + ou - trouvé: " << std::endl;
         ccPoint++;
-        NB();
-        EXP_2();
+        T_1();
+        E_2();
         instructionsStack.push(op);
     }
 }
 
-void NB() {
-    //std::cout << "[E2] Recherche d'un nombre: " << ccPoint << std::endl;
-    char digits[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
-    bool finded = false;
-    for (unsigned int i = 0; i < 10 && !finded; i++) {
-        //std::cout << cc[ccPoint] << " : " << digits[i] << std::endl;
-        if (cc[ccPoint] == digits[i]) {
-            //std::cout << "[NB] Le nombre " << digits[i] << " a été trouvé." << std::endl;
-            finded = true;
-            instructionsStack.push(cc[ccPoint]);
-            ccPoint++;
+void T_1() {
+    P();
+    T_2();
+}
+
+void T_2() {
+    char op = cc[ccPoint];
+    if (op == '*' || op == '/') {
+        ccPoint++;
+        P();
+        T_2();
+        instructionsStack.push(op);
+    }
+}
+
+void P() {
+    if (cc[ccPoint] == '(') {
+        instructionsStack.push('(');
+        ccPoint++;
+        E_1();
+        if (cc[ccPoint] != ')') {
+            throwSyntaxError();
         }
+        instructionsStack.push(')');
+        ccPoint++;
+    } else {
+        NB();
     }
 
-    if (!finded) {
+
+}
+
+void NB() {
+    //std::cout << "[E2] Recherche d'un nombre: " << ccPoint << std::endl;
+    
+    if (digits.isInCategory(cc[ccPoint])) {
+        instructionsStack.push(cc[ccPoint]);
+        ccPoint++;
+    } else {
         throwSyntaxError();
-        //std::cout << "[NB] N'a pas trouve de nombre: " << ccPoint << std::endl;
     }
+    
 }
 
 void isCorrect(char *cc1) {
     cc = cc1;
-    EXP_1();
+    E_1();
     if (cc[ccPoint] != '\0') {
         std::cout << "Une erreur a ete trouvee a la lecture du caractere " << cc[ccPoint] << " (col " << ccPoint << ")" << std::endl;
     } else {

@@ -1,7 +1,7 @@
 CC=g++
 FLAGS=-Wall
 
-program.exe: main.o synthaxAnalyser.o stack.o
+program.exe: main.o synthaxAnalyser.o stack.o lexicalAnalyser.o lexiconPart.o
 	$(CC) $(FLAGS) -o $@ $^
 
 main.o: main.cpp main.hpp
@@ -11,6 +11,12 @@ synthaxAnalyser.o: synthaxAnalyser.cpp synthaxAnalyser.hpp
 	$(CC) $(FLAGS) -c $<
 
 stack.o: stack.cpp stack.hpp
+	$(CC) $(FLAGS) -c $<
+
+lexicalAnalyser.o: lexicalAnalyser.cpp lexicalAnalyser.hpp
+	$(CC) $(FLAGS) -c $<
+
+lexiconPart.o: lexiconPart.cpp lexiconPart.hpp
 	$(CC) $(FLAGS) -c $<
 
 clean:
