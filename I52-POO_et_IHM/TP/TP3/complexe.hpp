@@ -23,7 +23,7 @@ class Complexe {
         Complexe getConjugue() const;
         double getModulo() const;
         void print() const;
-        Comlexe Sum(const Complexe &z);
+        Complexe& Sum(const Complexe &z);
         Complexe& operator +=(const Complexe &z);
         Complexe& operator -=(const Complexe &z);
         Complexe& operator *=(const Complexe &z);

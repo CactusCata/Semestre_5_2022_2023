@@ -1,8 +1,12 @@
 #include "complexe.hpp"
 
+static Complexe zLocalFile(2, 3);
+
 Complexe::Complexe(double real, double imaginary) {
     this->setReal(real);
     this->setImaginary(imaginary);
+    std::cout << "Creation d'un constructeur: (" << this->getReal() << ',' << this->getImaginary() << ')' << std::endl;
+
 }
 
 Complexe::Complexe():
@@ -18,7 +22,7 @@ Complexe(z.getReal(), z.getImaginary())
 }
 
 Complexe::~Complexe() {
-    std::cerr << "Destructeur de complexe appele" << std::endl;
+    std::cout << "Appelle d'un destructeur: (" << this->getReal() << ',' << this->getImaginary() << ')' << std::endl;
 }
 
 double Complexe::getReal() const {
@@ -56,7 +60,7 @@ void Complexe::print() const {
     std::cout << this->getReal() << sign << "ix" << imgAbs << std::endl;
 }
 
-Complexe::Comlexe Sum(const Complexe &z) {
+Complexe& Complexe::Sum(const Complexe &z) {
     return *this += z;
 }
 

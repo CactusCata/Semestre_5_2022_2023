@@ -2,7 +2,7 @@ CC=g++
 CFLAGS=-Wall
 
 program.exe: main.o libcomplexe.a
-	$(CC) $(CFLAGS) main.o -lcomplexe -o $@
+	$(CC) $(CFLAGS) main.o -L. -lcomplexe -o $@
 
 main.o: main.cpp main.hpp
 	$(CC) $(CFLAGS) -c $<
