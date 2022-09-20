@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]) {
     
-    Graph g = readGraph("graphdd.dat");
+    Graph g = readGraph("graph.dat");
     printGraph(g);
 
 
