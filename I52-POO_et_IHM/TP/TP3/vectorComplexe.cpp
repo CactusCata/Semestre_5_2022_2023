@@ -17,3 +17,5 @@ VecteurComplexe::VecteurComplexe(ifstream& fStream) {
 VecteurComplexe::~VecteurComplexe() {
     delete [] this->m_complexes;
 }
+
+// git remote set-url origin git@github.com:username/your-repository.git
