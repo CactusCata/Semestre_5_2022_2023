@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include "stack.hpp"
-#include "lexiconPart.hpp"
+#include "lexiconPartEnum.hpp"
 
 void axiom();
 void E_1();

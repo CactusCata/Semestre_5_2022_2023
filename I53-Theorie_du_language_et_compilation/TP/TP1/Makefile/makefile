@@ -10,11 +10,12 @@ crible: crible.c
 # Le paramètre -l permet de dire jusqu'à
 # quelle valeur en puissance de deux l'algorithme
 # va chercher.
-# 
+#
 # Le paramètre -p correspond au nombre
 # de print (notion de pas)
 data.dat: crible.exe
-	./crible.exe -p100 -l10 | sed "s/pi(//g" | sed "s/)/ /g" > data.dat
+	./crible.exe -p100 -l10 | sed "s/pi(//g" | sed "s/)/ /g" >> data.dat
+
 #./crible.exe -p100 -l10 > tmp; cat tmp | sed "s/pi(//g" | sed "s/)=/ /g" > data.dat
 
 # Question 3
@@ -26,12 +27,10 @@ pi.png: data.dat data.plot
 
 # Question 4
 timing.png: crible
-	touch timing.dat
-	rm timing.dat
-	touch timing.dat
-	for i in {10..28}
-	do
-		./crible.exe $$i > timing.dat
+	> timing.dat
+	for i in {10..28}; \
+	do \
+		./crible -t -l $$i >> timing.dat \
 	done
 	gnuplot timing.plot
 
@@ -40,7 +39,7 @@ criblesOX.exe: crible.c
 	gcc -g -Wall -O1 ./crible.c -o cribleO1.exe
 	gcc -g -Wall -O2 ./crible.c -o cribleO2.exe
 	gcc -g -Wall -O3 ./crible.c -o cribleO3.exe
-	
+
 timingOx.png: criblesOX.exe timing.dat
 	touch timingO1.dat
 	rm timingO1.dat
