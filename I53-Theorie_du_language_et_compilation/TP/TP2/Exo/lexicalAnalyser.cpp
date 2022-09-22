@@ -1,7 +1,7 @@
 #include "lexicalAnalyser.hpp"
 
-std::vector<LexiconPart> analex(const std::string text) {
-    std::vector<LexiconPart> lexiconsParts;
+std::vector<LexiconPart *> analex(const std::string text) {
+    std::vector<LexiconPart *> lexiconsParts;
     for (unsigned int i = 0; i < text.length();) {
         appendLexicalUnit(lexiconsParts, text, i);
 
@@ -11,10 +11,10 @@ std::vector<LexiconPart> analex(const std::string text) {
     }
 
     //anaL.append("]");
-    return anaL;
+    return lexiconsParts;
 }
 
-void appendLexicalUnit(std::vector<LexiconPart> &lexiconsParts, const std::string &text, unsigned int &i) {
+void appendLexicalUnit(std::vector<LexiconPart *> &lexiconsParts, const std::string &text, unsigned int &i) {
     bool foundGroup = false;
     unsigned char c = text[i];
 
@@ -29,12 +29,11 @@ void appendLexicalUnit(std::vector<LexiconPart> &lexiconsParts, const std::strin
 
             c = text[++i];
         }
-        lexiconsParts.push_back(digits.serialize(number))
-        lexicalsUnits.append(digits.serialize(number));
+        lexiconsParts.push_back(digits.createLexiconPart(number));
     } else {
-        for (LexiconPart lexical : lexicons) {
+        for (LexiconType lexical : lexicons) {
             if (lexical.isInCategory(c)) {
-                lexicalsUnits.append(lexical.serialize(c));
+                lexiconsParts.push_back(lexical.createLexiconPart(c));
                 foundGroup = true;
                 break;
             }

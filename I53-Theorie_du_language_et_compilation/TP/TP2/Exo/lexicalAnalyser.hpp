@@ -5,10 +5,10 @@
 #include "lexiconTypeEnum.hpp"
 #include "lexiconPart.hpp"
 
-std::string analex(const std::string text);
+std::vector<LexiconPart *> analex(const std::string text);
 
 void throwLexicalAnalyserError(const char& orphan);
 
-void appendLexicalUnit(std::string &lexicalsUnits, const std::string &text, unsigned int &i);
+void appendLexicalUnit(std::vector<LexiconPart *> &lexiconsParts, const std::string &text, unsigned int &i);
 
 #endif

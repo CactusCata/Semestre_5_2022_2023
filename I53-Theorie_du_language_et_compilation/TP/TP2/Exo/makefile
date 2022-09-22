@@ -1,29 +1,40 @@
 CC=g++
 FLAGS=-Wall
-
+OBJ=main.o lexicalAnalyser.o synthaxAnalyser.o stack.o utils.o lexiconPart.o lexiconPartChar.o lexiconPartString.o lexiconType.o lexiconTypeEnum.o
 
 # Build .exe executable
-program.exe: main.o synthaxAnalyser.o stack.o lexicalAnalyser.o lexiconPart.o utils.o numberLexiconPart.o
+program.exe: $(OBJ)
 	$(CC) $(FLAGS) -o $@ $^
 
 
 # Build .o objects
-main.o: main.cpp main.hpp
-	$(CC) $(FLAGS) -c $<
-
-synthaxAnalyser.o: synthaxAnalyser.cpp synthaxAnalyser.hpp
-	$(CC) $(FLAGS) -c $<
-
-stack.o: stack.cpp stack.hpp
-	$(CC) $(FLAGS) -c $<
 
 lexicalAnalyser.o: lexicalAnalyser.cpp lexicalAnalyser.hpp
+	$(CC) $(FLAGS) -c $<
+
+lexiconPartChar.o: lexiconPartChar.cpp lexiconPartChar.hpp
+	$(CC) $(FLAGS) -c $<
+
+lexiconPartString.o: lexiconPartString.cpp lexiconPartString.hpp
 	$(CC) $(FLAGS) -c $<
 
 lexiconPart.o: lexiconPart.cpp lexiconPart.hpp
 	$(CC) $(FLAGS) -c $<
 
-numberLexiconPart.o: numberLexiconPart.cpp numberLexiconPart.hpp
+
+lexiconType.o: lexiconType.cpp lexiconType.hpp
+	$(CC) $(FLAGS) -c $<
+
+lexiconTypeEnum.o: lexiconTypeEnum.cpp lexiconTypeEnum.hpp
+	$(CC) $(FLAGS) -c $<
+
+main.o: main.cpp main.hpp
+	$(CC) $(FLAGS) -c $<
+
+stack.o: stack.cpp stack.hpp
+	$(CC) $(FLAGS) -c $<
+
+synthaxAnalyser.o: synthaxAnalyser.cpp synthaxAnalyser.hpp
 	$(CC) $(FLAGS) -c $<
 
 utils.o: utils.cpp utils.hpp

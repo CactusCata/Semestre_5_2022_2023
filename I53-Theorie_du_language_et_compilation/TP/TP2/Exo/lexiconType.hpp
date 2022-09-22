@@ -5,6 +5,8 @@
 #include <vector>
 
 #include "lexiconPart.hpp"
+#include "lexiconPartChar.hpp"
+#include "lexiconPartString.hpp"
 
 class LexiconType {
 
@@ -15,7 +17,8 @@ class LexiconType {
     public:
         LexiconType(const std::vector<char>& symbols, const std::string& name);
 
-        LexiconPart serialize(const char& symbol) const;
+        LexiconPartChar* createLexiconPart(const char& symbol) const;
+        LexiconPartString* createLexiconPart(const std::string& text) const;
         bool isInCategory(const char& symbol) const;
 
 };

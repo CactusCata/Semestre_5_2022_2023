@@ -1,26 +1,24 @@
 #include "lexiconType.hpp"
 
-LexiconPart::LexiconPart(const std::vector<char>& symbolss, const std::string& name):
-m_symbols(std::move(symbolss)),
+LexiconType::LexiconType(const std::vector<char>& symbols, const std::string& name):
+m_symbols(std::move(symbols)),
 m_name(std::move(name))
 {
 }
 
-std::string LexiconType::serialize(const char& symbol) {
-    std::string serialized;
-    serialized.append("('");
-    serialized.append(m_name);
-    serialized.append("',");
-    serialized.push_back(symbol);
-    serialized.append(")");
-    return serialized;
+LexiconPartChar* LexiconType::createLexiconPart(const char& symbol) const {
+    LexiconPartChar *lexicon = new LexiconPartChar(this->m_name, symbol);
+    return lexicon;
 }
 
-bool LexiconType::isInCategory(const char& symbol) {
+LexiconPartString* LexiconType::createLexiconPart(const std::string& text) const {
+    LexiconPartString *lexicon = new LexiconPartString(this->m_name, text);
+    return lexicon;
+}
+
+bool LexiconType::isInCategory(const char& symbol) const {
     for (const char &c : this->m_symbols) {
-        std::cout << c << " " << symbol << std::endl;
         if (c == symbol) {
-            std::cout << "founded" << std::endl;
             return true;
         }
     }
