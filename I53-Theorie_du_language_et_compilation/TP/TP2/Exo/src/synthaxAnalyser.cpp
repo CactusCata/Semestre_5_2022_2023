@@ -11,6 +11,7 @@ void E_1() {
 }
 
 void E_2() {
+    // Addition ou soustraction
     LexiconPart *lp = getLexiconPart();
     if (lp->getLexiconTypeName() == LEXICON_OPERATOR_ADD_SUB_TYPE) {
         lexiconIndex++;
@@ -26,6 +27,7 @@ void T_1() {
 }
 
 void T_2() {
+    // Multiplication ou division
     LexiconPart *lp = getLexiconPart();
     if (lp->getLexiconTypeName() == LEXICON_OPERATOR_MULT_DIV_TYPE) {
         lexiconIndex++;
