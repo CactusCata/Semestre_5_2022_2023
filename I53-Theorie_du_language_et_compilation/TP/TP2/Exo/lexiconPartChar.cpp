@@ -10,9 +10,9 @@ std::string LexiconPartChar::serialize() {
     std::string serialized;
     serialized.append("('");
     serialized.append(this->m_lexiconTypeName);
-    serialized.append("',");
+    serialized.append("','");
     serialized.push_back(this->m_value);
-    serialized.append(")");
+    serialized.append("')");
     return serialized;
 }
 

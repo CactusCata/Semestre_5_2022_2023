@@ -17,7 +17,7 @@ const std::string LEXICON_BRACKET_LEFT_TYPE = "BRACKET_L";
 const LexiconType bracketLeft({'('}, LEXICON_BRACKET_LEFT_TYPE);
 
 const std::string LEXICON_BRACKET_RIGHT_TYPE = "BRACKET_R";
-const LexiconType bracketRight({')'}, LEXICON_BRACKET_LEFT_TYPE);
+const LexiconType bracketRight({')'}, LEXICON_BRACKET_RIGHT_TYPE);
 
 // use empty space bar character because he is removed before all (check main.cpp)
 const std::string LEXICON_OUT_OF_BOUNDS = "OUT_OF_BOUNDS";

@@ -38,13 +38,14 @@ void T_2() {
 void P() {
     LexiconPart *lp = getLexiconPart();
     if (lp->getLexiconTypeName() == LEXICON_BRACKET_LEFT_TYPE) {
-        instructionsStack.push(lp);
+        //instructionsStack.push(lp);
         lexiconIndex++;
         E_1();
-        if (lp->getLexiconTypeName() != LEXICON_BRACKET_RIGHT_TYPE) {
+        LexiconPart *newLp = getLexiconPart();
+        if (newLp->getLexiconTypeName() != LEXICON_BRACKET_RIGHT_TYPE) {
             throwSyntaxError();
         }
-        instructionsStack.push(lp);
+        //instructionsStack.push(newLp);
         lexiconIndex++;
     } else {
         NB();
