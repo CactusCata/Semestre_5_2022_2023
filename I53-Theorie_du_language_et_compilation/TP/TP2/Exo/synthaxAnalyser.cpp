@@ -68,7 +68,6 @@ void NB() {
 void isCorrect(const std::vector<LexiconPart *> &lp) {
     lexiconsParts = lp;
     E_1();
-    std::cout << "lol";
     if (lexiconsParts.size() != lexiconIndex) {
         std::cout << "Une erreur a ete trouvee a la lecture du caractere " << lexiconsParts.at(lexiconIndex)->getChar() << " (col " << lexiconIndex << ")" << std::endl;
     } else {
@@ -78,7 +77,6 @@ void isCorrect(const std::vector<LexiconPart *> &lp) {
 }
 
 void throwSyntaxError() {
-    std::cout << "Tentative d'envoi d'erreur..." << std::endl;
     if (lexiconIndex >= lexiconsParts.size()) {
         std::cout << "Des caracteres etaient encore attendus a la fin de la chaine." << std::endl;
     } else {

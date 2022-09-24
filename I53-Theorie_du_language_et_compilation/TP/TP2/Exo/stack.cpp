@@ -8,7 +8,7 @@ Stack::Stack() {
 void Stack::print() {
     std::cout << '(';
     if (first != nullptr) {
-        std::cout << first->item;
+        std::cout << first->item->serialize();
         Element *e = first->next;
         while (e != nullptr) {
             std::cout << ", " << e->item->serialize();
