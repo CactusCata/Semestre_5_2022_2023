@@ -1,7 +1,7 @@
 #include "synthaxAnalyser.hpp"
 
-char *cc;
-int ccPoint = 0;
+std::vector<LexiconPart *> lexiconsParts;
+size_t lexiconIndex = 0;
 
 Stack instructionsStack;
 
@@ -11,12 +11,12 @@ void E_1() {
 }
 
 void E_2() {
-    char op = cc[ccPoint];
-    if (op == '+' || op == '-') {
-        ccPoint++;
+    LexiconPart *lp = getLexiconPart();
+    if (lp->getLexiconTypeName() == LEXICON_OPERATOR_ADD_SUB_TYPE) {
+        lexiconIndex++;
         T_1();
         E_2();
-        instructionsStack.push(op);
+        instructionsStack.push(lp);
     }
 }
 
@@ -26,25 +26,26 @@ void T_1() {
 }
 
 void T_2() {
-    char op = cc[ccPoint];
-    if (op == '*' || op == '/') {
-        ccPoint++;
+    LexiconPart *lp = getLexiconPart();
+    if (lp->getLexiconTypeName() == LEXICON_OPERATOR_MULT_DIV_TYPE) {
+        lexiconIndex++;
         P();
         T_2();
-        instructionsStack.push(op);
+        instructionsStack.push(lp);
     }
 }
 
 void P() {
-    if (cc[ccPoint] == '(') {
-        instructionsStack.push('(');
-        ccPoint++;
+    LexiconPart *lp = getLexiconPart();
+    if (lp->getLexiconTypeName() == LEXICON_BRACKET_LEFT_TYPE) {
+        instructionsStack.push(lp);
+        lexiconIndex++;
         E_1();
-        if (cc[ccPoint] != ')') {
+        if (lp->getLexiconTypeName() != LEXICON_BRACKET_RIGHT_TYPE) {
             throwSyntaxError();
         }
-        instructionsStack.push(')');
-        ccPoint++;
+        instructionsStack.push(lp);
+        lexiconIndex++;
     } else {
         NB();
     }
@@ -53,22 +54,23 @@ void P() {
 }
 
 void NB() {
-    //std::cout << "[E2] Recherche d'un nombre: " << ccPoint << std::endl;
     
-    if (digits.isInCategory(cc[ccPoint])) {
-        instructionsStack.push(cc[ccPoint]);
-        ccPoint++;
+    LexiconPart *lp = getLexiconPart();
+    if (lp->getLexiconTypeName() == LEXICON_DIGIT_TYPE) {
+        lexiconIndex++;
+        instructionsStack.push(lp);
     } else {
         throwSyntaxError();
     }
     
 }
 
-void isCorrect(char *cc1) {
-    cc = cc1;
+void isCorrect(const std::vector<LexiconPart *> &lp) {
+    lexiconsParts = lp;
     E_1();
-    if (cc[ccPoint] != '\0') {
-        std::cout << "Une erreur a ete trouvee a la lecture du caractere " << cc[ccPoint] << " (col " << ccPoint << ")" << std::endl;
+    std::cout << "lol";
+    if (lexiconsParts.size() != lexiconIndex) {
+        std::cout << "Une erreur a ete trouvee a la lecture du caractere " << lexiconsParts.at(lexiconIndex)->getChar() << " (col " << lexiconIndex << ")" << std::endl;
     } else {
         std::cout << "Expression correcte" << std::endl;
         instructionsStack.print();
@@ -76,6 +78,19 @@ void isCorrect(char *cc1) {
 }
 
 void throwSyntaxError() {
-    std::cout << "Une erreur a ete trouvee a la lecture du caractere " << cc[ccPoint] << " (col " << ccPoint << ")" << std::endl;
+    std::cout << "Tentative d'envoi d'erreur..." << std::endl;
+    if (lexiconIndex >= lexiconsParts.size()) {
+        std::cout << "Des caracteres etaient encore attendus a la fin de la chaine." << std::endl;
+    } else {
+        lexiconsParts.at(lexiconIndex)->throwError();
+    }
     exit(0);
+}
+
+LexiconPart *getLexiconPart() {
+    if (lexiconIndex < lexiconsParts.size()) {
+        return lexiconsParts[lexiconIndex];
+    } else {
+        return bracketOutOfBounds.createLexiconPart(" ");
+    }
 }

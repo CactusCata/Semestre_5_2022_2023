@@ -15,11 +15,8 @@ int main(int argc, char *argv[]) {
     for (unsigned int i = 0; i < lexiconsParts.size() - 1; i++) {
         std::cout << lexiconsParts.at(i)->serialize() << ','; 
     }
-
     std::cout << lexiconsParts.at(lexiconsParts.size() - 1)->serialize() << std::endl;
-    //std::cout << "Résultat: " << lexiconsParts << std::endl;
 
-    //char *arithmeticSentence = argv[1];
-    //isCorrect(arithmeticSentence);
+    isCorrect(lexiconsParts);
 
 }

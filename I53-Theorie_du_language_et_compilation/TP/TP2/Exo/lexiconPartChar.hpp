@@ -15,7 +15,9 @@ class LexiconPartChar : public LexiconPart {
 
         virtual std::string serialize();
 
-
+        virtual char getChar() const;
+        virtual std::string getString() const;
+        virtual void throwError() const;
 
 };
 

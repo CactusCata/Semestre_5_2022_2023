@@ -2,8 +2,9 @@
 #define LEXICON_PART_HPP
 
 #include <iostream>
+#include "serializable.hpp"
 
-class LexiconPart {
+class LexiconPart : public Serializable {
 
     protected:
         std::string m_lexiconTypeName;
@@ -12,7 +13,12 @@ class LexiconPart {
 
         LexiconPart(const std::string& lexiconTypeName);
 
-        virtual std::string serialize() = 0;
+        std::string getLexiconTypeName();
+
+        virtual char getChar() const = 0;
+        virtual std::string getString() const = 0;
+        virtual void throwError() const = 0;
+
 
 };
 

@@ -2,8 +2,11 @@
 #define SYNTHAX_ANALYSER_HPP
 
 #include <iostream>
+#include <vector>
+
 #include "stack.hpp"
 #include "lexiconTypeEnum.hpp"
+#include "lexiconPart.hpp"
 
 void axiom();
 void E_1();
@@ -13,9 +16,11 @@ void T_2();
 void P();
 void NB();
 
-void isCorrect(char *cc);
+void isCorrect(const std::vector<LexiconPart *> &lexiconsParts);
 
 void throwSyntaxError();
+
+LexiconPart *getLexiconPart();
 
 
 #endif

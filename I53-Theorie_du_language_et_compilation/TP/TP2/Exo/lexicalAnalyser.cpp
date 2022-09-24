@@ -2,15 +2,11 @@
 
 std::vector<LexiconPart *> analex(const std::string text) {
     std::vector<LexiconPart *> lexiconsParts;
+
     for (unsigned int i = 0; i < text.length();) {
         appendLexicalUnit(lexiconsParts, text, i);
-
-        //if (i + 1 < text.length()) {
-        //    anaL.append(",");
-        //}
     }
 
-    //anaL.append("]");
     return lexiconsParts;
 }
 

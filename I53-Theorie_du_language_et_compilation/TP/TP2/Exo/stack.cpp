@@ -8,20 +8,20 @@ Stack::Stack() {
 void Stack::print() {
     std::cout << '(';
     if (first != nullptr) {
-        std::cout << first->value;
+        std::cout << first->item;
         Element *e = first->next;
         while (e != nullptr) {
-            std::cout << ", " << e->value;
+            std::cout << ", " << e->item->serialize();
             e = e->next;
         }
     }
     std::cout << ')' << std::endl;
 }
 
-Element* Stack::newElement(char value) {
+Element* Stack::newElement(Serializable *item) {
     Element* e = new Element;
     e->next = nullptr;
-    e->value = value;
+    e->item = item;
     return e;
 }
 
@@ -36,8 +36,8 @@ bool Stack::push(Element* e) {
     return true;
 }
 
-bool Stack::push(char value) {
-    Element *e = newElement(value);
+bool Stack::push(Serializable *item) {
+    Element *e = newElement(item);
     bool successfullyPush = push(e);
     
     if (!successfullyPush) {
@@ -47,17 +47,17 @@ bool Stack::push(char value) {
     return successfullyPush;
 }
 
-char Stack::pop() {
+Serializable *Stack::pop() {
 
     Element* e = first;
     if (e != nullptr) {
         first = e->next;
         size--;
-        char c = e->value;
+        Serializable *c = e->item;
         delete e;
         return c;
     }
     
     size--;
-    return '?';
+    return nullptr;
 }

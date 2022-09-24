@@ -15,3 +15,15 @@ std::string LexiconPartChar::serialize() {
     serialized.append(")");
     return serialized;
 }
+
+char LexiconPartChar::getChar() const {
+    return this->m_value;
+}
+
+std::string LexiconPartChar::getString() const {
+    return "";
+}
+
+void LexiconPartChar::throwError() const {
+    std::cout << "Error lors de la lecture du caractere '" << this->getChar() << "'."; 
+}

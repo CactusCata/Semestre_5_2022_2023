@@ -2,10 +2,11 @@
 #define STACK_HPP
 
 #include <iostream>
+#include "serializable.hpp"
 
 typedef struct Element {
     Element *next;
-    char value;
+    Serializable *item;
 } Element;
 
 class Stack {
@@ -14,15 +15,15 @@ class Stack {
         unsigned int size;
         Element* first;
 
-        Element* newElement(char value);
+        Element* newElement(Serializable *item);
         bool push(Element* e);
 
     public:
         Stack();
         void print();
-        bool push(char c);
+        bool push(Serializable *item);
 
-        char pop();
+        Serializable *pop();
 
 };
 
