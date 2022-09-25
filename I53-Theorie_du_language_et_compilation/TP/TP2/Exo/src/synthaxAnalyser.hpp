@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "stack.hpp"
+#include "queue.hpp"
 #include "lexiconTypeEnum.hpp"
 #include "lexiconPart.hpp"
 
@@ -16,7 +17,7 @@ void T_2();
 void P();
 void NB();
 
-void isCorrect(const std::vector<LexiconPart *> &lexiconsParts);
+Queue analSynthax(const std::vector<LexiconPart *> &lexiconsParts);
 
 void throwSyntaxError();
 

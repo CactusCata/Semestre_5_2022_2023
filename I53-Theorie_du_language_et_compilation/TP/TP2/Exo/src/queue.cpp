@@ -1,11 +1,11 @@
-#include "stack.hpp"
+#include "queue.hpp"
 
-Stack::Stack() {
+Queue::Queue() {
     first = nullptr;
     size = 0;
 }
 
-void Stack::print() {
+void Queue::print() {
     std::cout << '(';
     if (first != nullptr) {
         std::cout << first->item->serialize();
@@ -18,27 +18,35 @@ void Stack::print() {
     std::cout << ')' << std::endl;
 }
 
-Element* Stack::newElement(Serializable *item) {
+Element* Queue::newElement(Serializable *item) {
     Element* e = new Element;
     e->next = nullptr;
     e->item = item;
     return e;
 }
 
-bool Stack::push(Element* e) {
+bool Queue::add(Element* e) {
     if (e == nullptr) {
         return false;
     }
 
-    e->next = first;
-    first = e;
+    if (isEmpty()) {
+        first = e;
+    } else {
+        Element *current = first;
+        while (current->next != nullptr) {
+            current = current->next;
+        }
+        current->next = e;
+    }
+
     size++;
     return true;
 }
 
-bool Stack::push(Serializable *item) {
+bool Queue::add(Serializable *item) {
     Element *e = newElement(item);
-    bool successfullyPush = push(e);
+    bool successfullyPush = add(e);
     
     if (!successfullyPush) {
         delete e;
@@ -47,10 +55,14 @@ bool Stack::push(Serializable *item) {
     return successfullyPush;
 }
 
-Serializable *Stack::pop() {
+bool Queue::isEmpty() {
+    return first == nullptr;
+}
+
+Serializable *Queue::get() {
 
     Element* e = first;
-    if (!isEmpty()) {
+    if (e != nullptr) {
         first = e->next;
         size--;
         Serializable *c = e->item;
@@ -60,8 +72,4 @@ Serializable *Stack::pop() {
     
     size--;
     return nullptr;
-}
-
-bool Stack::isEmpty() {
-    return first == nullptr;
 }

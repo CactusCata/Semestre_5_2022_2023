@@ -3,12 +3,20 @@
 int main(int argc, char *argv[]) {
 
     if (argc <= 1) {
-        std::cout << "You must specify an arithmetic sentence." << std::endl;
+        std::cout << "You must specify a file or an arithmetic sentence." << std::endl;
         return 1;
     }
 
+    std::ifstream arithmeticFile(argv[1]);
+    std::string text;
 
-    std::string text = charsToString(argv[1]);
+    if (!arithmeticFile) {
+        std::cout << "File not found, try to resolve as arithmetic expression." << std::endl;
+        text = charsToString(argv[1]);
+    } else {
+        std::getline(arithmeticFile, text);
+    }
+
     std::string lexicalAnalyse = erase(text, ' ');
     std::vector<LexiconPart *> lexiconsParts = analex(lexicalAnalyse);
 
@@ -17,6 +25,10 @@ int main(int argc, char *argv[]) {
     }
     std::cout << lexiconsParts.at(lexiconsParts.size() - 1)->serialize() << std::endl;
 
-    isCorrect(lexiconsParts);
+    Queue queue = analSynthax(lexiconsParts);
+    
+    createThreeAddressCode("a.out", queue);
+
+
 
 }
