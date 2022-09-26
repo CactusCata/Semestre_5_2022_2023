@@ -1,7 +1,10 @@
 #ifndef VECTOR_COMPLEXE_HPP
 #define VECTOR_COMPLEXE_HPP
 
-class vectorComplexe {
+#include "complexe.hpp"
+#include <fstream>
+
+class VectorComplexe {
 
     private:
         unsigned short m_size;
@@ -9,12 +12,14 @@ class vectorComplexe {
 
     public:
       // construction a partir d'un tableau de complexes
-      VecteurComplexe (const Complexe* complexes, unsigned short size);
+      VectorComplexe (const Complexe* complexes, unsigned short size);
 
       // construction a partir du contenu d'un fichier
-      VecteurComplexe (ifstream& fStream);
+      VectorComplexe (std::ifstream& fStream);
 
-      ~VecteurComplexe();
+      ~VectorComplexe();
+
+      void print();
 
 };
 

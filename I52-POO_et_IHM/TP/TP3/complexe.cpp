@@ -42,22 +42,21 @@ void Complexe::setImaginary(double imaginary) {
 }
 
 Complexe Complexe::getConjugue() const {
-    Complexe z(this->getReal(), -this->getImaginary());
-    return z;
+    return Complexe(this->getReal(), -this->getImaginary());
 }
 
 double Complexe::getModulo() const {
     return sqrt(this->getReal() * this->getReal() + this->getImaginary() * this->getImaginary());
 }
 
-void Complexe::print() const {
+std::string Complexe::print() const {
     char sign = '+';
     float imgAbs = this->getImaginary();
     if (imgAbs < 0) {
       sign = '-';
       imgAbs *= -1;
     }
-    std::cout << this->getReal() << sign << "ix" << imgAbs << std::endl;
+    std::cout << this->getReal() << sign << "ix" << imgAbs;
 }
 
 Complexe& Complexe::Sum(const Complexe &z) {
@@ -89,6 +88,27 @@ Complexe& Complexe::operator /=(const Complexe &z) {
     this->setReal(this->getReal() / deno);
     this->setImaginary(this->getImaginary() / deno);
     return *this;
+}
+
+
+Complexe operator *(const Complexe& z, const int& k) {
+    return Complexe(z.getReal() * k, z.getImaginary() * k);
+}
+
+Complexe operator *(const int& k, const Complexe& z) {
+    return z * k;
+}
+
+ostream operator <<(const std::ostream& stream, const Complexe& z) {
+    return stream << this->print();
+}
+
+Complexe operator *(const Complexe &z, const int &k) {
+    return Complexe(z.getReal() * k, z.getImaginary() * k);
+}
+
+Complexe operator *(const int &k, const Complexe &z) {
+    return z * k;
 }
 
 Complexe Complexe::operator +(const Complexe &z) const {

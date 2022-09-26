@@ -2,6 +2,7 @@
 #define COMPLEXE_HPP
 
 #include <iostream>
+#include <fstream>
 #include <cmath>
 
 class Complexe {
@@ -22,7 +23,7 @@ class Complexe {
         void setImaginary(double imaginary);
         Complexe getConjugue() const;
         double getModulo() const;
-        void print() const;
+        std::string print() const;
         Complexe& Sum(const Complexe &z);
         Complexe& operator +=(const Complexe &z);
         Complexe& operator -=(const Complexe &z);
@@ -39,6 +40,9 @@ class Complexe {
         Complexe Sum3(const Complexe& z);
         Complexe& Sum4(const Complexe& z);
 
+        friend Complexe operator *(const Complexe& z, const int& k);
+        friend Complexe operator *(const int& k, const Complexe& z);
+        friend ostream operator <<(const std::ostream& stream, const Complexe& z);
 };
 
 #endif

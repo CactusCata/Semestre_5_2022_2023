@@ -1,9 +1,18 @@
-#include "mainExo1.hpp"
-
-Complexe zGlobal(1, 2);
+#include "mainExo3.hpp"
 
 int main(int argc, char *argv[]) {
 
-    Complexe zLocalMain(3, 4);
+    std::ifstream vectDataFile("vectData.dat");
 
+    if (!vectDataFile) {
+        std::cout << "Le fichier n'a pas ete trouve !" << std::endl;
+        exit(0);
+    }
+
+    VectorComplexe vect(vectDataFile);
+    vect.print();
+
+
+    Complexe z(12.0d, -56.0d);
+    std::cout << z << std::endl;
 }
