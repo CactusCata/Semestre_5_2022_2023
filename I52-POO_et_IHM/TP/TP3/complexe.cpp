@@ -50,13 +50,18 @@ double Complexe::getModulo() const {
 }
 
 std::string Complexe::print() const {
+    std::string serialized;
+    serialized.append(std::to_string(this->getReal()));
     char sign = '+';
     float imgAbs = this->getImaginary();
     if (imgAbs < 0) {
       sign = '-';
       imgAbs *= -1;
     }
-    std::cout << this->getReal() << sign << "ix" << imgAbs;
+    serialized.push_back(sign);
+    serialized.append("ix");
+    serialized.append(std::to_string(imgAbs));
+    return serialized;
 }
 
 Complexe& Complexe::Sum(const Complexe &z) {
@@ -99,16 +104,8 @@ Complexe operator *(const int& k, const Complexe& z) {
     return z * k;
 }
 
-ostream operator <<(const std::ostream& stream, const Complexe& z) {
-    return stream << this->print();
-}
-
-Complexe operator *(const Complexe &z, const int &k) {
-    return Complexe(z.getReal() * k, z.getImaginary() * k);
-}
-
-Complexe operator *(const int &k, const Complexe &z) {
-    return z * k;
+std::ostream &operator <<(std::ostream& stream, const Complexe& z) {
+    return stream << z.getReal() << z.getImaginary();
 }
 
 Complexe Complexe::operator +(const Complexe &z) const {
@@ -119,16 +116,10 @@ Complexe Complexe::operator -(const Complexe &z) const {
     return Complexe(this->getReal() - z.getReal(), this->getImaginary() - z.getImaginary());
 }
 
-Complexe Complexe::operator *(const Complexe &z) const {
-    Complexe z1(z);
-    return z1 *= *this;
-}
-
 Complexe Complexe::operator /(const Complexe &z) const {
     Complexe z1(z);
     return z1 /= *this;
 }
-
 
 bool Complexe::operator ==(const Complexe &z) const {
     return this->getReal() == z.getReal() && this->getImaginary() == z.getImaginary();

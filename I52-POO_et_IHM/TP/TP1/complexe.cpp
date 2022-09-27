@@ -39,12 +39,9 @@ Complexe Bidon(Complexe& c) {
     return c;
 }
 
-void CreerComplexe(Complexe** c) {
-    // Y'aura une étoile en trop ?
-    c = new Complexe*;
-    Complexe c1;
-    Init(c1);
-    *c = &c1;
+void CreerComplexe(Complexe** pc) {
+    *pc = new Complexe;
+    Init(**pc);
 }
 
 void CreerComplexe(PtComplexe& ptr) {

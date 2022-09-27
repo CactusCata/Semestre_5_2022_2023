@@ -42,7 +42,7 @@ class Complexe {
 
         friend Complexe operator *(const Complexe& z, const int& k);
         friend Complexe operator *(const int& k, const Complexe& z);
-        friend ostream operator <<(const std::ostream& stream, const Complexe& z);
+        friend std::ostream& operator <<(std::ostream& stream, const Complexe& z);
 };
 
 #endif

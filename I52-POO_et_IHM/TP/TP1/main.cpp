@@ -82,5 +82,9 @@ int main(int argc, char **argv) {
     std::cout << "L'addresse de c8.b = " << &(c8.b) << std::endl;
 
 
-   
+    Complexe *pt;
+    creerComplexe(&pt);
+
+
+
 }
