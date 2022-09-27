@@ -24,6 +24,14 @@ Etudiant1::~Etudiant1() {
     delete [] this->notes;
 }
 
+unsigned int getNb() {
+  return this->nb;
+}
+
+unsigned int *getNotes() {
+  return this->notes;
+}
+
 void Etudiant1::ajouterNotes(unsigned int* notes) {
     for (unsigned int i = 0; i < this->nb; i++) {
         this->notes[i] = notes[i];

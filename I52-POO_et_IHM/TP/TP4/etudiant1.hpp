@@ -14,6 +14,9 @@ class Etudiant1 : public Personne {
         Etudiant1(const Etudiant1& student);
         ~Etudiant1();
 
+        unsigned int getNb();
+        unsigned int *getNotes();
+
         void ajouterNotes(unsigned int* notes);
         void print();
         double moyenne();

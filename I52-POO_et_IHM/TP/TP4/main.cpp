@@ -15,4 +15,8 @@ int main(int argc, char *argv[]) {
     potter.print();
     std::cout << "Sa moyenne est: " << potter.moyenne() << "." << std::endl;
 
+    std::cout << "--------------------------------" << std::endl;
+
+    // TODO faire seulement faire l'exercice 2 partie 3 seulement
+
 }
