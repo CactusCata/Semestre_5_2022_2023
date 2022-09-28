@@ -40,6 +40,9 @@ int main(int argc, char *argv[]) {
 
       unsigned int offset = pmatch[0].rm_eo;
 
+      printNTime(pmatch->rm_so, ' ');
+      printNTime(pmatch->rm_eo - pmatch->rm_so, '^');
+
       for (unsigned int g = 0; g < MAX_RE_INTERCEPT && pmatch[g].rm_so != -1; g++) {
 
         printf("Match %u, Group %u: [%u-%u]: %s\n",
