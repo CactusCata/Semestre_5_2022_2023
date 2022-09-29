@@ -11,5 +11,11 @@ testgrep: mygrep.exe
 mygrep.exe: mygrep.c
 	$(CC) $(CFLAGS) $< -o $@
 
+unilex.exe: unilex.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+unilex.o: unilex.c unilex.h
+	$(CC) $(CFLAGS) -c $<
+
 clean:
 	rm -f *.exe *.o ~*
