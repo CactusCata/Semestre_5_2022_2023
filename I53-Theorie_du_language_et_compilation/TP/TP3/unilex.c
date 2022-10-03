@@ -51,7 +51,9 @@ unilex_t *creer_unilex_table(char *fileName, int *size) {
       return NULL;
     }
 
-    unilex_t unilex = {.re = re, .name = name};
+    unilex_t unilex;
+    unilex.re = re;
+    unilex.name = name;
     unilexArray[i] = unilex;
   }
 

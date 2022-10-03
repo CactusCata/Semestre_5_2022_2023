@@ -6,7 +6,7 @@
 
 typedef struct {
   regex_t re;
-  char name[32];
+  char *name;
 } unilex_t;
 
 int main(int argc, char *argv[]);

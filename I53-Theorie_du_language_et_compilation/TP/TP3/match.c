@@ -11,6 +11,7 @@ int main(int argc, char *argv[]) {
 
   regmatch_t pmatch;
   if (regexec(&re, argv[2], 1, &pmatch, 0) == 0) {
+
     printf("Motif trouvé !\n");
     printf("Début du match: %d\n", pmatch.rm_so);
     printf("Fin du match: %d\n", pmatch.rm_eo);
