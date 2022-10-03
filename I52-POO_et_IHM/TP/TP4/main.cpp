@@ -19,4 +19,9 @@ int main(int argc, char *argv[]) {
 
     // TODO faire seulement faire l'exercice 2 partie 3 seulement
 
+    Matiere matieres[4] = {Matiere("Magie", 3), Matiere("Potion", 2), Matiere("Divination", 4), Matiere("Info", 1)};
+    Etudiant2 harry = Etudiant2("Potter", "Harry", 15, 4, matieres);
+    harry.ajouterNotes(notesPotter);
+
+    std::cout << "La moyenne de Harry est: " << harry.moyenne() << std::endl;
 }

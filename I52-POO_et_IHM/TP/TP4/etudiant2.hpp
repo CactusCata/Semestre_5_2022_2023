@@ -2,6 +2,8 @@
 #define ETUDIANT_2_HPP
 
 #include "matiere.hpp"
+#include "etudiant1.hpp"
+#include <ostream>
 
 class Etudiant2 : public Etudiant1 {
 

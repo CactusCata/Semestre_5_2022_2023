@@ -24,11 +24,11 @@ Etudiant1::~Etudiant1() {
     delete [] this->notes;
 }
 
-unsigned int getNb() {
+unsigned int Etudiant1::getNb() const {
   return this->nb;
 }
 
-unsigned int *getNotes() {
+unsigned int *Etudiant1::getNotes() const {
   return this->notes;
 }
 
@@ -38,7 +38,7 @@ void Etudiant1::ajouterNotes(unsigned int* notes) {
     }
 }
 
-void Etudiant1::print() {
+void Etudiant1::print() const {
     Personne::print();
     std::cout << " | notes: (";
     if (this->nb > 0) {
@@ -50,7 +50,7 @@ void Etudiant1::print() {
     std::cout << ')' << std::endl;
 }
 
-double Etudiant1::moyenne() {
+double Etudiant1::moyenne() const {
     unsigned int sum = 0;
     for (unsigned int i = 0; i < this->nb; i++) {
         sum += this->notes[i];

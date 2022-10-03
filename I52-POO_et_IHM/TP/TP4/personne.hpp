@@ -13,7 +13,7 @@ class Personne {
 
     public:
         Personne(std::string nom, std::string prenom, unsigned int age);
-        void print();
+        void print() const;
         void ageing();
 
 };

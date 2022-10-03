@@ -2,6 +2,7 @@
 #define MATIERE_HPP
 
 #include <string>
+#include <iostream>
 
 class Matiere {
 
