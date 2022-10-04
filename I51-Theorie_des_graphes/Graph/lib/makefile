@@ -11,4 +11,4 @@ graph.o: graph.c graph.h
 	$(CC) $(CFLAGS) -c $<
 
 clean:
-	rm -f *.exe *.o
+	rm -f *.exe *.o *.a

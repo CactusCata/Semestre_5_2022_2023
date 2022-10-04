@@ -14,7 +14,7 @@ Graph readGraph(char *fileName) {
 
   char LINE_BUFFER[1024];
   while (fgets(LINE_BUFFER, 1024, file)) {
-    if (LINE_BUFFER[0] == 'n') {
+    if (LINE_BUFFER[0] == 'e') {
       sscanf(LINE_BUFFER, "edgeAmount=%d", &edgeAmount);
       graph = initGraph(edgeAmount);
     } else {
@@ -37,28 +37,16 @@ void writeGraph(Graph graph, char *fileName) {
 
   FILE *file = fopen(fileName, "w");
 
-  fprintf(file, "edgeAmount=%d", graph.edgeAmount);
+  fprintf(file, "edgeAmount=%d\n", graph.edgeAmount);
 
   for (unsigned int i = 0; i < graph.edgeAmount; i++) {
     for (unsigned int j = i + 1; j < graph.edgeAmount; j++) {
       if (graph.matrixAdj[i][j]) {
-          fprintf(file, "%d %d\n", i, graph.matrixAdj[i][j]);
+          fprintf(file, "%d %d\n", i, j);
       }
     }
   }
 
   fclose(file);
 
-}
-
-Graph initGraph(unsigned int edgeAmount) {
-  Graph g;
-  g.edgeAmount = edgeAmount;
-
-  unsigned char **matrixAdj = (unsigned char **) malloc(sizeof(unsigned char *) * edgeAmount);
-  for (unsigned int i = 0; i < edgeAmount; i++) {
-    matrixAdj[i] = calloc(edgeAmount, sizeof(unsigned char));
-  }
-  g.matrixAdj = matrixAdj;
-  return g;
 }
