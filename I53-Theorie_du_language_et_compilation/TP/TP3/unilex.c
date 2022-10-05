@@ -13,7 +13,7 @@ int main(int argc, char *argv[]) {
   }
 
   char *regFileName = argv[1];
-  //char *textFileName = argv[2];
+  char *textFileName = argv[2];
 
   int arraySize = 0;
   unilex_t *unilexArray = creer_unilex_table(regFileName, &arraySize);

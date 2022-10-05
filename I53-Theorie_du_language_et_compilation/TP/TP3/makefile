@@ -17,5 +17,8 @@ unilex.exe: unilex.o
 unilex.o: unilex.c unilex.h
 	$(CC) $(CFLAGS) -c $<
 
+testunlix.exe: unilex.exe
+	./unilex.exe ./file2.txt ./spec.txt
+
 clean:
 	rm -f *.exe *.o ~*
