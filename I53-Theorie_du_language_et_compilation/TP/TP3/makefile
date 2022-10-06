@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -g -Wall
 
 
 match.exe: match.c
@@ -17,8 +17,9 @@ unilex.exe: unilex.o
 unilex.o: unilex.c unilex.h
 	$(CC) $(CFLAGS) -c $<
 
-testunlix.exe: unilex.exe
-	./unilex.exe ./file2.txt ./spec.txt
+testunlix: unilex.exe
+	./unilex.exe ./spec.txt ./file2.txt
 
 clean:
+	clear
 	rm -f *.exe *.o ~*
