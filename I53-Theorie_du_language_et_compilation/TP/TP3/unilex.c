@@ -27,25 +27,45 @@ int main(int argc, char *argv[]) {
 
 }
 
-lexicalUnitCatch *getLexicalsUnits(char *fileName, unilex_t *unilexArray, unsigned int *size) {
+Queue *getLexicalsUnits(char *fileName, unilex_t *unilexArray, unsigned int *size) {
   FILE *file = fopen(fileName, "r");
 
   if (!file) {
-    printf("Le fichier %s n'a pas été trouvé.\n", fileName);
+    printf("Le fichier '%s' n'a pas été trouvé.\n", fileName);
     exit(0);
   }
 
-  char lineBuffer[MAX_LINE_FILE];
+  char *lineBuffer = (char *) malloc(sizeof(char) * MAX_LINE_FILE);
   fgets(lineBuffer, MAX_LINE_FILE, file);
 
-  unilex_t currentUnilex = unilexArray[0];
-  regmatch_t pmatch;
-  while (regexec(&currentUnilex.re, lineBuffer, 1, &pmatch, 0) == 0) {
+  while (lineBuffer[0] != '\0') {
+    for (unsigned int i = 0; i < size; i++) {
+      unilex_t currentUnilex = unilexArray[i];
+      regmatch_t pmatch;
+      if (regexec(&currentUnilex.re, lineBuffer, 1, &pmatch, 0) == 0) {
+        if (pmatch->rm_so == 0) {
+          
+        }
+      }
 
-    printf("Motif trouvé !\n");
-    printf("Début du match: %d\n", pmatch.rm_so);
-    printf("Fin du match: %d\n", pmatch.rm_eo);
+    }
   }
+
+  unilex_t currentUnilex = unilexArray[2];
+  printf("%s\n", currentUnilex.name);
+  regmatch_t *pmatch = (regmatch_t *) malloc(sizeof(regmatch_t) * 10);
+  for (unsigned int i = 0; i < 10; i++) {
+    if (regexec(&currentUnilex.re, lineBuffer, 10, pmatch, 0)) {
+      break;
+    }
+
+    printf("Motif trouve !\n");
+    printf("Début du match: %d\n", pmatch->rm_so);
+    printf("Fin du match: %d\n", pmatch->rm_eo);
+    lineBuffer += pmatch->rm_eo;
+  }
+
+  fclose(file);
 
   return NULL;
 
@@ -57,7 +77,7 @@ void printLexicalsUnitsCatchs(lexicalUnitCatch *lexicalUnitsCatchs, unsigned int
   }
 }
 
-unilex_t *creer_unilex_table(char *fileName, int *size) {
+unilex_t *creer_unilex_table(char *fileName, unsigned int *size) {
   FILE *file = fopen(fileName, "r");
 
   if (!file) {
@@ -77,12 +97,14 @@ unilex_t *creer_unilex_table(char *fileName, int *size) {
     sscanf(lineBuffer, "\"%[^\"]\" %[^\n]\n", reExpr, reName);
     printf("boucle: %s %s\n", reExpr, reName);
 
-    regex_t re;
-    if (regcomp(&re, reExpr, REG_EXTENDED) != 0) {
+    regex_t *rePtr = (regex_t *) malloc(sizeof(rePtr));
+    if (regcomp(rePtr, reExpr, REG_EXTENDED) != 0) {
       return NULL;
     }
-    unilex_t unilex = {.re = re, .name = reName};
-    unilexArray[lineNumber++] = unilex;
+    unilex_t *unilexPtr = (unilex_t *) malloc(sizeof(unilex_t));
+    (*unilexPtr).re = *rePtr;
+    (*unilexPtr).name = reName;
+    unilexArray[lineNumber++] = *unilexPtr;
   }
 
   *size = lineAmount;
