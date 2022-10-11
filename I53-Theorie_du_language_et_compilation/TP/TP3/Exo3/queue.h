@@ -1,8 +1,8 @@
 #ifndef QUEUE_HPP
 #define QUEUE_HPP
 
-#include "unilex.h"
-#include "stdio.h"
+#include <stdio.h>
+#include "utils.h"
 
 typedef struct Element {
     lexicalUnitCatch *value;

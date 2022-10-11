@@ -1,33 +1,6 @@
-#include "unilex.h"
+#include "lexicalAnalyse.h"
 
-int main(int argc, char *argv[]) {
-
-  if (argc < 2) {
-    printf("Veuillez préciser le nom du fichier contenant les règles re.\n");
-    return 0;
-  }
-
-  if (argc < 3) {
-    printf("Veuillez préciser le nom du fichier à analyser.\n");
-    return 0;
-  }
-
-  char *regFileName = argv[1];
-  char *textFileName = argv[2];
-
-  unsigned int arraySize = 0;
-  unilex_t *unilexArray = creer_unilex_table(regFileName, &arraySize);
-
-  unsigned int size = 0;
-  lexicalUnitCatch *lexicalsUnits = getLexicalsUnits(textFileName, unilexArray, &size);
-
-
-  return 0;
-
-
-}
-
-Queue *getLexicalsUnits(char *fileName, unilex_t *unilexArray, unsigned int *size) {
+Queue *getLexicalsUnits(char *fileName, unilex_t *unilexArray, unsigned int size) {
   FILE *file = fopen(fileName, "r");
 
   if (!file) {
@@ -35,39 +8,34 @@ Queue *getLexicalsUnits(char *fileName, unilex_t *unilexArray, unsigned int *siz
     exit(0);
   }
 
+  Queue *queue = createQueue();
+
   char *lineBuffer = (char *) malloc(sizeof(char) * MAX_LINE_FILE);
   fgets(lineBuffer, MAX_LINE_FILE, file);
 
-  while (lineBuffer[0] != '\0') {
+  while (lineBuffer[0] != '\n') {
     for (unsigned int i = 0; i < size; i++) {
       unilex_t currentUnilex = unilexArray[i];
       regmatch_t pmatch;
       if (regexec(&currentUnilex.re, lineBuffer, 1, &pmatch, 0) == 0) {
-        if (pmatch->rm_so == 0) {
-          
+        if (pmatch.rm_so == 0) {
+          char *matchedText = getStringPart(lineBuffer, 0, pmatch.rm_eo);
+          lexicalUnitCatch *lucPtr = (lexicalUnitCatch *) malloc(sizeof(lexicalUnitCatch));
+          lucPtr->reCategory = currentUnilex.name;
+          lucPtr->caught = matchedText;
+
+          printf("%s %s %d\n", lucPtr->reCategory, matchedText, pmatch.rm_eo);
+          add(queue, lucPtr);
+          lineBuffer += pmatch.rm_eo;
+          break;
         }
       }
-
     }
-  }
-
-  unilex_t currentUnilex = unilexArray[2];
-  printf("%s\n", currentUnilex.name);
-  regmatch_t *pmatch = (regmatch_t *) malloc(sizeof(regmatch_t) * 10);
-  for (unsigned int i = 0; i < 10; i++) {
-    if (regexec(&currentUnilex.re, lineBuffer, 10, pmatch, 0)) {
-      break;
-    }
-
-    printf("Motif trouve !\n");
-    printf("Début du match: %d\n", pmatch->rm_so);
-    printf("Fin du match: %d\n", pmatch->rm_eo);
-    lineBuffer += pmatch->rm_eo;
   }
 
   fclose(file);
 
-  return NULL;
+  return queue;
 
 }
 
@@ -112,17 +80,4 @@ unilex_t *creer_unilex_table(char *fileName, unsigned int *size) {
 
   return unilexArray;
 
-}
-
-unsigned int getFileLineAmount(FILE *file) {
-  unsigned int lineCount = 0;
-
-  char lineBuffer[MAX_LINE_FILE];
-
-  while (fgets(lineBuffer, MAX_LINE_FILE, file)) {
-    lineCount++;
-  }
-
-  rewind(file);
-  return lineCount;
 }
