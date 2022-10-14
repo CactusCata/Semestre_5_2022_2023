@@ -12,6 +12,13 @@ Graph initGraph(unsigned int edgeAmount) {
   return g;
 }
 
+void freeGraph(Graph graph) {
+  for (size_t i = 0; i < graph.edgeAmount; i++) {
+    free(graph.matrixAdj[i]);
+  }
+  free(graph.matrixAdj);
+}
+
 void printGraph(Graph graph) {
   unsigned int n = graph.edgeAmount;
   printf("edgeAmount=%d\n", n);
@@ -33,22 +40,50 @@ void drawGraph(Graph graph, char *path, char *fileName) {
   sprintf(filePathNameExtension, "%s%s.dot", path, fileName);
   FILE *file = fopen(filePathNameExtension, "w");
 
+  if (!file) {
+    printf("The file '%s' do not exist.\n", filePathNameExtension);
+    exit(1);
+  }
+
   fprintf(file, "graph A {\n");
 
   for (unsigned int i = 0; i < n; i++) {
     for (unsigned int j = i + 1; j < n; j++) {
       if (graph.matrixAdj[i][j] == 1) {
-        fprintf(file, "\t%d -- %d\n", i, j);
+        fprintf(file, "\t%d -- %d;\n", i, j);
       }
     }
   }
 
   fprintf(file, "}");
   fclose(file);
-  
-  char cmd[256];
-  sprintf("dot -Tpng %s > %s.png", filePathNameExtension, fileName);
-  printf("%s\n", cmd);
+
+  char cmd[512];
+  sprintf(cmd, "dot -Tpng %s > %s%s.png", filePathNameExtension, path, fileName);
   system(cmd);
 
+}
+
+size_t getComposanteConnexeAmount(Graph graph) {
+  unsigned char *reached = (unsigned char *) calloc(sizeof(unsigned char), graph.edgeAmount);
+  size_t composanteConnexeAmount = 0;
+  for (size_t s = 0; s < graph.edgeAmount; s++) {
+    if (!reached[s]) {
+      composanteConnexeAmount++;
+      reachAllNeighbors(s, graph, reached);
+    }
+  }
+  free(reached);
+  return composanteConnexeAmount;
+}
+
+void reachAllNeighbors(size_t s, Graph graph, unsigned char *reached) {
+  if (!reached[s]) {
+    reached[s] = 1;
+    for (size_t sNeighbors = 0; sNeighbors < graph.edgeAmount; sNeighbors++) {
+      if (graph.matrixAdj[s][sNeighbors]) {
+        reachAllNeighbors(sNeighbors, graph, reached);
+      }
+    }
+  }
 }

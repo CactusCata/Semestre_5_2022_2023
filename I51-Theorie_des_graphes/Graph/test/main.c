@@ -9,5 +9,9 @@ int main(int argc, char *argv[]) {
 
   drawGraph(g, "../data/", "test2");
 
+  printf("Le nombre de composante de G est: %ld\n", getComposanteConnexeAmount(g));
+
+  freeGraph(g);
+
   return 0;
 }

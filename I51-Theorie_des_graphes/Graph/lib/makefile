@@ -1,8 +1,19 @@
 CC = gcc
 CFLAGS = -g -Wall
 
+all:
+	make libcontainer.a
+	make libgraph.a
+
+
+libcontainer.a: list.o
+	ar crs $@ $^
+
+list.o: list.c list.h
+	$(CC) $(CFLAGS) -c $<
+
 libgraph.a: inout.o graph.o
-	ar crs libgraph.a $^
+	ar crs $@ $^
 
 inout.o: inout.c inout.h
 	$(CC) $(CFLAGS) -c $<

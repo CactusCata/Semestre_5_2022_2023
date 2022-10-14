@@ -1,0 +1,10 @@
+faire une fonction qui calcul la taille de la plus grande composante connexe
+fonction qui crée une fonction aléatoire
+fonction greante(Graph g) qui return la taille de la composante géante
+
+taille de la plus grande composante
+
+Faire une pile plutot qu'une liste
+
+
+TOUJOURS METTRE LES LIBRAIRIES A LA FIN DE LIGNE DE GCC/G++

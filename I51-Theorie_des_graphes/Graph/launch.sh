@@ -2,10 +2,12 @@ clear
 
 cd lib
 make clean
-make libgraph.a
+make
 
 cd ../test
 make clean
 make prog.exe
 
-./prog.exe
+# Possible de mettre "valgrind" en lancant la commande:
+# ./launch.sh valgrind
+$1 ./prog.exe
