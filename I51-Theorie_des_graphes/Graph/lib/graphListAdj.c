@@ -32,7 +32,7 @@ GraphL initGraphLFromFile(char *fileName) {
     if (lineFileBuffer[0] == 'e') {
       if (!sscanf(lineFileBuffer, "edgeAmount=%d\n", &edgeAmount)) {
         printf("Vous devez indiquer l'ordre du graph en premier.");
-        exit(-1);
+        exit(1);
       }
       printf("EdgeAmount = %d\n", edgeAmount);
       foundEdgeAmount = 1;
@@ -45,8 +45,9 @@ GraphL initGraphLFromFile(char *fileName) {
       }
       printf("test: %s\n", lineFileBuffer);
       int sommet;
-      char *cached;
-      if (sscanf(lineFileBuffer, "%d: %ms", &sommet, &cached)) {
+      char *cached = (char *) malloc(sizeof(char) * 1024);
+      printf("RES: %d\n", sscanf(lineFileBuffer, "%d: %[^\n]\n", &sommet, cached));
+      if (sscanf(lineFileBuffer, "%d: %[^\n]\n", &sommet, cached)) {
         printf("Sommet concerné: %d\n", sommet);
         Stack *stackSommet = &graph.listAdj[sommet];
 
