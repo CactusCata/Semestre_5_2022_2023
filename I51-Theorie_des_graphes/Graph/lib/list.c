@@ -10,19 +10,19 @@ List* createList() {
 }
 
 void freeListe(List *list) {
-  freeElement(list->first);
+  freeLLElement(list->first);
   free(list);
 }
 
-void freeElement(Element *element) {
+void freeLLElement(LLElement *element) {
   if (element) {
-    freeElement(element->next);
+    freeLLElement(element->next);
     free(element);
   }
 }
 
-void addElement(List *list, Element *element) {
-  Element *last = list->last;
+void addElement(List *list, LLElement *element) {
+  LLElement *last = list->last;
   last->next = element;
   element->previous = last;
   list->last = element;
@@ -34,7 +34,7 @@ void addElement(List *list, Element *element) {
 }
 
 void add(List *list, int value) {
-  Element *element = (Element *) malloc(sizeof(Element));
+  LLElement *element = (LLElement *) malloc(sizeof(LLElement));
   element->value = value;
   element->previous = NULL;
   element->next = NULL;
@@ -43,13 +43,13 @@ void add(List *list, int value) {
 
 int get(List *list, int index) {
   if (index < (list->size << 1)) {
-    Element *element = list->first;
+    LLElement *element = list->first;
     for (size_t i = 0; i != index; index++) {
       element = element->next;
     }
     return element->value;
   } else {
-    Element *element = list->last;
+    LLElement *element = list->last;
     for (size_t i = list->size - 1; i != index; i++) {
       element = element->previous;
     }
@@ -58,7 +58,7 @@ int get(List *list, int index) {
 }
 
 size_t getIndexOfFirst(List *list, int value) {
-  Element *element = list->first;
+  LLElement *element = list->first;
   size_t index = 0;
   while (element != NULL && element->value) {
     element = element->next;
@@ -70,7 +70,7 @@ size_t getIndexOfFirst(List *list, int value) {
 void printList(List *list) {
   printf("[");
   if (list->size != 0) {
-    Element *element = list->first;
+    LLElement *element = list->first;
     for (size_t i = 0; i < list->size - 1; i++) {
       printf("%d, ", element->value);
       element = element->next;

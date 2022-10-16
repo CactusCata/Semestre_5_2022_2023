@@ -4,32 +4,32 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct Element {
-  struct Element *next;
-  struct Element *previous;
+typedef struct LLElement {
+  struct LLElement *next;
+  struct LLElement *previous;
   int value;
-} Element;
+} LLElement;
 
 typedef struct List {
   size_t size;
-  Element *first;
-  Element *last;
+  LLElement *first;
+  LLElement *last;
 } List;
 
 List* createList();
 
 void freeListe(List *list);
 
-void freeElement(Element *element);
+void freeLLElement(LLElement *LLElement);
 
-void addElement(List *list, Element *element);
+void addLLElement(List *list, LLElement *LLElement);
 
 void add(List *list, int value);
 
 int get(List *list, int index);
 
 size_t getIndexOfFirst(List *list, int value);
-// renvoie l'indice du premier element qui vaut value dans la liste
+// renvoie l'indice du premier LLElement qui vaut value dans la liste
 
 void printList(List *list);
 

@@ -2,16 +2,23 @@
 
 int main(int argc, char *argv[]) {
 
-  Graph g = readGraph("../data/graph1.dat");
-  printGraph(g);
+  GraphM g = initGraphMFromFile("../data/graph1.graphM");
+  printGraphM(g);
 
-  writeGraph(g, "../data/loool.dat");
+  writeGraphMInFile(g, "../data/loool.graphM");
 
-  drawGraph(g, "../data/", "test2");
+  drawGraphM(g, "../data/", "test2");
 
-  printf("Le nombre de composante de G est: %ld\n", getComposanteConnexeAmount(g));
+  printf("Le nombre de composante de G est: %lld\n", getComposanteConnexeAmountM(g));
 
-  freeGraph(g);
+  freeGraphM(g);
+
+
+  GraphL g2 = initGraphLFromFile("../data/graphTest.graphL");
+  printf("Passed\n");
+  printGraphL(g2);
+
+  freeGraphL(g2);
 
   return 0;
 }

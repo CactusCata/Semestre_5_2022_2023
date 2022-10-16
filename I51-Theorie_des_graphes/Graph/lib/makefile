@@ -5,21 +5,33 @@ all:
 	make libcontainer.a
 	make libgraph.a
 
-
-libcontainer.a: list.o
+# Containers
+libcontainer.a: list.o stack.o
 	ar crs $@ $^
 
 list.o: list.c list.h
 	$(CC) $(CFLAGS) -c $<
 
-libgraph.a: inout.o graph.o
+stack.o: stack.c stack.h
+	$(CC) $(CFLAGS) -c $<
+
+test_stack.exe: stack.o test_stack.c
+	$(CC) $(CFLAGS) -o $@ $^
+
+
+# Graph
+libgraph.a: graphMatAdj.o graphListAdj.o graphTypeConvertor.o
 	ar crs $@ $^
 
-inout.o: inout.c inout.h
+graphMatAdj.o: graphMatAdj.c graphMatAdj.h
 	$(CC) $(CFLAGS) -c $<
 
-graph.o: graph.c graph.h
+graphListAdj.o: graphListAdj.c graphListAdj.h
 	$(CC) $(CFLAGS) -c $<
 
+graphTypeConvertor.o: graphTypeConvertor.c graphTypeConvertor.h
+	$(CC) $(CFLAGS) -c $<
+
+# Cleaner
 clean:
 	rm -f *.exe *.o *.a

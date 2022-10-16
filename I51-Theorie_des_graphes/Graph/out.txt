@@ -1,0 +1,104 @@
+[H[2J[3Jrm -f *.exe *.o *.a
+make libcontainer.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c list.c
+ar crs libcontainer.a list.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+make libgraph.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c inout.c
+gcc -g -Wall -c graph.c
+ar crs libgraph.a inout.o graph.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+rm -f *.exe *.o
+gcc -g -Wall -I$GRAPH/lib -L$GRAPH/lib -c main.c
+[H[2J[3Jrm -f *.exe *.o *.a
+make libcontainer.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c list.c
+ar crs libcontainer.a list.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+make libgraph.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c inout.c
+gcc -g -Wall -c graph.c
+ar crs libgraph.a inout.o graph.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+rm -f *.exe *.o
+gcc -g -Wall  -c main.c
+[H[2J[3Jrm -f *.exe *.o *.a
+make libcontainer.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c list.c
+ar crs libcontainer.a list.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+make libgraph.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c inout.c
+gcc -g -Wall -c graph.c
+ar crs libgraph.a inout.o graph.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+rm -f *.exe *.o
+gcc -g -Wall LIB_PATH_WINDOWS -c main.c
+[H[2J[3Jrm -f *.exe *.o *.a
+make libcontainer.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c list.c
+ar crs libcontainer.a list.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+make libgraph.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c inout.c
+gcc -g -Wall -c graph.c
+ar crs libgraph.a inout.o graph.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+rm -f *.exe *.o
+gcc -g -Wall LIB_PATH_WINDOWS -c main.c
+[H[2J[3Jrm -f *.exe *.o *.a
+make libcontainer.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c list.c
+ar crs libcontainer.a list.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+make libgraph.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c inout.c
+gcc -g -Wall -c graph.c
+ar crs libgraph.a inout.o graph.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+rm -f *.exe *.o
+gcc -g -Wall -I../lib -L../lib -c main.c
+gcc -g -Wall -I../lib -L../lib main.o -o prog.exe -lgraph -lcontainer
+edgeAmount=5
+[
+	[0, 0, 0, 1, 0]
+	[0, 0, 1, 0, 0]
+	[0, 1, 0, 0, 1]
+	[1, 0, 0, 0, 0]
+	[0, 0, 1, 0, 0]
+]
+Le nombre de composante de G est: 2
+[H[2J[3Jrm -f *.exe *.o *.a
+make libcontainer.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c list.c
+ar crs libcontainer.a list.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+make libgraph.a
+make[1]: Entering directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+gcc -g -Wall -c inout.c
+gcc -g -Wall -c graph.c
+ar crs libgraph.a inout.o graph.o
+make[1]: Leaving directory 'D:/Adam/Travail/Superieur/Licence/Semestre_5_2022_2023/I51-Theorie_des_graphes/Graph/lib'
+rm -f *.exe *.o
+gcc -g -Wall -I../lib -L../lib -c main.c
+gcc -g -Wall -I../lib -L../lib main.o -o prog.exe -lgraph -lcontainer
+edgeAmount=5
+[
+	[0, 0, 0, 1, 0]
+	[0, 0, 1, 0, 0]
+	[0, 1, 0, 0, 1]
+	[1, 0, 0, 0, 0]
+	[0, 0, 1, 0, 0]
+]
+Le nombre de composante de G est: 2
