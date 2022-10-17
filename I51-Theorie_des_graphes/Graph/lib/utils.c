@@ -29,8 +29,10 @@ char *intToStr(int value) {
 
 void appendText(char *base, size_t *cursor, char *toAdd) {
   size_t i = 0;
-  for (; toAdd[i] != '\0'; (*cursor)++, i++) {
+  for (; toAdd[i] != '\0'; i++) {
     base[*cursor + i] = toAdd[i];
   }
+  printf("[%s] cursor = %d + %d\n", toAdd, *cursor, i);
   base[*cursor + i + 1] = '\0';
+  *cursor += i;
 }

@@ -144,7 +144,7 @@ void drawGraphL(GraphL graph, char *path, char *fileName) {
         appendText(lineBuffer, &cursor, " ");
       }
       char *sommetAdjStr = intToStr(current->value);
-      printf("On rentre dans la BOUCLE %d  %s !!\n", s, sommetAdjStr);
+      printf("On rentre dans la BOUCLE %d %d %s !!\n", s, strlen(sommetAdjStr), sommetAdjStr);
       appendText(lineBuffer, &cursor, sommetAdjStr);
       //free(sommetAdjStr);
 
