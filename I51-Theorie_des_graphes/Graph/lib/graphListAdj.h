@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "stack.h"
+#include "utils.h"
 
 typedef struct {
   unsigned int edgeAmount;
@@ -26,10 +28,19 @@ void freeGraphL(GraphL graph);
 void printGraphL(GraphL graph);
 // Ecrit sur la console le graph correspondant
 
-size_t getComposanteConnexeAmountL(GraphL graph);
+void drawGraphL(GraphL graph, char *path, char *fileName);
+// Créer un fichier .png à partir du graph correspondant
+
+size_t getComposanteConnexeAmountRecL(GraphL graph);
 // Calcul le nombre de composante connexe du graph correspondant
 
-void reachAllNeighborsL(size_t s, GraphL graph, unsigned char *reached);
+void reachAllNeighborsRecL(size_t s, GraphL graph, unsigned char *reached);
+// Permet de visiter tous les voisins dans une composante connexe du graph correspondant
+
+size_t getComposanteConnexeAmountIteL(GraphL graph);
+// Calcul le nombre de composante connexe du graph correspondant
+
+void reachAllNeighborsIteL(size_t s, GraphL graph, unsigned char *reached);
 // Permet de visiter tous les voisins dans une composante connexe du graph correspondant
 
 #endif

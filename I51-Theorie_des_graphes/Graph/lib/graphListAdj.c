@@ -4,13 +4,13 @@ GraphL initGraphL(unsigned int edgeAmount) {
   GraphL graph;
   graph.edgeAmount = edgeAmount;
 
-  Stack *listAdj = (Stack *) malloc(sizeof(Stack *) * edgeAmount);
-  
+  Stack *listAdj = (Stack *) malloc(sizeof(Stack) * edgeAmount);
+
   for (size_t i = 0; i < edgeAmount; i++) {
     listAdj[i].first = NULL;
     listAdj[i].size = 0;
   }
-  
+
   graph.listAdj = listAdj;
   return graph;
 }
@@ -34,40 +34,31 @@ GraphL initGraphLFromFile(char *fileName) {
         printf("Vous devez indiquer l'ordre du graph en premier.");
         exit(1);
       }
-      printf("EdgeAmount = %d\n", edgeAmount);
       foundEdgeAmount = 1;
       graph = initGraphL(edgeAmount);
-      printf("Graph has been init\n");
     } else {
       if (!foundEdgeAmount) {
         printf("Vous devez indiquer l'ordre du graph en premier.");
         exit(1);
       }
-      printf("test: %s\n", lineFileBuffer);
-      int sommet;
-      char *cached = (char *) malloc(sizeof(char) * 1024);
-      printf("RES: %d\n", sscanf(lineFileBuffer, "%d: %[^\n]\n", &sommet, cached));
-      if (sscanf(lineFileBuffer, "%d: %[^\n]\n", &sommet, cached)) {
-        printf("Sommet concerné: %d\n", sommet);
-        Stack *stackSommet = &graph.listAdj[sommet];
+      size_t cursor = 0;
+      int sommet = readNextUInt(lineFileBuffer, &cursor);
+      cursor++; // count the ':'
+      Stack *stackSommet = &graph.listAdj[sommet];
 
-        int neighboorSommet = -1;
-        while (sscanf(lineFileBuffer, " %d", &neighboorSommet)) {
-          char numberBuffer[32];
-          sprintf(numberBuffer, "%d", neighboorSommet);
-          lineFileBuffer += 1 + strlen(numberBuffer);
-          push(stackSommet, neighboorSommet);
-          //push(&graph.listAdj[neighboorSommet], sommet); add on neighboor the sommet 
-        }
-      } else {
-        printf("OTHER\n");
+      int sommetAdj = -1;
+      cursor++; // count the space
+      while ((sommetAdj = readNextUInt(lineFileBuffer, &cursor)) != -1) {
+        push(stackSommet, sommetAdj);
+        cursor++; // count the potential space
+        //push(&graph.listAdj[neighboorSommet], sommet); add on neighboor the sommet
       }
     }
   }
 
   free(lineFileBuffer);
   fclose(file);
-  
+
   return graph;
 }
 
@@ -81,21 +72,34 @@ void writeGraphLInFile(GraphL graph, char *fileName) {
 
     if (!stackIsEmpty(stack)) {
       char *lineSommet = (char *) malloc(sizeof(char) * 1024);
-      sprintf(lineSommet, "%lld:", s);
+      size_t lineSommetCursor = 0;
+
+      // Ecrit le sommet concerné
+      char *sommetStr = intToStr(s);
+      appendText(lineSommet, &lineSommetCursor, sommetStr);
+      free(sommetStr);
+      appendText(lineSommet, &lineSommetCursor, ":");
 
       SElement *element = stack->first;
       while (element) {
-        sprintf(lineSommet, "%s %d", lineSommet, element->value);
+        char *sommetStr = intToStr(element->value);
+        appendText(lineSommet, &lineSommetCursor, " ");
+        appendText(lineSommet, &lineSommetCursor, sommetStr);
+        free(sommetStr);
         element = element->next;
       }
-    } 
+      fprintf(file, "%s\n", lineSommet);
+      free(lineSommet);
+    }
   }
+  fclose(file);
 }
 
 void freeGraphL(GraphL graph) {
   for (size_t s = 0; s < graph.edgeAmount; s++) {
-    freeStack(&graph.listAdj[s]);
+    freeStack(&(graph.listAdj[s]));
   }
+  free(graph.listAdj);
 }
 
 void printGraphL(GraphL graph) {
@@ -113,26 +117,107 @@ void printGraphL(GraphL graph) {
   printf("]\n");
 }
 
-size_t getComposanteConnexeAmountL(GraphL graph) {
+void drawGraphL(GraphL graph, char *path, char *fileName) {
+  unsigned int n = graph.edgeAmount;
+
+  char filePathNameExtension[256];
+  sprintf(filePathNameExtension, "%s%s.dot", path, fileName);
+  FILE *file = fopen(filePathNameExtension, "w");
+
+  fprintf(file, "graph A {\n");
+
+  for (unsigned int s = 0; s < n; s++) {
+    char *lineBuffer = (char *) malloc(sizeof(char) * 2048);
+    size_t cursor = 0;
+
+    Stack *stack = &(graph.listAdj[s]);
+
+    appendText(lineBuffer, &cursor, "\t");
+    char *sommetStr = intToStr(s);
+    appendText(lineBuffer, &cursor, sommetStr);
+    //free(sommetStr);
+    appendText(lineBuffer, &cursor, " -- {");
+    SElement *current = stack->first;
+
+    while (current) {
+      if (current != stack->first) {
+        appendText(lineBuffer, &cursor, " ");
+      }
+      char *sommetAdjStr = intToStr(current->value);
+      printf("On rentre dans la BOUCLE %d  %s !!\n", s, sommetAdjStr);
+      appendText(lineBuffer, &cursor, sommetAdjStr);
+      //free(sommetAdjStr);
+
+      current = current->next;
+    }
+    appendText(lineBuffer, &cursor, "};\n");
+    printf("%s\n", lineBuffer);
+    fputs(lineBuffer, file);
+    //free(lineBuffer);
+  }
+
+  fprintf(file, "}");
+  fclose(file);
+
+  char cmd[512];
+  sprintf(cmd, "dot -Tpng %s > %s%s.png", filePathNameExtension, path, fileName);
+  system(cmd);
+}
+
+size_t getComposanteConnexeAmountRecL(GraphL graph) {
   unsigned char *reached = (unsigned char *) calloc(sizeof(unsigned char), graph.edgeAmount);
   size_t composanteConnexeAmount = 0;
   for (size_t s = 0; s < graph.edgeAmount; s++) {
     if (!reached[s]) {
       composanteConnexeAmount++;
-      reachAllNeighborsL(s, graph, reached);
+      reachAllNeighborsRecL(s, graph, reached);
     }
   }
   free(reached);
   return composanteConnexeAmount;
 }
 
-void reachAllNeighborsL(size_t s, GraphL graph, unsigned char *reached) {
+void reachAllNeighborsRecL(size_t s, GraphL graph, unsigned char *reached) {
   reached[s] = 1;
   SElement *element = graph.listAdj[s].first;
   while (element) {
     if (reached[element->value] == 0) {
-      reachAllNeighborsL(element->value, graph, reached);
+      reachAllNeighborsRecL(element->value, graph, reached);
     }
     element = element->next;
   }
+}
+
+size_t getComposanteConnexeAmountIteL(GraphL graph) {
+  unsigned char *reached = (unsigned char *) calloc(sizeof(unsigned char), graph.edgeAmount);
+  size_t composanteConnexeAmount = 0;
+  for (size_t s = 0; s < graph.edgeAmount; s++) {
+    if (!reached[s]) {
+      composanteConnexeAmount++;
+      reachAllNeighborsIteL(s, graph, reached);
+    }
+  }
+  free(reached);
+  return composanteConnexeAmount;
+}
+
+void reachAllNeighborsIteL(size_t s, GraphL graph, unsigned char *reached) {
+  Stack *stack = createStack();
+  Stack *aux;
+  push(stack, s);
+  reached[s] = 1;
+
+  while (!stackIsEmpty(stack)) {
+    int sommet = pop(stack);
+    aux = &graph.listAdj[sommet];
+    SElement *currentElement = aux->first;
+    while (currentElement) {
+      if (reached[currentElement->value] == 0) {
+        push(stack, currentElement->value);
+        reached[currentElement->value] = 1;
+      }
+      currentElement = currentElement->next;
+    }
+  }
+  free(stack);
 }

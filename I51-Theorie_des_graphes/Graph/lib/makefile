@@ -4,6 +4,7 @@ CFLAGS = -g -Wall
 all:
 	make libcontainer.a
 	make libgraph.a
+	make libUtils.a
 
 # Containers
 libcontainer.a: list.o stack.o
@@ -30,6 +31,13 @@ graphListAdj.o: graphListAdj.c graphListAdj.h
 	$(CC) $(CFLAGS) -c $<
 
 graphTypeConvertor.o: graphTypeConvertor.c graphTypeConvertor.h
+	$(CC) $(CFLAGS) -c $<
+
+# Utils
+libUtils.a: utils.o
+	ar crs $@ $^
+
+utils.o: utils.c utils.h
 	$(CC) $(CFLAGS) -c $<
 
 # Cleaner

@@ -89,11 +89,6 @@ void drawGraphM(GraphM graph, char *path, char *fileName) {
   sprintf(filePathNameExtension, "%s%s.dot", path, fileName);
   FILE *file = fopen(filePathNameExtension, "w");
 
-  if (!file) {
-    printf("The file '%s' do not exist.\n", filePathNameExtension);
-    exit(1);
-  }
-
   fprintf(file, "graph A {\n");
 
   for (unsigned int i = 0; i < n; i++) {

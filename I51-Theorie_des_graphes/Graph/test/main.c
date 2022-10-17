@@ -9,14 +9,15 @@ int main(int argc, char *argv[]) {
 
   drawGraphM(g, "../data/", "test2");
 
-  printf("Le nombre de composante de G est: %lld\n", getComposanteConnexeAmountM(g));
+  printf("Le nombre de composante de G est: %ld\n", getComposanteConnexeAmountM(g));
 
   freeGraphM(g);
 
 
   GraphL g2 = initGraphLFromFile("../data/graphTest.graphL");
-  printf("Passed\n");
   printGraphL(g2);
+
+  drawGraphL(g2, "../data/", "test4");
 
   freeGraphL(g2);
 
