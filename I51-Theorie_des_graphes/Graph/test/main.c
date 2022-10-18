@@ -2,6 +2,7 @@
 
 int main(int argc, char *argv[]) {
 
+  /**
   GraphM g = initGraphMFromFile("../data/graph1.graphM");
   printGraphM(g);
 
@@ -12,14 +13,20 @@ int main(int argc, char *argv[]) {
   printf("Le nombre de composante de G est: %ld\n", getComposanteConnexeAmountM(g));
 
   freeGraphM(g);
+  */
 
-
+  /**
   GraphL g2 = initGraphLFromFile("../data/graphTest.graphL");
   printGraphL(g2);
 
   drawGraphL(g2, "../data/", "test4");
 
   freeGraphL(g2);
+  */
+
+  int n = 3;
+  printf("Proportion connexe pour n = %d vaut %d\n", n, proportionConnexe(n));
+
 
   return 0;
 }

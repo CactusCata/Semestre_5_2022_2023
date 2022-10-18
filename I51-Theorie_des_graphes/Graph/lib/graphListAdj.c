@@ -135,25 +135,36 @@ void drawGraphL(GraphL graph, char *path, char *fileName) {
     appendText(lineBuffer, &cursor, "\t");
     char *sommetStr = intToStr(s);
     appendText(lineBuffer, &cursor, sommetStr);
-    //free(sommetStr);
+    free(sommetStr);
+
     appendText(lineBuffer, &cursor, " -- {");
     SElement *current = stack->first;
+    unsigned char isFirstElement = 1;
 
     while (current) {
-      if (current != stack->first) {
-        appendText(lineBuffer, &cursor, " ");
+      if (current->value < s) {
+        current = current->next;
+        continue;
       }
+
+      if (!isFirstElement) {
+        appendText(lineBuffer, &cursor, " ");
+
+      }
+
+      if (isFirstElement) {
+        isFirstElement = 0;
+      }
+
       char *sommetAdjStr = intToStr(current->value);
-      printf("On rentre dans la BOUCLE %d %d %s !!\n", s, strlen(sommetAdjStr), sommetAdjStr);
       appendText(lineBuffer, &cursor, sommetAdjStr);
-      //free(sommetAdjStr);
+      free(sommetAdjStr);
 
       current = current->next;
     }
     appendText(lineBuffer, &cursor, "};\n");
-    printf("%s\n", lineBuffer);
     fputs(lineBuffer, file);
-    //free(lineBuffer);
+    free(lineBuffer);
   }
 
   fprintf(file, "}");
@@ -220,4 +231,60 @@ void reachAllNeighborsIteL(size_t s, GraphL graph, unsigned char *reached) {
     }
   }
   free(stack);
+}
+
+unsigned char isConnexe(GraphL graph) {
+  unsigned char *reached = (unsigned char *) calloc(sizeof(unsigned char), graph.edgeAmount - 1);
+  reachAllNeighborsIteL(0, graph, reached);
+
+  for (unsigned int i = 0; i < graph.edgeAmount - 1; i++) {
+    if (!reached[i]) {
+      free(reached);
+      return 0;
+    }
+  }
+
+  free(reached);
+  return 1;
+}
+
+
+unsigned int proportionConnexe(int order) {
+  int max = 1 << ((order * (order - 1)) / 2);
+  Pair *pairs = generatePairEnum(order);
+  unsigned int cpt = 0;
+
+  for (unsigned int k = 0; k < max; k++) {
+    GraphL g = intToGraph(k, order, pairs);
+    if (isConnexe(g)) {
+      cpt++;
+    }
+
+    printGraphL(g);
+    char fileName[32];
+    sprintf(fileName, "graph%d", k);
+    printf("%s\n", fileName);
+    drawGraphL(g, "../data/", fileName);
+    freeGraphL(g);
+  }
+  free(pairs);
+  return cpt;
+}
+
+GraphL intToGraph(unsigned int n, int order, Pair *pairs) {
+  GraphL g = initGraphL(order);
+  int k = 0;
+  printf("Essais de intToGraph(%d, %d)\n", n, order);
+
+  while (n) {
+    printf("n = %d\n", n);
+    if (n & 1) {
+      Stack *stack = &g.listAdj[pairs[k].e1];
+      push(stack, pairs[k].e2);
+      printf("On met dans le sommet %d la valeur %d.\n", pairs[k].e1, pairs[k].e2);
+    }
+    k++;
+    n >>= 1;
+  }
+  return g;
 }

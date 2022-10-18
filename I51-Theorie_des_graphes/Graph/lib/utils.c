@@ -24,6 +24,7 @@ char *intToStr(int value) {
 
   char *text = (char *) malloc(sizeof(char) * (charSize + 1));
   sprintf(text, "%d", value);
+  text[charSize] = '\0';
   return text;
 }
 
@@ -32,7 +33,23 @@ void appendText(char *base, size_t *cursor, char *toAdd) {
   for (; toAdd[i] != '\0'; i++) {
     base[*cursor + i] = toAdd[i];
   }
-  printf("[%s] cursor = %d + %d\n", toAdd, *cursor, i);
   base[*cursor + i + 1] = '\0';
   *cursor += i;
+}
+
+Pair *generatePairEnum(int order) {
+  int amount = ((order - 1) * order) / 2;
+  printf("amount = %d\n", amount);
+  Pair *pairs = (Pair *) malloc(sizeof(Pair) * (amount));
+  unsigned int k = 0;
+
+  for (unsigned int i = 0; i < order; i++) {
+    for (unsigned int j = i + 1; j < order; j++) {
+      printf("%d %d %d\n", k, i, j);
+      pairs[k].e1 = i;
+      pairs[k].e2 = j;
+      k++;
+    }
+  }
+  return pairs;
 }

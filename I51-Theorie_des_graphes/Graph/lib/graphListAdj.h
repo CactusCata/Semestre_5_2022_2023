@@ -43,4 +43,10 @@ size_t getComposanteConnexeAmountIteL(GraphL graph);
 void reachAllNeighborsIteL(size_t s, GraphL graph, unsigned char *reached);
 // Permet de visiter tous les voisins dans une composante connexe du graph correspondant
 
+unsigned char isConnexe(GraphL graph);
+
+unsigned int proportionConnexe(int order);
+
+GraphL intToGraph(unsigned int n, int order, Pair *pairs);
+
 #endif
