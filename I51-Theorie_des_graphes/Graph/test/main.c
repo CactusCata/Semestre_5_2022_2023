@@ -24,7 +24,14 @@ int main(int argc, char *argv[]) {
   freeGraphL(g2);
   */
 
-  int n = 3;
+  Pair *pairs = generatePairEnum(6);
+  GraphL g = intToGraph(623, 6, pairs);
+  printGraphL(g);
+  drawGraphL(g, "../data/", "tmp");
+  printf("La composante de taille maximale est: %d\n", geante(g));
+
+
+  int n = 7;
   printf("Proportion connexe pour n = %d vaut %d\n", n, proportionConnexe(n));
 
 

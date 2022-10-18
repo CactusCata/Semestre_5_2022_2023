@@ -259,12 +259,6 @@ unsigned int proportionConnexe(int order) {
     if (isConnexe(g)) {
       cpt++;
     }
-
-    printGraphL(g);
-    char fileName[32];
-    sprintf(fileName, "graph%d", k);
-    printf("%s\n", fileName);
-    drawGraphL(g, "../data/", fileName);
     freeGraphL(g);
   }
   free(pairs);
@@ -274,17 +268,57 @@ unsigned int proportionConnexe(int order) {
 GraphL intToGraph(unsigned int n, int order, Pair *pairs) {
   GraphL g = initGraphL(order);
   int k = 0;
-  printf("Essais de intToGraph(%d, %d)\n", n, order);
 
   while (n) {
-    printf("n = %d\n", n);
     if (n & 1) {
       Stack *stack = &g.listAdj[pairs[k].e1];
       push(stack, pairs[k].e2);
-      printf("On met dans le sommet %d la valeur %d.\n", pairs[k].e1, pairs[k].e2);
     }
     k++;
     n >>= 1;
   }
   return g;
+}
+
+void reachAllNeighborsRecLAndRecord(unsigned int s, GraphL graph, unsigned char *reached, unsigned int *sizeComposante) {
+  reached[s] = 1;
+  SElement *element = graph.listAdj[s].first;
+  while (element) {
+    if (reached[element->value] == 0) {
+      (*sizeComposante)++;
+      reachAllNeighborsRecLAndRecord(element->value, graph, reached, sizeComposante);
+    }
+    element = element->next;
+  }
+}
+
+unsigned int geante(GraphL graph) {
+  unsigned int maxC = 1;
+  unsigned char *reached = (unsigned char *) calloc(sizeof(unsigned char), graph.edgeAmount);
+
+  for (unsigned int s = 0; s < graph.edgeAmount - maxC; s++) {
+    if (reached[s] == 0) {
+      unsigned int sizeComposante = 1; // peut etre 0
+      reachAllNeighborsRecLAndRecord(s, graph, reached, &sizeComposante);
+      if (sizeComposante > maxC) {
+        maxC = sizeComposante;
+      }
+    }
+  }
+
+  free(reached);
+  return maxC;
+}
+
+unsigned int getDegree(GraphL graph, unsigned int sommet) {
+  return graph.listAdj[sommet].size;
+}
+
+InfoGraph *getInfosGraph(GraphL graph) {
+  InfoGraph *infos = (InfoGraph *) malloc(sizeof(InfoGraph) * graph.edgeAmount);
+  unsigned char *reached = (unsigned char *) calloc(sizeof(unsigned char), graph.edgeAmount);
+
+
+  free(reached);
+  return infos;
 }

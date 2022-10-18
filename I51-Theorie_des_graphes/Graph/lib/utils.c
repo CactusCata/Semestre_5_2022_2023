@@ -39,13 +39,11 @@ void appendText(char *base, size_t *cursor, char *toAdd) {
 
 Pair *generatePairEnum(int order) {
   int amount = ((order - 1) * order) / 2;
-  printf("amount = %d\n", amount);
   Pair *pairs = (Pair *) malloc(sizeof(Pair) * (amount));
   unsigned int k = 0;
 
   for (unsigned int i = 0; i < order; i++) {
     for (unsigned int j = i + 1; j < order; j++) {
-      printf("%d %d %d\n", k, i, j);
       pairs[k].e1 = i;
       pairs[k].e2 = j;
       k++;

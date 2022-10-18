@@ -7,6 +7,7 @@
 
 #include "stack.h"
 #include "utils.h"
+#include "graphUtils.h"
 
 typedef struct {
   unsigned int edgeAmount;
@@ -48,5 +49,13 @@ unsigned char isConnexe(GraphL graph);
 unsigned int proportionConnexe(int order);
 
 GraphL intToGraph(unsigned int n, int order, Pair *pairs);
+
+void reachAllNeighborsRecLAndRecord(unsigned int s, GraphL graph, unsigned char *reached, unsigned int *sizeComposante);
+
+unsigned int geante(GraphL graph);
+
+unsigned int getDegree(GraphL graph, unsigned int sommet);
+
+InfoGraph *getInfosGraph(GraphL graph);
 
 #endif
