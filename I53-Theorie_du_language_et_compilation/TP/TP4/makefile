@@ -1,18 +1,24 @@
-CC = gcc
-CFLAGS = -Wall -g
+CC=gcc
+CFLAGS=-Wall -g
+LIBS = -lm
+OBJS = afd.o afn.o utils.o arrayUtils.o
 
-testaf: af.exe
-	./af.exe bbbbbb #vrai
-	./af.exe aa #faux
-	./af.exe aaa #vrai
-	./af.exe aaabbbaba #vrai
+af.exe: af.c $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+	valgrind ./af.exe
 
-af.exe: af.o afd.o afn.o
-	$(CC) $(CFLAGS) $^ -o $@
+afd.o: afd.c
+	$(CC) $(CFLAGS) -c $<
 
-%.o: %.c
-	$(CC) -c $(CFLAGS) $< -o $@
+afn.o: afn.c
+	$(CC) $(CFLAGS) -c $<
+
+utils.o: utils.c utils.h
+	$(CC) $(CFLAGS) -c $<
+
+arrayUtils.o: arrayUtils.c arrayUtils.h
+	$(CC) $(CFLAGS) -c $<
 
 clean:
 	clear
-	rm -f *.exe *.o *~
+	rm -f *~ *.o

@@ -1,47 +1,30 @@
-/*
-  I53 Compilation et théorie des langages
-  Nicolas Méloni
-  01 - 11 - 2019
-*/
-
 #ifndef AFD_H
 #define AFD_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <limits.h>
-#include <string.h>
+#include "utils.h"
+#include "arrayUtils.h"
 
-#define SYMB_ASCII_DEB 32
-#define SYMB_ASCII_FIN 127
-#define SYMB_NONE 255
+#define ASCII_FIRST 38
+#define ASCII_LAST 127
+#define MAX_SYMBOLES 80
 
-#define ETAT_NONE ((uint) -1)
-#define ETAT_MAX ((uint) -2)
-#define ULLONG_BIT (sizeof(ullong)*CHAR_BIT)
 
-typedef unsigned int uint;
-typedef unsigned long long int ullong;
-typedef unsigned char uchar;
+struct AFD{
+  int Q,q0,lenF,lenSigma;
+  int *F;
+  char * Sigma;
+  char dico[MAX_SYMBOLES];
+  int **delta;
+};
 
-typedef struct {
-  uint nbetat, nbsymb, nbfinal;
-  uint init;
-  char * alphabet;
-  uchar tsymb[SYMB_ASCII_FIN];
-  uint *finals;
-  uint **delta;
-} afd;
+typedef struct AFD * AFD;
 
-void afd_init(afd *A, uint nbetat, char *alphabet, uint nbfinal, uint init, uint *finals);
-void afd_add_trans(afd *A, uint q1, uint s, uint q2);
-void afd_free(afd *A);
-void afd_copy(afd *dest, afd *src);
-void afd_print(afd A);
-void afd_finit( afd *A, char *nomfichier);
-int afd_simul(char *s, afd A);
+AFD afd_init(int Q, int q0, int nbFinals, int * listFinals, char *Sigma);
+void afd_ajouter_transition(AFD A, int q1, char s, int q2);
+void afd_print(AFD A);
+void afd_free(AFD A);
 
-uint* str_splitInt(char* a_str, const char a_delim, uint count);
-
+AFD afd_finit(char *file);
+int afd_simuler(AFD A, char *s);
 
 #endif

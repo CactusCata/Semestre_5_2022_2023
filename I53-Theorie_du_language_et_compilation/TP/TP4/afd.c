@@ -1,222 +1,222 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+
 #include "afd.h"
 
-void afd_init(afd *A, uint nbetat, char * alphabet, uint nbfinal, uint init, uint *finals)
-{
-  int i, nbsymb=0;
-  uchar symb;
+/*
+ * FUNCTION: afd_init
+ * ------------------
+ * initialise et retourne un AFD dont les états sont numérotés de 0 à `Q`
+ *
+ * param:
+ *        Q  - plus grandétat de l'automate
+ *        q0 - état inital
+ *        nbFinals - nombre d'états finals
+ *        listFinals - tableau de `nbFinals` entiers représentant les états finals
+ *        Sigma - alphabet de l'automate
+ *
+ * return:
+ *        un AFD dont la tableau de transition est allouée mais vide
+ */
+AFD  afd_init(int Q, int q0, int nbFinals, int * listFinals, char *Sigma){
+  AFD A;
+  if ( (A=malloc(sizeof(struct AFD))) == NULL){
+    printf("malloc error A");
+    exit(1);
+  }
+  A->Q = Q;
+  A->q0 = q0;
 
-  A->nbetat = nbetat;
-  A->nbfinal = nbfinal;
-  A->init = init;
+  A->lenF = nbFinals;
+  if ( (A->F = malloc(sizeof(int)*nbFinals)) == NULL){
+    printf("malloc error A->F");
+    exit(1);
+  }
+  for (int i=0; i<nbFinals; i++) A->F[i] = listFinals[i];
 
-  for (i=0; i<SYMB_ASCII_FIN; i++)
-    A->tsymb[i] = SYMB_NONE;
+  A->lenSigma = strlen(Sigma);
+  if ( (A->Sigma = malloc(sizeof(char)*(A->lenSigma+1)))==NULL){
+    printf("malloc error A->Sigma");
+    exit(1);
+  }
+  strcpy(A->Sigma,Sigma);
+  for (int i=0; i<MAX_SYMBOLES; i++) A->dico[i]=-1;
+  for (int i=0; i<A->lenSigma; i++) A->dico[Sigma[i]-ASCII_FIRST]=i;
 
-  A->alphabet = malloc(strlen(alphabet)+1);
-  strcpy(A->alphabet, alphabet);
-  A->nbsymb = strlen(alphabet);
-
-  while (*alphabet != '\0'){
-
-    if ( (*alphabet < SYMB_ASCII_DEB) ||
-	 (*alphabet > SYMB_ASCII_FIN) ){
-      fprintf(stderr,"[afd_init] caractere ascii numero %d invalide\n", *alphabet);
-      exit(-1);
+  if ((A->delta = malloc( sizeof(int**)*(Q+1)))==NULL){
+    printf("malloc error A->Sigma");
+    exit(1);
+  }
+  for (int q=0; q<A->Q+1; q++){
+    if( (A->delta[q] = malloc( sizeof(int *)*A->lenSigma))==NULL){
+      printf("malloc error A->Sigma[%d]", q);
+      exit(1);
     }
-
-    symb = (uchar) (*alphabet);
-    if ( A->tsymb[symb] != SYMB_NONE ){
-      fprintf(stderr,"[afd_init] caractere <%c> deja defini (ignorer)\n",symb);
-    }
-    else {
-      A->tsymb[symb] = nbsymb;
-      nbsymb++;
-    }
-    alphabet++;
+    for (int s=0; s<A->lenSigma; s++)	A->delta[q][s]=-1;
   }
-
-  A->finals = calloc(nbfinal, sizeof(uint));
-  for (i=0; i < nbfinal; i++){
-    A->finals[i] = finals[i];
-  }
-
-  int j;
-  A->delta = calloc(nbetat, sizeof(uint *));
-  for (i=0; i<nbetat; i++){
-    A->delta[i] = calloc(A->nbsymb, sizeof(uint));
-    for (j=0; j<A->nbsymb; j++)
-      A->delta[i][j] = ETAT_NONE;
-  }
-}
-
-void afd_free(afd *A)
-{
-  int i;
-  free(A->finals);
-  free(A->alphabet);
-  for (i=0; i<A->nbetat; i++)
-    free(A->delta[i]);
-  free(A->delta);
-}
-
-void afd_add_trans(afd *A, uint q1, uint s, uint q2)
-{
-  uchar symb = A->tsymb[s];
-
-  if (symb == SYMB_NONE){
-    fprintf(stderr, "[add_trans] %u -- %c --> %u\n", q1,s,q2);
-    exit(-1);
-  }
-
-  if ( (q1<0) || (q1>=A->nbetat) ){
-   fprintf(stderr, "[add_trans] etat <%d> non reconnu\n", q1);
-    exit(-1);
-  }
-  if ( (q2<0) || (q2>=A->nbetat) ){
-   fprintf(stderr, "[add_trans] etat <%d> non reconnu\n", q2);
-    exit(-1);
-  }
-
-  A->delta[q1][symb] = q2;
-}
-
-void afd_copy(afd *dest, afd *src)
-{
-  dest->nbetat = src->nbetat;
-  dest->nbsymb = src->nbsymb;
-  dest->nbfinal = src->nbfinal;
-  dest->init = src->init;
-
-  dest->alphabet = calloc(src->nbsymb, sizeof(char));
-  strcpy(dest->alphabet, src->alphabet);
-
-  memcpy(dest->tsymb, src->tsymb,SYMB_ASCII_FIN);
-
-  int size = (src->nbetat-1)/ULLONG_BIT+1;
-  dest->finals = calloc(sizeof(ullong),size);
-  memcpy(dest->finals, src->finals, sizeof(ullong)*size);
-
-  int i;
-  dest->delta = calloc(src->nbetat, sizeof(uint *));
-  for (i=0; i<src->nbetat; i++){
-    dest->delta[i] = calloc(src->nbsymb, sizeof(uint));
-    memcpy(dest->delta[i], src->delta[i], sizeof(uint)*src->nbsymb);
-  }
-}
-
-void afd_print(afd A)
-{
-  int i;
-
-  printf("etat initial: %d\n", A.init);
-  printf("etats finals:");
-
-  for (i=0; i< A.nbfinal; i++){
-    printf(" %u", A.finals[i]);
-    }
-  printf("\n");
-
-  uint q;
-  int printed;
-
-  for (q=0; q<A.nbetat; q++){
-    printed = 0;
-    for (i=0; i<A.nbsymb; i++){
-
-      if (A.delta[q][i]!=ETAT_NONE){
-	if (printed==1)
-	  printf("    ");
-	else
-	  printf("%4u", q);
-	printf(" -- %c --> %u\n", A.alphabet[i], A.delta[q][i]);
-	printed=1;
-      }
-    }
-    //if (printed==0) printf("\n");
-  }
+  return A;
 }
 
 /*
-  Initialise l'afd `A` à partir des données du fichier
-  `nomfichier`
-*/
-void afd_finit(afd *A, char *nomfichier){
-  FILE *file = fopen(nomfichier, "r");
+ * FUNCTION: afd_ajouter_transition
+ * --------------------------------
+ * ajoute la transition  `q1` -- `s` --> `q2` à l'automate `A`
+ *
+ * param:
+ *        A  - un AFD
+ *        q1 - état de départ de la transition
+ *        s  - étiquette de la transition
+ *        q2 - état d'arrivée de la transition
+ */
+void afd_ajouter_transition(AFD A, int q1, char s, int q2){
+  int res = A->dico[s-ASCII_FIRST];
+  A->delta[q1][res] = q2;
+}
+
+
+/*
+ * FUNCTION: afd_print
+ * -------------------
+ * affiche l'AFD `A`
+ *
+ * param:
+ *        A  - un AFD
+ */
+void afd_print(AFD A){
+  printf("Q = {0,..,%d}\n", A->Q);
+  printf("q0 = %d\n", A->q0);
+  printf("F = {");
+  for (int i=0; i<A->lenF; i++) printf("%d,",A->F[i]);
+  printf("\b}\n");
+  int cellsize = (int)(ceil(log10( (double)A->Q)))+1;
+  int first_column_size = cellsize>=5 ? cellsize+2 : 7;
+  int padding = (cellsize>=5)? (cellsize-5)/2+1: 1;
+  int line_length = first_column_size+1+(cellsize+2)*A->lenSigma;
+  char * line = malloc(sizeof(char)*(line_length+2));
+  for (int i=0; i<=line_length; i++) line[i]='-';
+  line[line_length+1]='\0';
+
+  printf("%s\n",line);
+  printf("|%*sdelta |", padding, "");
+  for (int i=0; i<A->lenSigma; i++) {
+    printf("%*c |", cellsize, A->Sigma[i]);
+  }
+  printf("\n");
+  printf("%s\n",line);
+
+
+  for (int q=0; q<A->Q+1; q++){
+    printf("|%*d |", padding+5, q);
+    for (int i=0; i<A->lenSigma; i++){
+      int s = A->dico[A->Sigma[i]-ASCII_FIRST];
+      if (A->delta[q][s] !=-1)
+	printf("%*d |", cellsize, A->delta[q][s]);
+      else
+	printf("%*s |", cellsize, "");
+    }
+    printf("\n");
+    printf("%s\n",line);
+  }
+  free(line);
+}
+
+/*
+ * FUNCTION: afd_free
+ * -------------------
+ * libère la mémoire de l'AFD `A` initialisé par la fonction afd_init
+ *
+ * param:
+ *        A  - un AFD
+ */
+void afd_free(AFD A){
+  free(A->F);
+  free(A->Sigma);
+  for (int q=0; q<A->Q+1; q++) free(A->delta[q]);
+  free(A->delta);
+  free(A);
+}
+
+
+/*
+ * FUNCTION: afd_finit
+ * ------------------
+ * initialise et renvoie un AFD à partir du fichier `file` écrit au format:
+ *
+ *  'nombre_etat
+ *  'etat_initial
+ *  'nombre_etats_finals
+ *  'etat_final_1 etat_final_2 ... etat_final_n
+ *  'alphabet
+ *  'etat_i1 symbole_k1 etat_j1
+ *  'etat_i2 symbole_k2 etat_j2
+ *  '...
+ *  'etat_in symbole_kn etat_jn
+ *
+ * param :
+ *         file - un nom de fichier
+ * return:
+ *         un AFD complet
+ */
+AFD afd_finit(char *fileName) {
+  FILE *file = fopen(fileName, "r");
 
   if (!file) {
-    printf("Le fichier '%s' n'a pas été trouvé.\n", nomfichier);
+    printf("The file '%s' do not exist.\n", fileName);
     exit(1);
   }
 
-  uint nbetat;
-  char *alphabet;
-  uint nbfinal;
-  uint init;
+  int Q;
+  int q0;
+  int nbFinals;
+  fscanf(file, "%d\n", &Q);
+  fscanf(file, "%d\n", &q0);
+  fscanf(file, "%d\n", &nbFinals);
 
-  fscanf(file, "%u %ms %u\n", &nbetat, &alphabet, &nbfinal);
-  fscanf(file, "%u\n", &init);
+  char *lineBuffer = (char *) malloc(sizeof(char) * 1024);
+  fgets(lineBuffer, 1024, file);
+  int *listFinals = getAllIntInLine(lineBuffer, nbFinals);
+  free(lineBuffer);
 
-  char lineTextBuffer[1024];
-  fgets(lineTextBuffer, 1024, file);
+  char *Sigma;
+  fscanf(file, "%ms\n", &Sigma);
 
-  uint *finals = str_splitInt(lineTextBuffer, ' ', nbfinal);
+  AFD A = afd_init(Q, q0, nbFinals, listFinals, Sigma);
 
-  afd_init(A, nbetat, alphabet, nbfinal, init, finals);
-
-  while (fgets(lineTextBuffer, 1024, file)) {
-    uint q1, q2;
-    char s;
-    sscanf(lineTextBuffer, "%u %c %u\n", &q1, &s, &q2);
-    afd_add_trans(A, q1, s, q2);
+  int etat_i, etat_j;
+  char symbol;
+  while (!feof(file)) {
+    if (fscanf(file, "%d %c %d\n", &etat_i, &symbol, &etat_j) != 0) {
+      afd_ajouter_transition(A, etat_i, symbol, etat_j);
+    }
   }
 
   fclose(file);
 
-}
 
-uint* str_splitInt(char* a_str, const char a_delim, uint count) {
-    uint* result = (uint *) malloc(sizeof(char) * count);
-
-    if (result) {
-      char* token = strtok(a_str, &a_delim);
-      uint index = 0;
-      while (token) {
-        uint res;
-        sscanf(token, "%u", &res);
-        result[index] = res;
-        token = strtok(NULL, &a_delim);
-        index++;
-      }
-    }
-
-    return result;
+  return A;
 }
 
 /*
-  Renvoie 1 si la chaine `s` est acceptée par l'automate
-  `A` 0 sinon
-*/
-int afd_simul(char *s, afd A){
+ * FUNCTION: afd_simuler
+ * ---------------------
+ * renvoie 1 si la chaine `s` est acceptée par l'AFD `A`, 0 sinon
+ *
+ * param:
+ *        A - un AFD
+ *        s - la chaine de caractères à analyser
+ */
+int afd_simuler(AFD A, char *s) {
+  unsigned int cursor = 0;
+  int q = A->q0;
 
-  uint etatCourant = A.init;
-  uchar currentChar = *s;
-  while (*s != '\0') {
-    uint etatSuivant = A.delta[etatCourant][A.tsymb[currentChar]];
-
-    if (etatSuivant == ETAT_NONE) {
-      break;
-    }
-
-    currentChar = *(s++);
-    etatCourant = etatSuivant;
+  while ((s[cursor] != '\0') && (s[cursor] != '\n')) {
+    int res = A->dico[s[cursor]-ASCII_FIRST];
+    q = A->delta[q][res];
+    cursor++;
   }
 
-  for (uint i = 0; i < A.nbfinal; i++) {
-    uint etatFinal = A.finals[i];
-    if (etatCourant == etatFinal) {
-      return 1;
-    }
-  }
+  return intIsInArray(q, A->F, A->lenF);
 
-  return 0;
- }
+}

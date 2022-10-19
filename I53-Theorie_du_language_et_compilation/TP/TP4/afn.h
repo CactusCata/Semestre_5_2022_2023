@@ -1,34 +1,30 @@
 #ifndef AFN_H
 #define AFN_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "afd.h"
+#include "utils.h"
+#include "arrayUtils.h"
 
+#define ASCII_FIRST 38
+#define ASCII_LAST 127
+#define MAX_SYMBOLES 80
 
-#define INT_ETAT(q) (1ULL<< (q)) 
-#define IN(q,X) ((INT_ETAT(q) & X ) > 0)
+struct AFN{
+  int Q,lenI,lenF,lenSigma;
+  int *I,*F;
+  char * Sigma;
+  char dico[MAX_SYMBOLES];
+  int ***delta;
+};
 
-typedef unsigned int uint;
-typedef unsigned long long int ullong;
+typedef struct AFN * AFN;
 
-typedef struct{
-  uint nbetat, nbsymb;
-  char * alphabet;
-  uchar tsymb[SYMB_ASCII_FIN];
-  ullong init, finals;
-  ullong **delta;
-} afn;
+AFN afn_init(int Q, int nbInitiaux,int * listInitiaux, int nbFinals, int * listFinals, char *Sigma);
+void afn_print(AFN A);
+void afn_free(AFN A);
 
-void afn_init(afn *A, uint nbetat, char * alphabet, ullong init, ullong finals);
-void afn_add_trans(afn *A, uint q1, uint s, uint q2);
-void afn_free(afn *A);
-
-void afn_print(afn A);
-void afn_finit(char *f, afn *A);
-
-ullong afn_epsilon_fermeture(afn A, ullong R);
-void afn_determinisation(afn A, afd *D);
-
+void afn_ajouter_transition(AFN A, int q1, char s, int q2);
+AFN afn_finit(char *file);
+int * afn_epsilon_fermeture(AFN A, int *R);
+int afn_simuler(AFN A, char *s);
 
 #endif
