@@ -4,6 +4,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+typedef unsigned int uint;
+
 typedef enum bool {
   False,
   True

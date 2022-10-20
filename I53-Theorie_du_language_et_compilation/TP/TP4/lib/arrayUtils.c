@@ -15,9 +15,9 @@ void fillIntArray(int *array, size_t arraySize, int value) {
   }
 }
 
-void shiftValuesArrayToRight(int *array, size_t arraySize, size_t startShiftingIndex) {
-  for (size_t currentIndex = arraySize - 1; currentIndex > startShiftingIndex; currentIndex--) {
-    array[currentIndex] = array[currentIndex - 1];
+void shiftValuesArrayToRight(int *array, int arraySize, int startShiftingIndex) {
+  for (int i = arraySize - 1; i >= startShiftingIndex; i--) {
+    array[i + 1] = array[i];
   }
 }
 

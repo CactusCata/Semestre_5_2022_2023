@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include "afd.h"
-#include "afn.h"
+#include "af.h"
 
 int main(int argc, char *argv[]){
 
@@ -17,7 +15,7 @@ int main(int argc, char *argv[]){
   afd_free(afd);
   */
 
-  AFN afn = afn_finit("afn1.afn");
+  AFN afn = afn_finit("../data/afn1.afn");
   afn_print(afn);
 
   afn_free(afn);

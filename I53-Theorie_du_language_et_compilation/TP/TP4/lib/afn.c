@@ -189,14 +189,13 @@ void afn_ajouter_transition(AFN A, int q1, char s, int q2) {
     fillIntArray(A->delta[q1][sommet], arraySize, -1);
     A->delta[q1][sommet][0] = q2;
   } else {
-    size_t q2InsertionIndex = 0;
-    while (A->delta[q1][sommet][q2InsertionIndex] < q2) {
-      q2InsertionIndex++;
-    }
-    shiftValuesArrayToRight(A->delta[q1][sommet], arraySize, q2InsertionIndex);
-    A->delta[q1][sommet][q2InsertionIndex] = q2;
+      size_t q2InsertionIndex = 0;
+      while (A->delta[q1][sommet][q2InsertionIndex] < q2 && A->delta[q1][sommet][q2InsertionIndex] != -1) {
+          q2InsertionIndex++;
+      }
+      shiftValuesArrayToRight(A->delta[q1][sommet], arraySize, q2InsertionIndex);
+      A->delta[q1][sommet][q2InsertionIndex] = q2;
   }
-  printArray(A->delta[q1][sommet], A->Q + 1);
 }
 
 /*
@@ -234,32 +233,21 @@ AFN afn_finit(char *fileName) {
   fscanf(file, "%d\n", &nbEtat);
   fscanf(file, "%d\n", &nbEtatInitiaux);
 
-  printf("nbEtat = %d\n", nbEtat);
-  printf("nbEtatInitiaux = %d\n", nbEtatInitiaux);
   char *lineBuffer = (char *) malloc(sizeof(char) * 1024);
   fgets(lineBuffer, 1024, file);
-  printf("ligne lue: %s\n", lineBuffer);
   int *listInitiaux = getAllIntInLine(lineBuffer, nbEtatInitiaux);
-  printf("listInitiaux:");
-  printArray(listInitiaux, nbEtatInitiaux);
-  printf("\n");
 
   uint nbEtatFinaux;
   fscanf(file, "%d\n", &nbEtatFinaux);
 
   fgets(lineBuffer, 1024, file);
   int *listFinals = getAllIntInLine(lineBuffer, nbEtatFinaux);
-  printf("listFinaux: ");
-  printArray(listFinals, nbEtatFinaux);
-  printf("\n");
   free(lineBuffer);
 
   char *Sigma;
   fscanf(file, "%ms\n", &Sigma);
-  printf("Sigma: %s\n", Sigma);
 
   AFN B = afn_init(nbEtat, nbEtatInitiaux, listInitiaux, nbEtatFinaux, listFinals, Sigma);
-  afn_print(B);
 
   int etat_i, etat_j;
   char symbol;

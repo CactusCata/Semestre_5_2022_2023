@@ -1,6 +1,9 @@
 #ifndef AFN_H
 #define AFN_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "utils.h"
 #include "arrayUtils.h"
 
