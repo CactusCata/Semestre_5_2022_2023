@@ -1,5 +1,5 @@
-#ifndef AF_H
-#define AF_H
+#ifndef MAIN_H
+#define MAIN_H
 
 #include <stdio.h>
 #include "../lib/afd.h"

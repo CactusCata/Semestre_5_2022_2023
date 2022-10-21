@@ -6,10 +6,10 @@ libaf.a: afd.o afn.o libutils.a  libcontainer.a
 	ar crs $@ $^
 
 afd.o: afd.c afd.h
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $< -lm
 
 afn.o: afn.c afn.h
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CFLAGS) -c $< -lm
 
 # utils lib
 libutils.a: utils.o arrayUtils.o

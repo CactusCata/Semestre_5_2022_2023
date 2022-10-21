@@ -6,8 +6,8 @@ make
 
 cd ../test
 make clean
-make af.exe
+make prog.exe
 
 # Possible de mettre "valgrind" en lancant la commande:
 # ./launch.sh valgrind
-$1 ./af.exe
+$1 ./prog.exe

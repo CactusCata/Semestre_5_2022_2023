@@ -6,6 +6,7 @@
 #include <string.h>
 #include "utils.h"
 #include "arrayUtils.h"
+#include "afd.h"
 
 #define ASCII_FIRST 38
 #define ASCII_LAST 127
@@ -28,6 +29,7 @@ void afn_free(AFN A);
 void afn_ajouter_transition(AFN A, int q1, char s, int q2);
 AFN afn_finit(char *file);
 int * afn_epsilon_fermeture(AFN A, int *R);
+AFD afn_determiniser(AFN A);
 int afn_simuler(AFN A, char *s);
 
 #endif

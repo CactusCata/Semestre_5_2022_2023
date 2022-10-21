@@ -1,13 +1,14 @@
 CC= gcc
 CFLAGS= -Wall -g
 CLIBS_PATH = -I../lib -L../lib
-CLIBS = -lm -laf -lutils -lcontainer
+CLIBS_BASICS = -lm
+CLIBS = -laf -lutils -lcontainer $(CLIBS_BASICS)
 
 # Main app
-af.exe: af.o
-	$(CC) $(CFLAGS) -o $@ $^ $(CLIBS_PATH) $(CLIBS)
+prog.exe: main.o
+	$(CC) $(CFLAGS) -o $@ $^ $(CLIBS) $(CLIBS_PATH)
 
-af.o: af.c af.h
+main.o: main.c main.h
 	$(CC) $(CFLAGS) -c $<
 
 clean:

@@ -31,3 +31,26 @@ void printArray(int *array, size_t arraySize) {
   }
   printf("]\n");
 }
+
+bool TwoDArrayIsInThreeDArray(int *array2D, int size2DArray, int **array3D, int size3DArray) {
+  for (int i = 0; i < size3DArray; i++) {
+    currentArray = array3D[i];
+    bool match = True;
+    for (int j = 0; j < size2DArray; j++) {
+      if (array2D[j] != currentArray[j]) {
+        match = False;
+        break;
+      }
+    }
+    if (match) {
+      return True;
+    }
+  }
+  return False;
+}
+
+void fill3DArrayWithNull(int **array3D, int arraySize) {
+  for (int i = 0; i < arraySize; i++) {
+    array3D
+  }
+}

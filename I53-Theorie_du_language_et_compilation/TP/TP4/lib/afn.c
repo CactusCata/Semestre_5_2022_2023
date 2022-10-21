@@ -181,7 +181,7 @@ void afn_free(AFN A){
  *        q2 - état d'arrivée de la transition
  */
 void afn_ajouter_transition(AFN A, int q1, char s, int q2) {
-  unsigned int arraySize = A->Q + 1;
+  unsigned int arraySize = A->Q + 3 // max - min + 1 + epsilonTransition + le -1 à la fin;
   int sommet = A->dico[s-ASCII_FIRST];
 
   if (A->delta[q1][sommet] == NULL) {
@@ -273,7 +273,48 @@ AFN afn_finit(char *fileName) {
  * terminant par -1, NULL si vide
  */
 
-int * afn_epsilon_fermeture(AFN A, int *R);
+int * afn_epsilon_fermeture(AFN A, int *R) {
+  Stack *stack = createStack();
+
+  // majoration du nombre de valeurs atteintes par le nombre d'état possible
+  int *fermeture = (int *) malloc(sizeof(int) * A->Q);
+  int cursorFermeture = 0;
+  fillIntArray(fermeture, A->Q, -1);
+
+  int index = 0;
+  while (R[index] != -1) {
+    push(stack, R[index]);
+    fermeture[cursorFermeture++] = R[index];
+  }
+
+  while (!stackIsEmpty(stack)) {
+    int q = pop(stack);
+    int letter = A->dico['&'-ASCII_FIRST];
+    if (A->delta[q][letter] != NULL) {
+      for (int deltaCursor = 0; A->delta[q][letter][deltaCursor] != -1; deltaCursor++) {
+        int q_sec = A->delta[q][letter][deltaCursor];
+        if (!intIsInArray(q_sec, fermeture, A->Q)) {
+          fermeture[cursorFermeture++] = q_sec;
+          push(stack, q_sec)
+        }
+      }
+    }
+  }
+  return fermeture;
+}
+
+AFD afn_determiniser(AFN A) {
+  int *Q_0 = afn_epsilon_fermeture(A, A->I);
+  int **S = (int **) malloc(sizeof(int *) * A->Q);
+
+  for (int q = 0; q <= S; q++) {
+    for (int indexAlphabet = 0; indexAlphabet < A->lenSigma; indexAlphabet++) {
+      char letter = A->Sigma[indexAlphabet];
+      int letterInt = A->dico[letter-ASCII_FIRST];
+      int *tmp = afn_epsilon_fermeture(A, A->[q][letterInt]);
+    }
+  }
+}
 /*
  * FUNCTION: afn_simuler
  * ---------------------
