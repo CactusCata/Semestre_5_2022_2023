@@ -181,7 +181,7 @@ void afn_free(AFN A){
  *        q2 - état d'arrivée de la transition
  */
 void afn_ajouter_transition(AFN A, int q1, char s, int q2) {
-  unsigned int arraySize = A->Q + 3 // max - min + 1 + epsilonTransition + le -1 à la fin;
+  unsigned int arraySize = A->Q + 3; // max - min + 1 + epsilonTransition + le -1 à la fin;
   int sommet = A->dico[s-ASCII_FIRST];
 
   if (A->delta[q1][sommet] == NULL) {
@@ -295,7 +295,7 @@ int * afn_epsilon_fermeture(AFN A, int *R) {
         int q_sec = A->delta[q][letter][deltaCursor];
         if (!intIsInArray(q_sec, fermeture, A->Q)) {
           fermeture[cursorFermeture++] = q_sec;
-          push(stack, q_sec)
+          push(stack, q_sec);
         }
       }
     }
@@ -303,17 +303,60 @@ int * afn_epsilon_fermeture(AFN A, int *R) {
   return fermeture;
 }
 
+
+/**
+
+int Q, int q0, int nbFinals, int * listFinals, char *Sigma
+Soit A un AFN
+
+Q vaut le nombre d'éléments de S
+q_0 vaut 0
+nbFinals vaut
+Sigma vaut Sigma
+
+*/
+
 AFD afn_determiniser(AFN A) {
   int *Q_0 = afn_epsilon_fermeture(A, A->I);
   int **S = (int **) malloc(sizeof(int *) * A->Q);
+  fill3DArrayWithNull(S, A->Q);
+  int sCursorW = 0; // vaut le nombre d'éléments de S
+  S[sCursorW++] = Q_0;
+  int *etatsFinaux = (int *) malloc(sizeof(int) * (1 << A->Q));
+  fillIntArray(etatsFinaux, 1 << A->Q, -1);
+  int etatsFinauxCursor = 0;
 
-  for (int q = 0; q <= S; q++) {
-    for (int indexAlphabet = 0; indexAlphabet < A->lenSigma; indexAlphabet++) {
-      char letter = A->Sigma[indexAlphabet];
-      int letterInt = A->dico[letter-ASCII_FIRST];
-      int *tmp = afn_epsilon_fermeture(A, A->[q][letterInt]);
+  for (int sCursorR = 0; S[sCursorR] != NULL; sCursorR++) {
+    int *setOfState = S[sCursorR];
+    for (int stateCusor = 0; setOfState[stateCusor] != -1; stateCusor++) {
+      int q = setOfState[stateCusor];
+      for (int indexAlphabet = 0; indexAlphabet < A->lenSigma; indexAlphabet++) {
+        char letter = A->Sigma[indexAlphabet];
+        int letterInt = A->dico[letter-ASCII_FIRST];
+
+        int *tmp = afn_epsilon_fermeture(A, A->delta[q][letterInt]);
+        if (!TwoDArrayIsInThreeDArray(tmp, A->Q, S, A->Q)) {
+          S[sCursorW++] = tmp;
+        }
+
+        // Ajout des états finaux
+        for (int cursor = 0; tmp[cursor] != -1; cursor++) {
+          int state = tmp[cursor];
+          if (intIsInArray(state, A->F, A->lenF)) {
+            etatsFinaux[etatsFinauxCursor++] = sCursorR - 1;
+            break;
+          }
+        }
+      }
     }
   }
+
+  etatsFinaux = ajustArray(etatsFinaux, etatsFinauxCursor);
+  AFD B = afd_init(sCursorW, 0, etatsFinauxCursor, etatsFinaux, A->Sigma);
+
+  // AJOUTER LES TRANSITIONS
+
+  return B;
 }
 /*
  * FUNCTION: afn_simuler

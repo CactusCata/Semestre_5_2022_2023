@@ -18,6 +18,11 @@ int main(int argc, char *argv[]){
   AFN afn = afn_finit("../data/afn1.afn");
   afn_print(afn);
 
+  AFD afd = afn_determiniser(afn);
+  afd_print(afd);
+
+  free(afd);
+
   afn_free(afn);
 
   /**

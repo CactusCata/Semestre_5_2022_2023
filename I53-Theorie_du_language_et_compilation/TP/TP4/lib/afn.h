@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "utils.h"
+#include "stack.h"
 #include "arrayUtils.h"
 #include "afd.h"
 

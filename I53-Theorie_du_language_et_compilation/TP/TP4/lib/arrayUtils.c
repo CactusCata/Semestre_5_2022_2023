@@ -34,7 +34,7 @@ void printArray(int *array, size_t arraySize) {
 
 bool TwoDArrayIsInThreeDArray(int *array2D, int size2DArray, int **array3D, int size3DArray) {
   for (int i = 0; i < size3DArray; i++) {
-    currentArray = array3D[i];
+    int *currentArray = array3D[i];
     bool match = True;
     for (int j = 0; j < size2DArray; j++) {
       if (array2D[j] != currentArray[j]) {
@@ -51,6 +51,15 @@ bool TwoDArrayIsInThreeDArray(int *array2D, int size2DArray, int **array3D, int 
 
 void fill3DArrayWithNull(int **array3D, int arraySize) {
   for (int i = 0; i < arraySize; i++) {
-    array3D
+    array3D[i] = NULL;
   }
+}
+
+int *ajustArray(int *from, int size) {
+  int *to = (int *) malloc(sizeof(int) * size);
+  for (int i = 0; i < size; i++) {
+    to[i] = from[i];
+  }
+  free(from);
+  return to;
 }
