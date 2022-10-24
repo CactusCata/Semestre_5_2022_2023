@@ -252,7 +252,7 @@ AFN afn_finit(char *fileName) {
   int etat_i, etat_j;
   char symbol;
   while (!feof(file)) {
-    if (fscanf(file, "%d %c %d\n", &etat_i, &symbol, &etat_j) != 0) {
+    if (fscanf(file, "%d %c %d\n", &etat_i, &symbol, &etat_j) == 3) {
       afn_ajouter_transition(B, etat_i, symbol, etat_j);
     }
   }
@@ -273,16 +273,23 @@ AFN afn_finit(char *fileName) {
  * terminant par -1, NULL si vide
  */
 
-int * afn_epsilon_fermeture(AFN A, int *R) {
+int * afn_epsilon_fermeture(AFN A, int *R, int RSize) {
   Stack *stack = createStack();
+  //printf("R: \n");
+  //printArray(R, -1);
 
   // majoration du nombre de valeurs atteintes par le nombre d'état possible
-  int *fermeture = (int *) malloc(sizeof(int) * A->Q);
+  int *fermeture = (int *) malloc(sizeof(int) * (A->Q + 3));
   int cursorFermeture = 0;
-  fillIntArray(fermeture, A->Q, -1);
+  fillIntArray(fermeture, A->Q + 3, -1);
 
-  int index = 0;
-  while (R[index] != -1) {
+  if (R == NULL) {
+    return fermeture;
+  }
+
+  for (int index = 0; index < RSize && R[index] != -1; index++) {
+    printf("\t\t\tWe reach R[%d] = \n", index);
+    printf("\t\t\t%d\n", R[index]);
     push(stack, R[index]);
     fermeture[cursorFermeture++] = R[index];
   }
@@ -317,34 +324,88 @@ Sigma vaut Sigma
 */
 
 AFD afn_determiniser(AFN A) {
-  int *Q_0 = afn_epsilon_fermeture(A, A->I);
-  int **S = (int **) malloc(sizeof(int *) * A->Q);
-  fill3DArrayWithNull(S, A->Q);
+  printf("before\n");
+  printArray(A->I, A->lenI);
+  int *Q_0 = afn_epsilon_fermeture(A, A->I, A->lenI);
+  printf("after\n");
+
+  int **S = (int **) malloc(sizeof(int *) * (1 << A->Q));
+  fill3DArrayWithNull(S, 1 << A->Q);
   int sCursorW = 0; // vaut le nombre d'éléments de S
   S[sCursorW++] = Q_0;
   int *etatsFinaux = (int *) malloc(sizeof(int) * (1 << A->Q));
   fillIntArray(etatsFinaux, 1 << A->Q, -1);
   int etatsFinauxCursor = 0;
 
-  for (int sCursorR = 0; S[sCursorR] != NULL; sCursorR++) {
+  /**
+  ---------------------------
+  | delta |   & |   a |   b |
+  ---------------------------
+  |     0 |     |  {1}|     |
+  ---------------------------
+  |     1 |     |  {2}|  {2}|
+  ---------------------------
+  |     2 |     |{0,3}|  {1}|
+  ---------------------------
+  |     3 |     |     |     |
+  ---------------------------
+  */
+
+  // SUPER MEMO
+  IL RESTE A FAIRE LA LIGNE POUR L'ENSEMBLE VIDE.
+  IL FAUT AUSSI REGARDER SI LE RESULTAT FINAL EST JUSTE (CF $TRUC)
+  REVOIR AUSSI LES MAJORATIONS DES 3 (6) LIGNES CI-DESSOUS
+
+  int *stateQ0 = (int *) malloc(sizeof(int) * ((A->lenSigma) * (1 << (A->Q + A->Q))));
+  char *stateSymb = (char *) malloc(sizeof(char) * ((A->lenSigma) * (1 << (A->Q + A->Q))));
+  int *stateQ1 = (int *) malloc(sizeof(int) * ((A->lenSigma) * (1 << (A->Q + A->Q))));
+  fillIntArray(stateQ0, (A->lenSigma) * (1 << (A->Q + A->Q)), -1);
+  fillCharArray(stateSymb, (A->lenSigma) * (1 << (A->Q + A->Q)), '?');
+  fillIntArray(stateQ1, (A->lenSigma) * (1 << (A->Q + A->Q)), -1);
+  printf("Size of arrays is = %d\n", (A->lenSigma) * (1 << (A->Q + A->Q)));
+  int transitionCursor = 0;
+
+  for (int sCursorR = 0; sCursorR < (1 << A->Q) && S[sCursorR] != NULL; sCursorR++) {
+    printf("                                       \n");
+    printf("                                       \n");
+    printf("                                       \n");
+    printf("S[%d] is running...\n", sCursorR);
     int *setOfState = S[sCursorR];
-    for (int stateCusor = 0; setOfState[stateCusor] != -1; stateCusor++) {
+    printArrayStopValue(setOfState, -1);
+    for (int stateCusor = 0; (stateCusor < A->Q + 3) && setOfState[stateCusor] != -1; stateCusor++) {
+      bool writtenFinalState = False;
+      printf("\tproccessing stateCusor = %d\n", stateCusor);
       int q = setOfState[stateCusor];
       for (int indexAlphabet = 0; indexAlphabet < A->lenSigma; indexAlphabet++) {
         char letter = A->Sigma[indexAlphabet];
         int letterInt = A->dico[letter-ASCII_FIRST];
+        printf("\t\tUse letter %c\n", letter);
 
-        int *tmp = afn_epsilon_fermeture(A, A->delta[q][letterInt]);
-        if (!TwoDArrayIsInThreeDArray(tmp, A->Q, S, A->Q)) {
+        printf("\t\tAdding epsilon fermeture...\n");
+        int *tmp = afn_epsilon_fermeture(A, A->delta[q][letterInt], A->Q + 3);
+        printf("\t\tEpsilon fermeture added !\n");
+        if (!TwoDArrayIsInThreeDArray(tmp, A->Q + 3, S, A->Q)) {
+          printf("\t\tAppend new state !\n");
           S[sCursorW++] = tmp;
         }
 
+        printf("Writting at index %d!\n", transitionCursor);
+        // $TRUC: les trois lignes suivantes
+        stateQ0[transitionCursor] = sCursorR;
+        stateSymb[transitionCursor] = letter;
+        stateQ1[transitionCursor] = sCursorW - 1;
+        printf("We added %d %c %d\n", stateQ0[transitionCursor], stateSymb[transitionCursor], stateQ1[transitionCursor]);
+        transitionCursor++;
+
         // Ajout des états finaux
-        for (int cursor = 0; tmp[cursor] != -1; cursor++) {
-          int state = tmp[cursor];
-          if (intIsInArray(state, A->F, A->lenF)) {
-            etatsFinaux[etatsFinauxCursor++] = sCursorR - 1;
-            break;
+        if (!writtenFinalState) {
+          for (int cursor = 0; tmp[cursor] != -1; cursor++) {
+            int state = tmp[cursor];
+            if (intIsInArray(state, A->F, A->lenF)) {
+              etatsFinaux[etatsFinauxCursor++] = sCursorR;
+              writtenFinalState = True;
+              break;
+            }
           }
         }
       }
@@ -352,9 +413,22 @@ AFD afn_determiniser(AFN A) {
   }
 
   etatsFinaux = ajustArray(etatsFinaux, etatsFinauxCursor);
-  AFD B = afd_init(sCursorW, 0, etatsFinauxCursor, etatsFinaux, A->Sigma);
+  AFD B = afd_init(sCursorW - 1, 0, etatsFinauxCursor, etatsFinaux, A->Sigma);
 
-  // AJOUTER LES TRANSITIONS
+  for (int i = 0; i < transitionCursor; i++) {
+    afd_ajouter_transition(B, stateQ0[i], stateSymb[i], stateQ1[i]);
+  }
+
+  free(stateQ0);
+  free(stateSymb);
+  free(stateQ1);
+
+  for (int i = 0; i < (1 << A->Q); i++) {
+      if (S[i] != NULL) {
+        free(S[i]);
+      }
+  }
+  free(S);
 
   return B;
 }

@@ -15,8 +15,20 @@ void fillIntArray(int *array, size_t arraySize, int value) {
   }
 }
 
+void fillCharArray(char *array, size_t arraySize, char value) {
+  for (size_t i = 0; i < arraySize; i++) {
+    array[i] = value;
+  }
+}
+
+int getArraySize(int *array, int stopValue) {
+  int count = 0;
+  for (; array[count] != stopValue; count++);
+  return count;
+}
+
 void shiftValuesArrayToRight(int *array, int arraySize, int startShiftingIndex) {
-  for (int i = arraySize - 1; i >= startShiftingIndex; i--) {
+  for (int i = arraySize - 2; i >= startShiftingIndex; i--) {
     array[i + 1] = array[i];
   }
 }
@@ -32,8 +44,12 @@ void printArray(int *array, size_t arraySize) {
   printf("]\n");
 }
 
+void printArrayStopValue(int *array, int stopValue) {
+  printArray(array, getArraySize(array, stopValue));
+}
+
 bool TwoDArrayIsInThreeDArray(int *array2D, int size2DArray, int **array3D, int size3DArray) {
-  for (int i = 0; i < size3DArray; i++) {
+  for (int i = 0; i < size3DArray && array3D[i] != NULL; i++) {
     int *currentArray = array3D[i];
     bool match = True;
     for (int j = 0; j < size2DArray; j++) {

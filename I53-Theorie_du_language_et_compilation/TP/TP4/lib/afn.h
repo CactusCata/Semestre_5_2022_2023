@@ -29,7 +29,7 @@ void afn_free(AFN A);
 
 void afn_ajouter_transition(AFN A, int q1, char s, int q2);
 AFN afn_finit(char *file);
-int * afn_epsilon_fermeture(AFN A, int *R);
+int * afn_epsilon_fermeture(AFN A, int *R, int RSize);
 AFD afn_determiniser(AFN A);
 int afn_simuler(AFN A, char *s);
 
