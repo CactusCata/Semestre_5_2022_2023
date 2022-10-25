@@ -288,8 +288,7 @@ int * afn_epsilon_fermeture(AFN A, int *R, int RSize) {
   }
 
   for (int index = 0; index < RSize && R[index] != -1; index++) {
-    printf("\t\t\tWe reach R[%d] = \n", index);
-    printf("\t\t\t%d\n", R[index]);
+    printf("\t\t\tWe reach R[%d] = %d\n", index, R[index]);
     push(stack, R[index]);
     fermeture[cursorFermeture++] = R[index];
   }
@@ -324,16 +323,14 @@ Sigma vaut Sigma
 */
 
 AFD afn_determiniser(AFN A) {
-  printf("before\n");
   printArray(A->I, A->lenI);
   int *Q_0 = afn_epsilon_fermeture(A, A->I, A->lenI);
-  printf("after\n");
 
-  int **S = (int **) malloc(sizeof(int *) * (1 << A->Q));
+  int **S = (int **) malloc(sizeof(int *) * (1 << (A->Q + 3)));
   fill3DArrayWithNull(S, 1 << A->Q);
   int sCursorW = 0; // vaut le nombre d'éléments de S
   S[sCursorW++] = Q_0;
-  int *etatsFinaux = (int *) malloc(sizeof(int) * (1 << A->Q));
+  int *etatsFinaux = (int *) malloc(sizeof(int) * (1 << (A->Q + 3)));
   fillIntArray(etatsFinaux, 1 << A->Q, -1);
   int etatsFinauxCursor = 0;
 
@@ -352,9 +349,9 @@ AFD afn_determiniser(AFN A) {
   */
 
   // SUPER MEMO
-  IL RESTE A FAIRE LA LIGNE POUR L'ENSEMBLE VIDE.
-  IL FAUT AUSSI REGARDER SI LE RESULTAT FINAL EST JUSTE (CF $TRUC)
-  REVOIR AUSSI LES MAJORATIONS DES 3 (6) LIGNES CI-DESSOUS
+  //IL RESTE A FAIRE LA LIGNE POUR L'ENSEMBLE VIDE.
+  //IL FAUT AUSSI REGARDER SI LE RESULTAT FINAL EST JUSTE (CF $TRUC)
+  //REVOIR AUSSI LES MAJORATIONS DES 3 (6) LIGNES CI-DESSOUS
 
   int *stateQ0 = (int *) malloc(sizeof(int) * ((A->lenSigma) * (1 << (A->Q + A->Q))));
   char *stateSymb = (char *) malloc(sizeof(char) * ((A->lenSigma) * (1 << (A->Q + A->Q))));
@@ -370,32 +367,39 @@ AFD afn_determiniser(AFN A) {
     printf("                                       \n");
     printf("                                       \n");
     printf("S[%d] is running...\n", sCursorR);
+    //print3DArrayStopValue(S, sCursorW, -1);
     int *setOfState = S[sCursorR];
     printArrayStopValue(setOfState, -1);
     for (int stateCusor = 0; (stateCusor < A->Q + 3) && setOfState[stateCusor] != -1; stateCusor++) {
       bool writtenFinalState = False;
       printf("\tproccessing stateCusor = %d\n", stateCusor);
       int q = setOfState[stateCusor];
-      for (int indexAlphabet = 0; indexAlphabet < A->lenSigma; indexAlphabet++) {
+      for (int indexAlphabet = 1; indexAlphabet < A->lenSigma; indexAlphabet++) {
         char letter = A->Sigma[indexAlphabet];
         int letterInt = A->dico[letter-ASCII_FIRST];
         printf("\t\tUse letter %c\n", letter);
 
-        printf("\t\tAdding epsilon fermeture...\n");
+        printf("\t\t\tAdding epsilon fermeture...\n");
         int *tmp = afn_epsilon_fermeture(A, A->delta[q][letterInt], A->Q + 3);
-        printf("\t\tEpsilon fermeture added !\n");
-        if (!TwoDArrayIsInThreeDArray(tmp, A->Q + 3, S, A->Q)) {
-          printf("\t\tAppend new state !\n");
+        printf("\t\t\tEpsilon fermeture added !\n");
+        //printArrayStopValue(tmp, -1);
+        int index = -1;
+        if (!TwoDArrayIsInThreeDArray(tmp, S, 1 << (A->Q), &index)) {
+          printf("\t\t\tAppend new state !\n");
+          printArrayStopValue(tmp, -1);
+          index = sCursorW;
           S[sCursorW++] = tmp;
         }
 
-        printf("Writting at index %d!\n", transitionCursor);
-        // $TRUC: les trois lignes suivantes
+        printf("\t\t\tIndex is %d.\n", index);
+
+        printf("\t\t\tWritting at index %d!\n", transitionCursor);
         stateQ0[transitionCursor] = sCursorR;
         stateSymb[transitionCursor] = letter;
-        stateQ1[transitionCursor] = sCursorW - 1;
-        printf("We added %d %c %d\n", stateQ0[transitionCursor], stateSymb[transitionCursor], stateQ1[transitionCursor]);
+        stateQ1[transitionCursor] = index;
+        printf("\t\t\tWe added %d %c %d\n", stateQ0[transitionCursor], stateSymb[transitionCursor], stateQ1[transitionCursor]);
         transitionCursor++;
+
 
         // Ajout des états finaux
         if (!writtenFinalState) {
@@ -413,7 +417,14 @@ AFD afn_determiniser(AFN A) {
   }
 
   etatsFinaux = ajustArray(etatsFinaux, etatsFinauxCursor);
-  AFD B = afd_init(sCursorW - 1, 0, etatsFinauxCursor, etatsFinaux, A->Sigma);
+
+  char newSigma[A->lenSigma];
+  for (int i = 0; i < A->lenSigma - 1; i++) {
+    newSigma[i] = A->Sigma[i + 1];
+  }
+  newSigma[A->lenSigma - 1] = '\0';
+
+  AFD B = afd_init(sCursorW - 1, 0, etatsFinauxCursor, etatsFinaux, newSigma);
 
   for (int i = 0; i < transitionCursor; i++) {
     afd_ajouter_transition(B, stateQ0[i], stateSymb[i], stateQ1[i]);

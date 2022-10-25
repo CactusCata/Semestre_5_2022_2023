@@ -16,7 +16,9 @@ void shiftValuesArrayToRight(int *array, int arraySize, int startShiftingIndex);
 
 void printArray(int *array, size_t arraySize);
 
-bool TwoDArrayIsInThreeDArray(int *array2D, int size2DArray, int **array3D, int size3DArray);
+bool TwoDArrayIsInThreeDArray(int *array2D, int **array3D, int size3DArray, int *index);
+
+void print3DArrayStopValue(int **array, int size, int stopValue);
 
 void fill3DArrayWithNull(int **array3D, int arraySize);
 

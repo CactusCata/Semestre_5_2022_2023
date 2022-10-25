@@ -48,17 +48,46 @@ void printArrayStopValue(int *array, int stopValue) {
   printArray(array, getArraySize(array, stopValue));
 }
 
-bool TwoDArrayIsInThreeDArray(int *array2D, int size2DArray, int **array3D, int size3DArray) {
+void print3DArrayStopValue(int **array, int size, int stopValue) {
+  for (int i = 0; i < size && array[i] != NULL; i++) {
+    printArrayStopValue(array[i], stopValue);
+  }
+}
+
+bool TwoDArrayIsInThreeDArray(int *array2D, int **array3D, int size3DArray, int *index) {
+  int arraySize2D = getArraySize(array2D, -1);
+  printf("\n\nComparaison 3D\n");
+  printf("Cible: \n");
+  printf("Taille : %d\n", getArraySize(array2D, -1));
+  printArrayStopValue(array2D, -1);
+  printf("\nCurrent: \n");
+  print3DArrayStopValue(array3D, size3DArray, -1);
+
+  if (arraySize2D == 0) {
+    for (int i = 0; i < size3DArray && array3D[i] != NULL; i++) {
+      int *currentArray = array3D[i];
+      if (getArraySize(currentArray, -1) == 0) {
+        (*index) = i;
+        return True;
+      }
+    }
+    return False;
+  }
+
   for (int i = 0; i < size3DArray && array3D[i] != NULL; i++) {
     int *currentArray = array3D[i];
     bool match = True;
-    for (int j = 0; j < size2DArray; j++) {
+    int currentArraySize = getArraySize(currentArray, -1);
+
+    for (int j = 0; j < arraySize2D; j++) {
       if (array2D[j] != currentArray[j]) {
         match = False;
         break;
       }
     }
+
     if (match) {
+      (*index) = i;
       return True;
     }
   }
