@@ -6,14 +6,14 @@
 
 #define ASCII_FIRST 38
 #define ASCII_LAST 127
-#define MAX_SYMBOLES 80
+#define MAX_SYMBOLES 90
 
 
 struct AFD{
   int Q,q0,lenF,lenSigma;
   int *F;
   char * Sigma;
-  char dico[MAX_SYMBOLES];
+  int dico[MAX_SYMBOLES];
   int **delta;
 };
 

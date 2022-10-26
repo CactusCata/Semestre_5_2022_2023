@@ -193,7 +193,8 @@ AFD afd_finit(char *fileName) {
   }
 
   fclose(file);
-
+  free(Sigma);
+  free(listFinals);
 
   return A;
 }

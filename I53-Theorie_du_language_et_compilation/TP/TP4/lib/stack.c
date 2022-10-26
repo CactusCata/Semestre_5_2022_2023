@@ -9,7 +9,7 @@ Stack* createStack() {
 
 void freeStack(Stack *stack) {
     freeSElement(stack->first);
-    //free(stack); // need to remove this if stack is not pointor
+    free(stack); // need to remove this if stack is not pointor
     // and he is an array of stack
 }
 

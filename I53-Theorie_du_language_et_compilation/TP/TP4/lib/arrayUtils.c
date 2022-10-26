@@ -49,8 +49,11 @@ void printArrayStopValue(int *array, int stopValue) {
 }
 
 void print3DArrayStopValue(int **array, int size, int stopValue) {
-  for (int i = 0; i < size && array[i] != NULL; i++) {
-    printArrayStopValue(array[i], stopValue);
+  for (int i = 0; i < size; i++) {
+    if (array[i] != NULL)
+      printArrayStopValue(array[i], stopValue);
+    else
+      break;
   }
 }
 

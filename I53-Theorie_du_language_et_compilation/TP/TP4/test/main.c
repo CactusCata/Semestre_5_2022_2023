@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
   AFD afd = afn_determiniser(afn);
   afd_print(afd);
 
-  free(afd);
+  afd_free(afd);
 
   afn_free(afn);
 

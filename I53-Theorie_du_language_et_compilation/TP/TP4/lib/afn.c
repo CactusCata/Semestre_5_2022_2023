@@ -158,7 +158,7 @@ void afn_free(AFN A){
   for (int q=0; q<A->Q+1; q++){
     for (int s=0; s<A->lenSigma; s++){
       if (A->delta[q][s]!=NULL)
-	free(A->delta[q][s]);
+	      free(A->delta[q][s]);
     }
     free(A->delta[q]);
   }
@@ -258,6 +258,9 @@ AFN afn_finit(char *fileName) {
   }
 
   fclose(file);
+  free(Sigma);
+  free(listInitiaux);
+  free(listFinals);
 
   return B;
 }
@@ -274,22 +277,20 @@ AFN afn_finit(char *fileName) {
  */
 
 int * afn_epsilon_fermeture(AFN A, int *R, int RSize) {
-  Stack *stack = createStack();
-  //printf("R: \n");
-  //printArray(R, -1);
 
   // majoration du nombre de valeurs atteintes par le nombre d'état possible
-  int *fermeture = (int *) malloc(sizeof(int) * (A->Q + 3));
+  int stateAmount = A->Q + 2;
+  int *fermeture = (int *) malloc(sizeof(int) * stateAmount);
   int cursorFermeture = 0;
-  fillIntArray(fermeture, A->Q + 3, -1);
+  fillIntArray(fermeture, stateAmount, -1);
 
   if (R == NULL) {
-    printf("R est nul !\n");
     return fermeture;
   }
 
+  Stack *stack = createStack();
+
   for (int index = 0; index < RSize && R[index] != -1; index++) {
-    printf("\t\t\tWe reach R[%d] = %d\n", index, R[index]);
     push(stack, R[index]);
     fermeture[cursorFermeture++] = R[index];
   }
@@ -300,62 +301,54 @@ int * afn_epsilon_fermeture(AFN A, int *R, int RSize) {
     if (A->delta[q][letter] != NULL) {
       for (int deltaCursor = 0; A->delta[q][letter][deltaCursor] != -1; deltaCursor++) {
         int q_sec = A->delta[q][letter][deltaCursor];
-        if (!intIsInArray(q_sec, fermeture, A->Q)) {
+        if (!intIsInArray(q_sec, fermeture, stateAmount)) {
           fermeture[cursorFermeture++] = q_sec;
           push(stack, q_sec);
         }
       }
     }
   }
+  freeStack(stack);
   return fermeture;
 }
-
-
-/**
-
-int Q, int q0, int nbFinals, int * listFinals, char *Sigma
-Soit A un AFN
-
-Q vaut le nombre d'éléments de S
-q_0 vaut 0
-nbFinals vaut
-Sigma vaut Sigma
-
-*/
 
 AFD afn_determiniser(AFN A) {
   printArray(A->I, A->lenI);
   int *Q_0 = afn_epsilon_fermeture(A, A->I, A->lenI);
 
-  int **S = (int **) malloc(sizeof(int *) * (1 << (A->Q + 3)));
-  printf("Taille : %d\n", 1 << (A->Q + 3));
-  fill3DArrayWithNull(S, 1 << (A->Q + 3));
-  int sCursorW = 0; // vaut le nombre d'éléments de S
+  int stateAmountAFN = A->Q + 2;
+  // le nombre de sous partie d'un ensemble à n + 1 éléments est 2^(n + 1)
+  int SMaxSize = 1 << stateAmountAFN;
+  printf("Taille : %d\n", SMaxSize);
+  int **S = (int **) malloc(sizeof(int *) * SMaxSize);
+  fill3DArrayWithNull(S, SMaxSize);
+
+
+  // Vaut l'indice d'écriture de S (vaut également à un tout instant le nombre d'élément de S)
+  int sCursorW = 0;
   S[sCursorW++] = Q_0;
-  int *etatsFinaux = (int *) malloc(sizeof(int) * (1 << (A->Q + 3)));
-  fillIntArray(etatsFinaux, 1 << A->Q, -1);
+
+  // Il peut y avoir au maximum le même nombre d'état finaux que d'état dans S
+  int *etatsFinaux = (int *) malloc(sizeof(int) * SMaxSize);
+  fillIntArray(etatsFinaux, SMaxSize, -1);
   int etatsFinauxCursor = 0;
 
-  // SUPER MEMO
-  //IL RESTE A FAIRE LA LIGNE POUR L'ENSEMBLE VIDE.
-  //IL FAUT AUSSI REGARDER SI LE RESULTAT FINAL EST JUSTE (CF $TRUC)
-  //REVOIR AUSSI LES MAJORATIONS DES 3 (6) LIGNES CI-DESSOUS
 
-  int *stateQ0 = (int *) malloc(sizeof(int) * ((A->lenSigma) * (1 << (A->Q + A->Q))));
-  char *stateSymb = (char *) malloc(sizeof(char) * ((A->lenSigma) * (1 << (A->Q + A->Q))));
-  int *stateQ1 = (int *) malloc(sizeof(int) * ((A->lenSigma) * (1 << (A->Q + A->Q))));
-  fillIntArray(stateQ0, (A->lenSigma) * (1 << (A->Q + A->Q)), -1);
-  fillCharArray(stateSymb, (A->lenSigma) * (1 << (A->Q + A->Q)), '?');
-  fillIntArray(stateQ1, (A->lenSigma) * (1 << (A->Q + A->Q)), -1);
-  printf("Size of arrays is = %d\n", (A->lenSigma) * (1 << (A->Q + A->Q)));
+  int maxTransitionSize = A->lenSigma * SMaxSize;
+  int *stateQ0 = (int *) malloc(sizeof(int) * maxTransitionSize);
+  char *stateSymb = (char *) malloc(sizeof(char) * maxTransitionSize);
+  int *stateQ1 = (int *) malloc(sizeof(int) * maxTransitionSize);
+  fillIntArray(stateQ0, maxTransitionSize, -1);
+  fillCharArray(stateSymb, maxTransitionSize, '?');
+  fillIntArray(stateQ1, maxTransitionSize, -1);
+  printf("Size of arrays is = %d\n", maxTransitionSize);
   int transitionCursor = 0;
 
-  for (int sCursorR = 0; sCursorR < (1 << (A->Q + 3)) && S[sCursorR] != NULL; sCursorR++) {
+  for (int sCursorR = 0; sCursorR < SMaxSize && S[sCursorR] != NULL; sCursorR++) {
     printf("                                       \n");
     printf("                                       \n");
     printf("                                       \n");
     printf("S[%d] is running...\n", sCursorR);
-    //print3DArrayStopValue(S, sCursorW, -1);
     int *setOfState = S[sCursorR];
     printArrayStopValue(setOfState, -1);
 
@@ -364,30 +357,33 @@ AFD afn_determiniser(AFN A) {
         int letterInt = A->dico[letter-ASCII_FIRST];
         printf("\t\tUse letter %c\n", letter);
 
-        int *stateReached = (int *) malloc(sizeof(int) * (A->Q + 3));
-        fillIntArray(stateReached, A->Q + 3, -1);
+        int *stateReached = (int *) malloc(sizeof(int) * stateAmountAFN);
+        fillIntArray(stateReached, stateAmountAFN, -1);
+        bool addedInS = False;
 
-        for (int stateCusor = 0; (stateCusor < A->Q + 3) && setOfState[stateCusor] != -1; stateCusor++) {
+        for (int stateCusor = 0; (stateCusor < stateAmountAFN) && setOfState[stateCusor] != -1; stateCusor++) {
           printf("\tproccessing stateCusor = %d\n", stateCusor);
           int q = setOfState[stateCusor];
 
           printf("\t\t\tAdding epsilon fermeture...\n");
-          int *tmp = afn_epsilon_fermeture(A, A->delta[q][letterInt], A->Q + 3);
+          int *tmp = afn_epsilon_fermeture(A, A->delta[q][letterInt], stateAmountAFN);
           printf("\t\t\tEpsilon fermeture added !\n");
           printf("Valeur de l'espsilon fermeture: \n");
           printArrayStopValue(tmp, -1);
 
-          concatenateArrays(stateReached, tmp, A->Q + 3);
+          concatenateArrays(stateReached, tmp, stateAmountAFN);
           printf("The state of reached is: \n");
           printArrayStopValue(stateReached, -1);
+          free(tmp);
         }
 
         int index = -1;
-        if (!TwoDArrayIsInThreeDArray(stateReached, S, 1 << ((A->Q) + 3), &index)) {
+        if (!TwoDArrayIsInThreeDArray(stateReached, S, SMaxSize, &index)) {
           index = sCursorW;
           printf("\t\t\tAppend new state on index %d!\n", index);
           printArrayStopValue(stateReached, -1);
           S[sCursorW++] = stateReached;
+          addedInS = True;
         }
 
         printf("\t\t\tIndex is %d.\n", index);
@@ -403,11 +399,16 @@ AFD afn_determiniser(AFN A) {
         for (int cursor = 0; stateReached[cursor] != -1; cursor++) {
           int state = stateReached[cursor];
           if (intIsInArray(state, A->F, A->lenF)) {
-            etatsFinaux[etatsFinauxCursor++] = index;
-            break;
+            if (!intIsInArray(index, etatsFinaux, etatsFinauxCursor)) {
+              etatsFinaux[etatsFinauxCursor++] = index;
+              break;
+            }
           }
         }
-      
+
+        if (!addedInS) {
+          free(stateReached);
+        }
     }
   }
 
@@ -428,11 +429,10 @@ AFD afn_determiniser(AFN A) {
   free(stateQ0);
   free(stateSymb);
   free(stateQ1);
+  free(etatsFinaux);
 
-  for (int i = 0; i < (1 << A->Q); i++) {
-      if (S[i] != NULL) {
-        free(S[i]);
-      }
+  for (int i = 0; i < SMaxSize && S[i] != NULL; i++) {
+    free(S[i]);
   }
   free(S);
 

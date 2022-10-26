@@ -11,13 +11,13 @@
 
 #define ASCII_FIRST 38
 #define ASCII_LAST 127
-#define MAX_SYMBOLES 80
+#define MAX_SYMBOLES 90
 
 struct AFN{
   int Q,lenI,lenF,lenSigma;
   int *I,*F;
   char * Sigma;
-  char dico[MAX_SYMBOLES];
+  int dico[MAX_SYMBOLES];
   int ***delta;
 };
 
