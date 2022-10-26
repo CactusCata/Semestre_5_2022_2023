@@ -86,11 +86,13 @@ bool TwoDArrayIsInThreeDArray(int *array2D, int **array3D, int size3DArray, int 
       }
     }
 
-    if (match) {
+    if (match && (arraySize2D == currentArraySize)) {
+      printf("Add\n");
       (*index) = i;
       return True;
     }
   }
+  printf("Not append\n");
   return False;
 }
 
@@ -107,4 +109,29 @@ int *ajustArray(int *from, int size) {
   }
   free(from);
   return to;
+}
+
+void concatenateArrays(int *stateReached, int *tmp, int arraySize) {
+  /**
+    tmp doit être trié dans l'ordre croissant et remplis de -1 après
+  */
+
+  int stateReachedCursor = 0;
+  int tmpCursor = 0;
+  while (tmp[tmpCursor] != -1) {
+    if ((tmp[tmpCursor] < stateReached[stateReachedCursor]) || (stateReached[stateReachedCursor] == -1)) {
+      shiftValuesArrayToRight(stateReached, arraySize, stateReachedCursor);
+      stateReached[stateReachedCursor] = tmp[tmpCursor];
+      stateReachedCursor++;
+      tmpCursor++;
+    } else if (tmp[tmpCursor] == stateReached[stateReachedCursor]) {
+      tmpCursor++;
+      stateReachedCursor++;
+    } else {
+      tmpCursor++;
+    }
+    printf("tmpCusor = %d\n", tmpCursor);
+    printf("stateReachedCursor = %d\n", stateReachedCursor);
+  }
+
 }

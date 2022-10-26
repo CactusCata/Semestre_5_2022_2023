@@ -26,4 +26,6 @@ int *ajustArray(int *from, int size);
 
 int getArraySize(int *array, int stopValue);
 
+void concatenateArrays(int *stateReached, int *tmp, int arraySize);
+
 #endif
