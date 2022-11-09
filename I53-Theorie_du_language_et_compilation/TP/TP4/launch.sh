@@ -6,8 +6,8 @@ make
 
 cd ../test
 make clean
-make prog.exe
+make mygrep
 
 # Possible de mettre "valgrind" en lancant la commande:
 # ./launch.sh valgrind
-$1 ./prog.exe
+#$1 ./mygrep

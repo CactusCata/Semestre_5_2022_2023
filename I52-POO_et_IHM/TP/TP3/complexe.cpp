@@ -105,7 +105,7 @@ Complexe operator *(const int& k, const Complexe& z) {
 }
 
 std::ostream &operator <<(std::ostream& stream, const Complexe& z) {
-    return stream << z.getReal() << z.getImaginary();
+    return stream << z.m_real << z.getImaginary();
 }
 
 Complexe Complexe::operator +(const Complexe &z) const {

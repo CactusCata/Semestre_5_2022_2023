@@ -33,7 +33,7 @@ void appendText(char *base, size_t *cursor, char *toAdd) {
   for (; toAdd[i] != '\0'; i++) {
     base[*cursor + i] = toAdd[i];
   }
-  base[*cursor + i] = '\0';
+  base[*cursor + i + 1] = '\0';
   *cursor += i;
 }
 

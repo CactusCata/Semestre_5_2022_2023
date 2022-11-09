@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "afn.h": "c"
+        "afn.h": "c",
+        "afd.h": "c",
+        "vect.h": "c",
+        "stdlib.h": "c"
     }
 }

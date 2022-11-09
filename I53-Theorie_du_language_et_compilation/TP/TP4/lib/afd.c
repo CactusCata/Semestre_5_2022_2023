@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-
 #include "afd.h"
 
 /*
@@ -20,42 +15,31 @@
  * return:
  *        un AFD dont la tableau de transition est allouée mais vide
  */
-AFD  afd_init(int Q, int q0, int nbFinals, int * listFinals, char *Sigma){
-  AFD A;
-  if ( (A=malloc(sizeof(struct AFD))) == NULL){
-    printf("malloc error A");
-    exit(1);
-  }
+AFD afd_init(int Q, int q0, Vect *listFinals, char *Sigma) {
+  AFD A = malloc(sizeof(struct AFD));
+  throwMallocErrorIfTrue(A == NULL);
+
   A->Q = Q;
   A->q0 = q0;
+  A->F = vectCopy(listFinals);
 
-  A->lenF = nbFinals;
-  if ( (A->F = malloc(sizeof(int)*nbFinals)) == NULL){
-    printf("malloc error A->F");
-    exit(1);
-  }
-  for (int i=0; i<nbFinals; i++) A->F[i] = listFinals[i];
-
+  // Alphabet
   A->lenSigma = strlen(Sigma);
-  if ( (A->Sigma = malloc(sizeof(char)*(A->lenSigma+1)))==NULL){
-    printf("malloc error A->Sigma");
-    exit(1);
-  }
+  A->Sigma = malloc(sizeof(char) * (A->lenSigma + 1));
+  throwMallocErrorIfTrue(A->Sigma == NULL);
   strcpy(A->Sigma,Sigma);
   for (int i=0; i<MAX_SYMBOLES; i++) A->dico[i]=-1;
   for (int i=0; i<A->lenSigma; i++) A->dico[Sigma[i]-ASCII_FIRST]=i;
 
-  if ((A->delta = malloc( sizeof(int**)*(Q+1)))==NULL){
-    printf("malloc error A->Sigma");
-    exit(1);
+  // Delta
+  A->delta = createVectArray();
+  for (int q = 0; q < A->Q + 1; q++) {
+    Vect *vect = createVect(false);
+    expendVectSize(vect, A->lenSigma);
+    vect->size = A->lenSigma;
+    vectArrayAdd(A->delta, vect);
   }
-  for (int q=0; q<A->Q+1; q++){
-    if( (A->delta[q] = malloc( sizeof(int *)*A->lenSigma))==NULL){
-      printf("malloc error A->Sigma[%d]", q);
-      exit(1);
-    }
-    for (int s=0; s<A->lenSigma; s++)	A->delta[q][s]=-1;
-  }
+
   return A;
 }
 
@@ -70,9 +54,29 @@ AFD  afd_init(int Q, int q0, int nbFinals, int * listFinals, char *Sigma){
  *        s  - étiquette de la transition
  *        q2 - état d'arrivée de la transition
  */
-void afd_ajouter_transition(AFD A, int q1, char s, int q2){
+void afd_ajouter_transition(AFD A, int q1, char s, int q2) {
+  if (q1 < 0 || q1 > A->Q) {
+    printf("Trying to execute function \"afd_ajouter_transition(AFD A, q1: %d, s: %c, q2: %d)\"...\n", q1, s, q2);
+    printf("q1 need to be in range of [%d, %d]\n", 0, A->Q);
+    exit(1);
+  }
+  
+  if (q2 < 0 || q2 > A->Q) {
+    printf("Trying to execute function \"afd_ajouter_transition(AFD A, q1: %d, s: %c, q2: %d)\"...\n", q1, s, q2);
+    printf("q2 need to be in range of [%d, %d]\n", 0, A->Q);
+    exit(1);
+  }
+
+  if (!charArrayContrains(A->Sigma, A->lenSigma, s)) {
+    printf("Trying to execute function \"afd_ajouter_transition(AFD A, q1: %d, s: %c, q2: %d)\"...\n", q1, s, q2);
+    printf("s need to be in range array:");
+    printArrayChar(A->Sigma, A->lenSigma);
+    printf("\n");
+    exit(1);
+  }
+  
   int res = A->dico[s-ASCII_FIRST];
-  A->delta[q1][res] = q2;
+  vectSet(vectArrayGet(A->delta, q1), q2, res);
 }
 
 
@@ -87,39 +91,81 @@ void afd_ajouter_transition(AFD A, int q1, char s, int q2){
 void afd_print(AFD A){
   printf("Q = {0,..,%d}\n", A->Q);
   printf("q0 = %d\n", A->q0);
-  printf("F = {");
-  for (int i=0; i<A->lenF; i++) printf("%d,",A->F[i]);
-  printf("\b}\n");
-  int cellsize = (int)(ceil(log10( (double)A->Q)))+1;
-  int first_column_size = cellsize>=5 ? cellsize+2 : 7;
-  int padding = (cellsize>=5)? (cellsize-5)/2+1: 1;
-  int line_length = first_column_size+1+(cellsize+2)*A->lenSigma;
-  char * line = malloc(sizeof(char)*(line_length+2));
-  for (int i=0; i<=line_length; i++) line[i]='-';
-  line[line_length+1]='\0';
+  printf("F = ");
+  printVect(A->F);
 
-  printf("%s\n",line);
-  printf("|%*sdelta |", padding, "");
-  for (int i=0; i<A->lenSigma; i++) {
-    printf("%*c |", cellsize, A->Sigma[i]);
+  // Alloc textMatrix
+  char ***textMatrix = (char ***) malloc(sizeof(char **) * (A->Q + 2));
+  int **dimsMatrix = (int **) malloc(sizeof(int *) * (A->Q + 2));
+
+  throwMallocErrorIfTrue(textMatrix == NULL);
+  throwMallocErrorIfTrue(dimsMatrix == NULL);
+
+  // Init first line (delta + letters of alphabet)
+  textMatrix[0] = (char **) malloc(sizeof(char *) * (A->lenSigma + 1));
+  dimsMatrix[0] = (int *) malloc(sizeof(int) * (A->lenSigma + 1));
+
+  throwMallocErrorIfTrue(textMatrix[0] == NULL);
+  throwMallocErrorIfTrue(dimsMatrix[0] == NULL);
+
+  char *cached = (char *) malloc(sizeof(char) * 32);
+  throwMallocErrorIfTrue(cached == NULL);
+  int z = 0;
+  appendText(cached, "delta", &z);
+  textMatrix[0][0] = cached;
+  dimsMatrix[0][0] = strlen(textMatrix[0][0]);
+  for (int alphaIndex = 1; alphaIndex < A->lenSigma + 1; alphaIndex++) {
+    textMatrix[0][alphaIndex] = (char *) malloc(sizeof(char) * 2);
+    throwMallocErrorIfTrue(textMatrix[0][alphaIndex] == NULL);
+    textMatrix[0][alphaIndex][0] = A->Sigma[alphaIndex - 1];
+    textMatrix[0][alphaIndex][1] = '\0';
+    dimsMatrix[0][alphaIndex] = 1;
   }
-  printf("\n");
-  printf("%s\n",line);
 
+  // Fill others lines
+  for (int stateIndex = 1; stateIndex < A->Q + 2; stateIndex++) {
+    dimsMatrix[stateIndex] = (int *) malloc(sizeof(int) * (A->lenSigma + 1));
+    textMatrix[stateIndex] = (char **) malloc(sizeof(char *) * (A->lenSigma + 1));
+    throwMallocErrorIfTrue(dimsMatrix[stateIndex] == NULL);
+    throwMallocErrorIfTrue(textMatrix[stateIndex] == NULL);
 
-  for (int q=0; q<A->Q+1; q++){
-    printf("|%*d |", padding+5, q);
-    for (int i=0; i<A->lenSigma; i++){
-      int s = A->dico[A->Sigma[i]-ASCII_FIRST];
-      if (A->delta[q][s] !=-1)
-	printf("%*d |", cellsize, A->delta[q][s]);
-      else
-	printf("%*s |", cellsize, "");
+    char *stateIndexText = (char *) malloc(sizeof(char) * 15);
+    throwMallocErrorIfTrue(stateIndexText == NULL);
+    sprintf(stateIndexText, "%d", stateIndex - 1);
+    textMatrix[stateIndex][0] = stateIndexText;
+    dimsMatrix[stateIndex][0] = strlen(stateIndexText);
+
+    Vect *vect = vectArrayGet(A->delta, stateIndex - 1);
+    for (int alphabetIndex = 1; alphabetIndex < A->lenSigma + 1; alphabetIndex++) {
+      if (alphabetIndex - 1 >= vect->size || vectGet(vect, alphabetIndex - 1) == -1) {
+        char *q2Null = (char *) malloc(sizeof(char) * 2);
+        throwMallocErrorIfTrue(q2Null == NULL);
+        q2Null[0] = ' ';
+        q2Null[1] = '\0';
+        textMatrix[stateIndex][alphabetIndex] = q2Null;
+        dimsMatrix[stateIndex][alphabetIndex] = 1;
+      } else {
+        int q2 = vectGet(vect, alphabetIndex - 1);
+        char *q2Str = (char *) malloc(sizeof(char) * 15);
+        throwMallocErrorIfTrue(q2Str == NULL);
+        sprintf(q2Str, "%d", q2);
+        textMatrix[stateIndex][alphabetIndex] = q2Str;
+        dimsMatrix[stateIndex][alphabetIndex] = strlen(q2Str);
+      }
     }
-    printf("\n");
-    printf("%s\n",line);
   }
-  free(line);
+
+  printMatrix(textMatrix, dimsMatrix, A->Q + 2, A->lenSigma + 1);
+
+  for (int line = 0; line < A->Q + 2; line++) {
+    for (int col = 0; col < A->lenSigma + 1; col++) {
+      free(textMatrix[line][col]);
+    }
+    free(textMatrix[line]);
+    free(dimsMatrix[line]);
+  }
+  free(textMatrix);
+  free(dimsMatrix);
 }
 
 /*
@@ -131,10 +177,12 @@ void afd_print(AFD A){
  *        A  - un AFD
  */
 void afd_free(AFD A){
-  free(A->F);
+  freeVect(A->F);
   free(A->Sigma);
-  for (int q=0; q<A->Q+1; q++) free(A->delta[q]);
-  free(A->delta);
+  for (int q = 0; q < A->Q + 1; q++) {
+    freeVect(vectArrayGet(A->delta, q));
+  }
+  freeVectArray(A->delta);
   free(A);
 }
 
@@ -175,26 +223,30 @@ AFD afd_finit(char *fileName) {
   fscanf(file, "%d\n", &nbFinals);
 
   char *lineBuffer = (char *) malloc(sizeof(char) * 1024);
+  throwMallocErrorIfTrue(lineBuffer == NULL);
   fgets(lineBuffer, 1024, file);
   int *listFinals = getAllIntInLine(lineBuffer, nbFinals);
+  Vect *vectFinaux = createVectFromIntArray(listFinals, nbFinals, false);
   free(lineBuffer);
 
   char *Sigma;
   fscanf(file, "%ms\n", &Sigma);
 
-  AFD A = afd_init(Q, q0, nbFinals, listFinals, Sigma);
+  AFD A = afd_init(Q, q0, vectFinaux, Sigma);
+
+  free(listFinals);
+  freeVect(vectFinaux);
 
   int etat_i, etat_j;
   char symbol;
   while (!feof(file)) {
-    if (fscanf(file, "%d %c %d\n", &etat_i, &symbol, &etat_j) != 0) {
+    if (fscanf(file, "%d %c %d\n", &etat_i, &symbol, &etat_j) == 3) {
       afd_ajouter_transition(A, etat_i, symbol, etat_j);
     }
   }
 
   fclose(file);
   free(Sigma);
-  free(listFinals);
 
   return A;
 }
@@ -213,11 +265,67 @@ int afd_simuler(AFD A, char *s) {
   int q = A->q0;
 
   while ((s[cursor] != '\0') && (s[cursor] != '\n')) {
-    int res = A->dico[s[cursor]-ASCII_FIRST];
-    q = A->delta[q][res];
+    if (!charArrayContrains(A->Sigma, A->lenSigma, s[cursor])) {
+      return 0;
+    }
+    int letterInt = A->dico[s[cursor]-ASCII_FIRST];
+    q = vectGet(vectArrayGet(A->delta, q), letterInt);
     cursor++;
   }
 
-  return intIsInArray(q, A->F, A->lenF);
+  return vectContrainsValue(A->F, q);
+
+}
+
+/**
+ * @brief Crée une image à partir d'un AFD.
+ * L'image créée sera placée dans le dossier ./data/graphViz/png/fileName.png
+ * L'image est créée à l'aide du module graphViz
+ * 
+ * @param A un AFD
+ * @param fileName le nom donné au fichier crée
+ */
+void afd_toPng(AFD A, char *fileName) {
+  char dotExtension[] = "dot";
+  char dotPath[] = "../data/graphViz/dot/";
+  char pngExtension[] = "png";
+  char pngPath[] = "../data/graphViz/png/";
+
+  char destinationDotFile[128];
+  char destinationPngFile[128];
+
+  sprintf(destinationDotFile, "%s%s.%s", dotPath, fileName, dotExtension);
+  sprintf(destinationPngFile, "%s%s.%s", pngPath, fileName, pngExtension);
+
+  FILE *file = fopen(destinationDotFile, "w");
+
+  graphVizInitGraph(file);
+
+  // Add initial state
+  graphVizAddInitialState(file, A->q0);
+
+  // Add final state
+  for (int i = 0; i < A->F->size; i++) {
+    graphVizAddFinalState(file, vectGet(A->F, i));
+  }
+
+  // Add transitions
+  for (int q = 0; q < A->Q + 1; q++) {
+    Vect *vect = vectArrayGet(A->delta, q);
+    for (int alphabetIndex = 0; alphabetIndex < A->lenSigma; alphabetIndex++) {
+      char letter = A->Sigma[alphabetIndex];
+      if (alphabetIndex < vect->size && vectGet(vect, alphabetIndex) != -1) {
+        int q2 = vectGet(vect, alphabetIndex);
+        graphVizAddTransition(file, q, letter, q2);
+      }
+    }
+  }
+
+  graphVizEnd(file);
+  fclose(file);
+
+  char cmd[512];
+  sprintf(cmd, "dot -Tpng %s > %s", destinationDotFile, destinationPngFile);
+  system(cmd);
 
 }

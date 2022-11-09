@@ -2,8 +2,10 @@
 #define MAIN_H
 
 #include <stdio.h>
-#include "../lib/afd.h"
+
 #include "../lib/afn.h"
+#include "../lib/compregex.h"
+
 
 int main(int argc, char *argv[]);
 

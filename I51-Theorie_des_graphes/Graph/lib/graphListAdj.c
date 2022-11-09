@@ -314,39 +314,11 @@ unsigned int getDegree(GraphL graph, unsigned int sommet) {
   return graph.listAdj[sommet].size;
 }
 
-InfoGraph *getInfosGraph(GraphL graph, int *sizeInfoGraph) {
+InfoGraph *getInfosGraph(GraphL graph) {
   InfoGraph *infos = (InfoGraph *) malloc(sizeof(InfoGraph) * graph.edgeAmount);
-  int infosCursorW = 0;
   unsigned char *reached = (unsigned char *) calloc(sizeof(unsigned char), graph.edgeAmount);
 
-  for (size_t s = 0; s < graph.edgeAmount; s++) {
-    if (!reached[s]) {
-      unsigned int composanteSize = 0;
-      reachAllNeighborsRecLAndRecord(s, graph, reached, &composanteSize);
-      infos[infosCursorW].representant = s;
-      infos[infosCursorW].composanteSize = composanteSize;
-      infosCursorW++;
-      (*sizeInfoGraph)++;
-    }
-  }
 
   free(reached);
   return infos;
-}
-
-GraphL randomGraph(int n, float p) {
-  srand(time(NULL) * getpid());
-  GraphL graph = initGraphL(n);
-  int seuil = ((1 + p) / (n - 1)) * RAND_MAX;
-  printf("Seuil: %d\n", seuil);
-  for (int i = 0; i < n; i++) {
-    for (int j = i + 1; j < n; j++) {
-      if (rand() > seuil) {
-        printf("Ajout de %d %d\n", i, j);
-        push(&graph.listAdj[i], j);
-        push(&graph.listAdj[j], i);
-      }
-    }
-  }
-  return graph;
 }

@@ -24,7 +24,6 @@ int main(int argc, char *argv[]) {
   freeGraphL(g2);
   */
 
-  /**
   Pair *pairs = generatePairEnum(6);
   GraphL g = intToGraph(623, 6, pairs);
   printGraphL(g);
@@ -34,15 +33,7 @@ int main(int argc, char *argv[]) {
 
   int n = 7;
   printf("Proportion connexe pour n = %d vaut %d\n", n, proportionConnexe(n));
-  */
 
-  char textBuffer[32];
-  for (float i = -1; i <= 1; i += 0.1) {
-    sprintf(textBuffer, "randGraph%f", i);
-    GraphL g = randomGraph(6, i);
-    drawGraphL(g, "../data/", textBuffer);
-    freeGraphL(g);
-  }
 
   return 0;
 }

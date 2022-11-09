@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <math.h>
-
 #include "afn.h"
 
 /*
@@ -22,35 +17,20 @@
  * return:
  *        un AFN dont la tableau de transition est allouée mais vide
  */
-AFN  afn_init(int Q, int nbInitiaux, int * listInitiaux, int nbFinals, int * listFinals, char *Sigma){
-  AFN A;
-  if ( (A=malloc(sizeof(struct AFN))) == NULL){
-    printf("malloc error A");
-    exit(1);
-  }
+AFN afn_init(int Q, Vect *initiaux, Vect *finaux, char *Sigma) {
+  AFN A = malloc(sizeof(struct AFN));
+  throwMallocErrorIfTrue(A == NULL);
+
   A->Q = Q;
+  A->I = vectCopy(initiaux);
+  A->F = vectCopy(finaux);
 
-  A->lenI = nbInitiaux;
-  if ( (A->I = malloc(sizeof(int)*nbInitiaux)) == NULL){
-    printf("malloc error A->I");
-    exit(1);
-  }
-  for (int i=0; i<nbInitiaux; i++) A->I[i] = listInitiaux[i];
-
-  A->lenF = nbFinals;
-  if ( (A->F = malloc(sizeof(int)*nbFinals)) == NULL){
-    printf("malloc error A->F");
-    exit(1);
-  }
-  for (int i=0; i<nbFinals; i++) A->F[i] = listFinals[i];
-
-
+  // Alphabet
   A->lenSigma = strlen(Sigma);
   if (Sigma[0] != '&') A->lenSigma++;
-  if ( (A->Sigma = malloc(sizeof(char)*(A->lenSigma+1)))==NULL){
-    printf("malloc error A->Sigma");
-    exit(1);
-  }
+  A->Sigma = malloc(sizeof(char) * (A->lenSigma + 1));
+  throwMallocErrorIfTrue(A->Sigma == NULL);
+
   if (Sigma[0] != '&'){
     strcpy(A->Sigma+1,Sigma);
     A->Sigma[0]='&';
@@ -60,20 +40,32 @@ AFN  afn_init(int Q, int nbInitiaux, int * listInitiaux, int nbFinals, int * lis
   for (int i=0; i<MAX_SYMBOLES; i++) A->dico[i]=-1;
   for (int i=0; i<A->lenSigma; i++) A->dico[A->Sigma[i]-ASCII_FIRST]=i;
 
-  if ((A->delta = malloc( sizeof(int***)*(Q+1)))==NULL){
-    printf("malloc error A->Sigma");
-    exit(1);
-  }
-  for (int q=0; q<A->Q+1; q++){
-    if( (A->delta[q] = malloc( sizeof(int **)*A->lenSigma))==NULL){
-      printf("malloc error A->Sigma[%d]", q);
-      exit(1);
+  // Delta
+  A->delta = malloc(sizeof(VectArray **) * (Q + 1));
+  throwMallocErrorIfTrue(A->delta == NULL);
+
+  for (int q = 0; q < A->Q + 1; q++) {
+    A->delta[q] = createVectArray();
+    for (int s = 0; s < A->lenSigma; s++)	{
+      vectArrayAdd(A->delta[q], NULL);
     }
-    for (int s=0; s<A->lenSigma; s++)	A->delta[q][s]=NULL;
   }
   return A;
 }
 
+/**
+ * 
+ * +-------+-------+-----+---------+
+ * | Delta |   &   |  a  |    b    |
+ * +-------+-------+-----+---------+
+ * |  {0}  | {0,1} | {0} | {0,1,3} |
+ * +-------+-------+-----+---------+
+ * | {0,1} |  {0}  | {1} |   {0}   |
+ * +-------+-------+-----+---------+
+ * 
+ * 
+ * 
+*/
 /*
  * FUNCTION: afn_print
  * -------------------
@@ -82,65 +74,80 @@ AFN  afn_init(int Q, int nbInitiaux, int * listInitiaux, int nbFinals, int * lis
  * param:
  *        A  - un AFN
  */
-void afn_print(AFN A){
+void afn_print(AFN A) {
   printf("Q = {0,..,%d}\n", A->Q);
-  printf("I = {");
-  for (int i=0; i<A->lenI; i++) printf("%d,",A->I[i]);
-  printf("\b}\n");
+  printVect(A->I);
+  printVect(A->F);
 
-  printf("F = {");
-  for (int i=0; i<A->lenF; i++) printf("%d,",A->F[i]);
-  printf("\b}\n");
+  // Alloc textMatrix
+  char ***textMatrix = (char ***) malloc(sizeof(char **) * (A->Q + 2));
+  int **dimsMatrix = (int **) malloc(sizeof(int *) * (A->Q + 2));
 
-  int state_size = (int)(ceil(log10( (double)A->Q)));
-  int padding = (state_size>=5)? (state_size-5)/2+1: 1;
-  int first_column_size = state_size>=5 ? state_size+2 : 7;
-  int max_cell_size = 0;
+  throwMallocErrorIfTrue(textMatrix == NULL);
+  throwMallocErrorIfTrue(dimsMatrix == NULL);
 
-  for (int q=0; q<A->Q; q++){
-    for (int s=0; s<A->lenSigma; s++){
-      if (A->delta[q][s]!=NULL){
-	int cell_size = 0;
+  // Init first line (delta + letters of alphabet)
+  textMatrix[0] = (char **) malloc(sizeof(char *) * (A->lenSigma + 1));
+  dimsMatrix[0] = (int *) malloc(sizeof(int) * (A->lenSigma + 1));
 
-	while (A->delta[q][s][cell_size]!=-1) cell_size++;
-	max_cell_size = (max_cell_size < cell_size ? cell_size : max_cell_size);
-      }
-    }
+  throwMallocErrorIfTrue(textMatrix[0] == NULL);
+  throwMallocErrorIfTrue(dimsMatrix[0] == NULL);
+
+  char *cached = (char *) malloc(sizeof(char) * 32);
+  throwMallocErrorIfTrue(cached == NULL);
+  int z = 0;
+  appendText(cached, "Delta", &z);
+  textMatrix[0][0] = cached;
+  dimsMatrix[0][0] = 5;
+  for (int alphaIndex = 1; alphaIndex < A->lenSigma + 1; alphaIndex++) {
+    textMatrix[0][alphaIndex] = (char *) malloc(sizeof(char) * 2);
+    throwMallocErrorIfTrue(textMatrix[0][alphaIndex] == NULL);
+    textMatrix[0][alphaIndex][0] = A->Sigma[alphaIndex - 1];
+    textMatrix[0][alphaIndex][1] = '\0';
+    dimsMatrix[0][alphaIndex] = 1;
   }
-  int total_cell_size = max_cell_size*(state_size+1)+1;
 
-  int line_length = first_column_size+1+(total_cell_size+1)*A->lenSigma;
-  char * line = malloc(sizeof(char)*(line_length+2));
-  for (int i=0; i<=line_length; i++) line[i]='-';
-  line[line_length+1]='\0';
-  printf("%s\n",line);
-  printf("|%*sdelta |", padding, "");
-  for (int i=0; i<A->lenSigma; i++) printf("%*c |", total_cell_size-1, A->Sigma[i]);
-  printf("\n");
-  printf("%s\n",line);
+  // Fill others lines
+  for (int stateIndex = 1; stateIndex < A->Q + 2; stateIndex++) {
+    dimsMatrix[stateIndex] = (int *) malloc(sizeof(int) * (A->lenSigma + 1));
+    textMatrix[stateIndex] = (char **) malloc(sizeof(char *) * (A->lenSigma + 1));
+    throwMallocErrorIfTrue(dimsMatrix[stateIndex] == NULL);
+    throwMallocErrorIfTrue(textMatrix[stateIndex] == NULL);
 
-  char *buffer = malloc(sizeof(char)*(total_cell_size+1));
-  for (int q=0; q<A->Q+1; q++){
-    printf("|%*d |", padding+5, q);
-    for (int i=0; i<A->lenSigma; i++){
-      int s = A->dico[A->Sigma[i]-ASCII_FIRST];
-      if (A->delta[q][s] != NULL){
-	int j=0;
-	buffer[0]='{';
-	buffer[1]='\0';
-	while (A->delta[q][s][j]!=-1) {
-	  sprintf(buffer,"%s%d,",buffer, A->delta[q][s][j++]);
-	}
-	printf("%*s\b}|", total_cell_size ,buffer );
+    char *stateIndexText = (char *) malloc(sizeof(char) * 15);
+    throwMallocErrorIfTrue(stateIndexText == NULL);
+    sprintf(stateIndexText, "%d", stateIndex - 1);
+    textMatrix[stateIndex][0] = stateIndexText;
+    dimsMatrix[stateIndex][0] = strlen(stateIndexText);
+
+    for (int alphabetIndex = 1; alphabetIndex < A->lenSigma + 1; alphabetIndex++) {
+      Vect *vect = vectArrayGet(A->delta[stateIndex - 1], alphabetIndex - 1);
+      if (vect == NULL) {
+        char *vectNull = (char *) malloc(sizeof(char) * 1);
+        throwMallocErrorIfTrue(vectNull == NULL);
+        vectNull[0] = '\0';
+        textMatrix[stateIndex][alphabetIndex] = vectNull;
+        dimsMatrix[stateIndex][alphabetIndex] = 0;
       } else {
-	printf("%*s|",total_cell_size,"");
+        char *vectSerialized = serializeVectArray(vect);
+        textMatrix[stateIndex][alphabetIndex] = vectSerialized;
+        dimsMatrix[stateIndex][alphabetIndex] = strlen(vectSerialized);
       }
     }
-    printf("\n");
-    printf("%s\n",line);
   }
-  free(buffer);
-  free(line);
+
+  printMatrix(textMatrix, dimsMatrix, A->Q + 2, A->lenSigma + 1);
+
+  for (int line = 0; line < A->Q + 2; line++) {
+    for (int col = 0; col < A->lenSigma + 1; col++) {
+      free(textMatrix[line][col]);
+    }
+    free(textMatrix[line]);
+    free(dimsMatrix[line]);
+  }
+  free(textMatrix);
+  free(dimsMatrix);
+
 }
 
 /*
@@ -152,20 +159,23 @@ void afn_print(AFN A){
  *        A  - un AFN
  */
 void afn_free(AFN A){
-  free(A->I);
-  free(A->F);
+  freeVect(A->I);
+  freeVect(A->F);
   free(A->Sigma);
-  for (int q=0; q<A->Q+1; q++){
-    for (int s=0; s<A->lenSigma; s++){
-      if (A->delta[q][s]!=NULL)
-	      free(A->delta[q][s]);
+
+  for (int q = 0; q < A->Q + 1; q++) {
+    VectArray *vectArray = A->delta[q]; 
+    for (int s = 0; s < A->lenSigma; s++) {
+      Vect *vect = vectArrayGet(vectArray, s);
+      if (vect != NULL) {
+        freeVect(vect);
+      } 
     }
-    free(A->delta[q]);
+    freeVectArray(vectArray);
   }
   free(A->delta);
   free(A);
 }
-
 
 /*
  * FUNCTION: afn_ajouter_transition
@@ -181,20 +191,17 @@ void afn_free(AFN A){
  *        q2 - état d'arrivée de la transition
  */
 void afn_ajouter_transition(AFN A, int q1, char s, int q2) {
-  unsigned int arraySize = A->Q + 3; // max - min + 1 + epsilonTransition + le -1 à la fin;
-  int sommet = A->dico[s-ASCII_FIRST];
+  int letterInt = A->dico[s-ASCII_FIRST];
 
-  if (A->delta[q1][sommet] == NULL) {
-    A->delta[q1][sommet] = (int *) malloc(sizeof(int) * arraySize);
-    fillIntArray(A->delta[q1][sommet], arraySize, -1);
-    A->delta[q1][sommet][0] = q2;
+  VectArray *vectArray = A->delta[q1];
+
+  if (vectArrayGet(vectArray, letterInt) == NULL) {
+    Vect *vect = createVect(true);
+    vectAdd(vect, q2);
+    vectArraySet(A->delta[q1], vect, letterInt);
   } else {
-      size_t q2InsertionIndex = 0;
-      while (A->delta[q1][sommet][q2InsertionIndex] < q2 && A->delta[q1][sommet][q2InsertionIndex] != -1) {
-          q2InsertionIndex++;
-      }
-      shiftValuesArrayToRight(A->delta[q1][sommet], arraySize, q2InsertionIndex);
-      A->delta[q1][sommet][q2InsertionIndex] = q2;
+    Vect *vect = vectArrayGet(vectArray, letterInt);
+    vectAdd(vect, q2);
   }
 }
 
@@ -234,20 +241,25 @@ AFN afn_finit(char *fileName) {
   fscanf(file, "%d\n", &nbEtatInitiaux);
 
   char *lineBuffer = (char *) malloc(sizeof(char) * 1024);
+  throwMallocErrorIfTrue(lineBuffer == NULL);
   fgets(lineBuffer, 1024, file);
   int *listInitiaux = getAllIntInLine(lineBuffer, nbEtatInitiaux);
+  Vect *vectInitiaux = createVectFromIntArray(listInitiaux, nbEtatInitiaux, false);
+  free(listInitiaux);
 
   uint nbEtatFinaux;
   fscanf(file, "%d\n", &nbEtatFinaux);
 
   fgets(lineBuffer, 1024, file);
   int *listFinals = getAllIntInLine(lineBuffer, nbEtatFinaux);
+  Vect *vectFinaux = createVectFromIntArray(listFinals, nbEtatFinaux, false);
+  free(listFinals);
   free(lineBuffer);
 
   char *Sigma;
   fscanf(file, "%ms\n", &Sigma);
 
-  AFN B = afn_init(nbEtat, nbEtatInitiaux, listInitiaux, nbEtatFinaux, listFinals, Sigma);
+  AFN B = afn_init(nbEtat, vectInitiaux, vectFinaux, Sigma);
 
   int etat_i, etat_j;
   char symbol;
@@ -259,8 +271,8 @@ AFN afn_finit(char *fileName) {
 
   fclose(file);
   free(Sigma);
-  free(listInitiaux);
-  free(listFinals);
+  freeVect(vectFinaux);
+  freeVect(vectInitiaux);
 
   return B;
 }
@@ -276,33 +288,30 @@ AFN afn_finit(char *fileName) {
  * terminant par -1, NULL si vide
  */
 
-int * afn_epsilon_fermeture(AFN A, int *R, int RSize) {
+Vect *afn_epsilon_fermeture(AFN A, Vect *R) {
 
-  // majoration du nombre de valeurs atteintes par le nombre d'état possible
-  int stateAmount = A->Q + 2;
-  int *fermeture = (int *) malloc(sizeof(int) * stateAmount);
-  int cursorFermeture = 0;
-  fillIntArray(fermeture, stateAmount, -1);
-
+  Vect *fermeture = createVect(true);
+  
   if (R == NULL) {
     return fermeture;
   }
 
   Stack *stack = createStack();
 
-  for (int index = 0; index < RSize && R[index] != -1; index++) {
-    push(stack, R[index]);
-    fermeture[cursorFermeture++] = R[index];
+  for (int index = 0; index < R->size; index++) {
+    push(stack, vectGet(R, index));
+    vectAdd(fermeture, vectGet(R, index));
   }
 
+  int epsilonLetter = A->dico['&'-ASCII_FIRST];
   while (!stackIsEmpty(stack)) {
     int q = pop(stack);
-    int letter = A->dico['&'-ASCII_FIRST];
-    if (A->delta[q][letter] != NULL) {
-      for (int deltaCursor = 0; A->delta[q][letter][deltaCursor] != -1; deltaCursor++) {
-        int q_sec = A->delta[q][letter][deltaCursor];
-        if (!intIsInArray(q_sec, fermeture, stateAmount)) {
-          fermeture[cursorFermeture++] = q_sec;
+    Vect *delta = vectArrayGet(A->delta[q], epsilonLetter);
+    if (delta != NULL) {
+      for (int index = 0; index < delta->size; index++) {
+        int q_sec = vectGet(delta, index);
+        if (!vectContrainsValue(fermeture, q_sec)) {
+          vectAdd(fermeture, q_sec);
           push(stack, q_sec);
         }
       }
@@ -312,132 +321,96 @@ int * afn_epsilon_fermeture(AFN A, int *R, int RSize) {
   return fermeture;
 }
 
+/**
+ * @brief Permet de convertir un AFN en son AFD.
+ * 
+ * @param A un AFN
+ * @return AFD l'AFD correspondant à la déterminisation de l'AFN A
+ */
 AFD afn_determiniser(AFN A) {
-  printArray(A->I, A->lenI);
-  int *Q_0 = afn_epsilon_fermeture(A, A->I, A->lenI);
+  Vect *Q_0 = afn_epsilon_fermeture(A, A->I);
 
-  int stateAmountAFN = A->Q + 2;
-  // le nombre de sous partie d'un ensemble à n + 1 éléments est 2^(n + 1)
-  int SMaxSize = 1 << stateAmountAFN;
-  printf("Taille : %d\n", SMaxSize);
-  int **S = (int **) malloc(sizeof(int *) * SMaxSize);
-  fill3DArrayWithNull(S, SMaxSize);
+  // Ensemble d'ensemble, correspond à la colonne gauche
+  // de la table de déterminisation
+  VectArray *S = createVectArray();
+  vectArrayAdd(S, Q_0);
 
+  Vect *finaux = createVect(false);
 
-  // Vaut l'indice d'écriture de S (vaut également à un tout instant le nombre d'élément de S)
-  int sCursorW = 0;
-  S[sCursorW++] = Q_0;
+  Vect *stateQ0 = createVect(false);
+  Vect *stateSymb = createVect(false);
+  Vect *stateQ1 = createVect(false);
 
-  // Il peut y avoir au maximum le même nombre d'état finaux que d'état dans S
-  int *etatsFinaux = (int *) malloc(sizeof(int) * SMaxSize);
-  fillIntArray(etatsFinaux, SMaxSize, -1);
-  int etatsFinauxCursor = 0;
-
-
-  int maxTransitionSize = A->lenSigma * SMaxSize;
-  int *stateQ0 = (int *) malloc(sizeof(int) * maxTransitionSize);
-  char *stateSymb = (char *) malloc(sizeof(char) * maxTransitionSize);
-  int *stateQ1 = (int *) malloc(sizeof(int) * maxTransitionSize);
-  fillIntArray(stateQ0, maxTransitionSize, -1);
-  fillCharArray(stateSymb, maxTransitionSize, '?');
-  fillIntArray(stateQ1, maxTransitionSize, -1);
-  printf("Size of arrays is = %d\n", maxTransitionSize);
-  int transitionCursor = 0;
-
-  for (int sCursorR = 0; sCursorR < SMaxSize && S[sCursorR] != NULL; sCursorR++) {
-    printf("                                       \n");
-    printf("                                       \n");
-    printf("                                       \n");
-    printf("S[%d] is running...\n", sCursorR);
-    int *setOfState = S[sCursorR];
-    printArrayStopValue(setOfState, -1);
-
+  for (int sCursor = 0; sCursor < S->size; sCursor++) {
+    Vect *setOfState = vectArrayGet(S, sCursor);
     for (int indexAlphabet = 1; indexAlphabet < A->lenSigma; indexAlphabet++) {
-        char letter = A->Sigma[indexAlphabet];
-        int letterInt = A->dico[letter-ASCII_FIRST];
-        printf("\t\tUse letter %c\n", letter);
+      char letter = A->Sigma[indexAlphabet];
+      int letterInt = A->dico[letter-ASCII_FIRST];
 
-        int *stateReached = (int *) malloc(sizeof(int) * stateAmountAFN);
-        fillIntArray(stateReached, stateAmountAFN, -1);
-        bool addedInS = False;
+      // Tous les états atteints seront stocké dans stateReached
+      Vect *stateReached = createVect(true);
+      bool addedInS = false;
 
-        for (int stateCusor = 0; (stateCusor < stateAmountAFN) && setOfState[stateCusor] != -1; stateCusor++) {
-          printf("\tproccessing stateCusor = %d\n", stateCusor);
-          int q = setOfState[stateCusor];
+      for (int stateCursor = 0; stateCursor < setOfState->size; stateCursor++) {
+        int q = vectGet(setOfState, stateCursor);
+        Vect *tmp = afn_epsilon_fermeture(A, vectArrayGet(A->delta[q], letterInt));
+        unionVectAsSet(stateReached, tmp);
+        freeVect(tmp);
+      }
+      
+      int index = getIndexOfVectInVectArray(S, stateReached);
+      
+      // Si stateReached (vecteur calculé) n'appartient pas à S, on l'ajoute dans S
+      if (index == -1) {
+        index = S->size;
+        vectArrayAdd(S, stateReached);
+        addedInS = true;
+      }
 
-          printf("\t\t\tAdding epsilon fermeture...\n");
-          int *tmp = afn_epsilon_fermeture(A, A->delta[q][letterInt], stateAmountAFN);
-          printf("\t\t\tEpsilon fermeture added !\n");
-          printf("Valeur de l'espsilon fermeture: \n");
-          printArrayStopValue(tmp, -1);
+      // On ajoute les morceaux de transition pour la construire plus tard, après
+      // avoir initialisé l'AFD
+      vectAdd(stateQ0, sCursor);
+      vectAdd(stateSymb, letter);
+      vectAdd(stateQ1, index);
 
-          concatenateArrays(stateReached, tmp, stateAmountAFN);
-          printf("The state of reached is: \n");
-          printArrayStopValue(stateReached, -1);
-          free(tmp);
+      // Ajout des états finaux
+      for (int stateReachedIndex = 0; stateReachedIndex < stateReached->size; stateReachedIndex++) {
+        int state = vectGet(stateReached, stateReachedIndex);
+        if (vectContrainsValue(A->F, state) && !vectContrainsValue(finaux, index)) {
+          vectAdd(finaux, index);
+          break;
         }
-
-        int index = -1;
-        if (!TwoDArrayIsInThreeDArray(stateReached, S, SMaxSize, &index)) {
-          index = sCursorW;
-          printf("\t\t\tAppend new state on index %d!\n", index);
-          printArrayStopValue(stateReached, -1);
-          S[sCursorW++] = stateReached;
-          addedInS = True;
-        }
-
-        printf("\t\t\tIndex is %d.\n", index);
-
-        printf("\t\t\tWritting at index %d!\n", transitionCursor);
-        stateQ0[transitionCursor] = sCursorR;
-        stateSymb[transitionCursor] = letter;
-        stateQ1[transitionCursor] = index;
-        printf("\t\t\tWe added %d %c %d\n", stateQ0[transitionCursor], stateSymb[transitionCursor], stateQ1[transitionCursor]);
-        transitionCursor++;
-
-        // Ajout des états finaux
-        for (int cursor = 0; stateReached[cursor] != -1; cursor++) {
-          int state = stateReached[cursor];
-          if (intIsInArray(state, A->F, A->lenF)) {
-            if (!intIsInArray(index, etatsFinaux, etatsFinauxCursor)) {
-              etatsFinaux[etatsFinauxCursor++] = index;
-              break;
-            }
-          }
-        }
-
-        if (!addedInS) {
-          free(stateReached);
-        }
+      }
+      
+      // Si le vecteur généré est déjà dans S, on l'a crée pour rien, on peut le supprimer définitivement
+      if (!addedInS) {
+        freeVect(stateReached);
+      }
     }
   }
 
-  etatsFinaux = ajustArray(etatsFinaux, etatsFinauxCursor);
+  char *newSigma = AFNSigmaToAFDSigma(A);
 
-  char newSigma[A->lenSigma];
-  for (int i = 0; i < A->lenSigma - 1; i++) {
-    newSigma[i] = A->Sigma[i + 1];
-  }
-  newSigma[A->lenSigma - 1] = '\0';
+  AFD B = afd_init(S->size - 1, 0, finaux, newSigma);
 
-  AFD B = afd_init(sCursorW - 1, 0, etatsFinauxCursor, etatsFinaux, newSigma);
-
-  for (int i = 0; i < transitionCursor; i++) {
-    afd_ajouter_transition(B, stateQ0[i], stateSymb[i], stateQ1[i]);
+  for (int i = 0; i < stateQ0->size; i++) {
+    afd_ajouter_transition(B, vectGet(stateQ0, i), vectGet(stateSymb, i), vectGet(stateQ1, i));
   }
 
-  free(stateQ0);
-  free(stateSymb);
-  free(stateQ1);
-  free(etatsFinaux);
+  freeVect(stateQ0);
+  freeVect(stateSymb);
+  freeVect(stateQ1);
+  freeVect(finaux);
+  free(newSigma);
 
-  for (int i = 0; i < SMaxSize && S[i] != NULL; i++) {
-    free(S[i]);
+  for (int i = 0; i < S->size; i++) {
+    freeVect(S->array[i]);
   }
-  free(S);
+  freeVectArray(S);
 
   return B;
 }
+
 /*
  * FUNCTION: afn_simuler
  * ---------------------
@@ -447,4 +420,266 @@ AFD afn_determiniser(AFN A) {
  *        A - un AFN
  *        s - la chaine de caractères à analyser
  */
-int afn_simuler(AFN A, char *s);
+int afn_simuler(AFN A, char *s) {
+  AFD afd = afn_determiniser(A);
+  int res = afd_simuler(afd, s);
+  afd_free(afd);
+  return res;
+
+
+  /*
+  Vect *R = afn_epsilon_fermeture(A, A->I);
+ 
+  for (int alphabetIndex = 0; alphabetIndex < A->lenSigma; alphabetIndex++) {
+    char letter = A->Sigma[alphabetIndex];
+    int letterInt = A->dico[letter-ASCII_FIRST];
+
+    Vect *tmp = createVect(true);
+    for (int q = 0; q < A->Q + 1; q++) {
+      unionVectAsSet(tmp, afn_epsilon_fermeture(A, vectArrayGet(A->delta[q], letterInt)));
+    }
+    freeVect(R);
+    R = tmp;
+  }
+
+  return intersectionOfVectIsNotEmpty(R, A->F);
+  */
+}
+
+/**
+ * @brief Permet de convertir l'alpabet d'un AFN en l'alphabet d'un AFD. (retire le caractère vide epsilon)
+ * 
+ * @param A l'AFN
+ * @return char* le nouvel alphabet
+ */
+char *AFNSigmaToAFDSigma(AFN A) {
+  char *newSigma = (char *) malloc(sizeof(char) * A->lenSigma);
+  throwMallocErrorIfTrue(newSigma == NULL);
+  for (int i = 0; i < A->lenSigma - 1; i++) {
+    newSigma[i] = A->Sigma[i + 1];
+  }
+  newSigma[A->lenSigma - 1] = '\0';
+  return newSigma;
+}
+
+/**
+ * @brief Crée une image à partir d'un AFN.
+ * L'image créée sera placée dans le dossier ./data/graphViz/png/fileName.png
+ * L'image est créée à l'aide du module graphViz
+ * 
+ * @param A un AFN
+ * @param fileName le nom donné au fichier crée
+ */
+void afn_toPng(AFN A, char *fileName) {
+  char dotExtension[] = "dot";
+  char dotPath[] = "../data/graphViz/dot/";
+  char pngExtension[] = "png";
+  char pngPath[] = "../data/graphViz/png/";
+
+  char destinationDotFile[128];
+  char destinationPngFile[128];
+
+  sprintf(destinationDotFile, "%s%s.%s", dotPath, fileName, dotExtension);
+  sprintf(destinationPngFile, "%s%s.%s", pngPath, fileName, pngExtension);
+
+  FILE *file = fopen(destinationDotFile, "w");
+
+  graphVizInitGraph(file);
+
+  // Add initial state
+  for (int i = 0; i < A->I->size; i++) {
+    graphVizAddInitialState(file, vectGet(A->I, i));
+  }
+
+  // Add final state
+  for (int i = 0; i < A->F->size; i++) {
+    graphVizAddFinalState(file, vectGet(A->F, i));
+  }
+
+  // Add transitions
+  for (int q = 0; q < A->Q + 1; q++) {
+    for (int alphabetIndex = 0; alphabetIndex < A->lenSigma; alphabetIndex++) {
+      char letter = A->Sigma[alphabetIndex];
+      Vect *vect = vectArrayGet(A->delta[q], alphabetIndex);
+      if (vect != NULL) {
+        for (int i = 0; i < vect->size; i++) {
+          int q2 = vectGet(vect, i);
+          graphVizAddTransition(file, q, letter, q2);
+        }
+      }
+    }
+  }
+
+  graphVizEnd(file);
+  fclose(file);
+
+  char cmd[512];
+  sprintf(cmd, "dot -Tpng %s > %s", destinationDotFile, destinationPngFile);
+  system(cmd);
+
+}
+
+/**
+ * @brief Permet de "verser" l'ensemble des transitions d'un AFN dans un autre AFN en lui ajoutant un décalage
+ * 
+ * @param from l'AFN qui recevra les transitions
+ * @param to l'AFN qui donnera ses transitions
+ * @param shift décalage des états
+ * 
+ * @see afn_union, afn_concat
+ */
+void afn_spill_transitions(AFN from, AFN to, int shift) {
+  for (int q = 0; q < from->Q + 1; q++) {
+    for (int alphabetIndex = 0; alphabetIndex < from->lenSigma; alphabetIndex++) {
+      char letter = from->Sigma[alphabetIndex];
+
+      Vect *vect = vectArrayGet(from->delta[q], alphabetIndex);
+      if (vect != NULL) {
+        for (int q2Index = 0; q2Index < vect->size; q2Index++) {
+          afn_ajouter_transition(to, q + shift, letter, vectGet(vect, q2Index) + shift);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * @brief Crée un AFN acceptant le langage constitué du seul symbole c.
+ * 
+ * @param C l'AFN qui acceptera le langage
+ * @param c caractère accepté
+ */
+void afn_char(AFN *C, char c) {
+  Vect *initiaux = createVect(false);
+  vectAdd(initiaux, 0);
+
+  Vect *finaux = createVect(false);
+  vectAdd(finaux, 1);
+
+  char sigma[2];
+  sprintf(sigma, "%c", c); 
+
+  *C = afn_init(1, initiaux, finaux, sigma);
+  afn_ajouter_transition(*C, 0, c, 1);
+
+  freeVect(initiaux);
+  freeVect(finaux);
+}
+
+/**
+ * @brief Construit l'AFN reconnaissant l'union des langages acceptés par les automates A et B.
+ * 
+ * @param C l'AFN qui acceptera le langage
+ * @param A AFN
+ * @param B AFN
+ */
+void afn_union(AFN *C, AFN A, AFN B) {
+
+  // construction des états initiaux
+  Vect *initiaux = createVect(false);
+  vectAdd(initiaux, 0);
+
+  // construction des états finaux
+  Vect *finaux = createVect(false);
+  for (int i = 0; i < A->F->size; i++) {
+    vectAdd(finaux, vectGet(A->F, i) + 1);
+  }
+  for (int i = 0; i < B->F->size; i++) {
+    vectAdd(finaux, vectGet(B->F, i) + A->Q + 2);
+  }
+
+  char *CSigma = unionCharArray(A->Sigma, A->lenSigma, B->Sigma, B->lenSigma);
+
+  // Création AFN
+  *C = afn_init(A->Q + B->Q + 2, initiaux, finaux, CSigma);
+
+  // Ajout des transitions dûes à l'union
+  for (int i = 0; i < A->I->size; i++) {
+    afn_ajouter_transition(*C, 0, '&', vectGet(A->I, i) + 1);
+  }
+  for (int i = 0; i < B->I->size; i++) {
+    afn_ajouter_transition(*C, 0, '&', vectGet(B->I, i) + A->Q + 2);
+  }
+
+  // Ajout des transitions de A dans C
+  afn_spill_transitions(A, *C, 1);
+
+  // Ajout des transitions de B dans C
+  afn_spill_transitions(B, *C, A->Q + 2);
+
+  free(CSigma);
+  freeVect(initiaux);
+  freeVect(finaux);
+}
+
+/**
+ * @brief Construit l'AFN reconnaissant la concaténation des langages acceptés par les automates A et B.
+ * 
+ * @param C l'AFN qui acceptera le langage
+ * @param A AFN
+ * @param B AFN
+ */
+void afn_concat(AFN *C, AFN A, AFN B) {
+  Vect *finaux = createVect(false);
+  for (int i = 0; i < B->F->size; i++) {
+    vectAdd(finaux, vectGet(B->F, i) + A->Q + 1);
+  }
+
+  char *CSigma = unionCharArray(A->Sigma, A->lenSigma, B->Sigma, B->lenSigma);
+
+  *C = afn_init(A->Q + B->Q + 1, A->I, finaux, CSigma);
+
+  // Ajout des transitions de A dabs C
+  afn_spill_transitions(A, *C, 0);
+
+  // Ajout des transitions de B dans C
+  afn_spill_transitions(B, *C, A->Q + 1);
+
+  for (int indexFinauxA = 0; indexFinauxA < A->F->size; indexFinauxA++) {
+    int qFinalA = vectGet(A->F, indexFinauxA);
+    for (int indexInitB = 0; indexInitB < B->I->size; indexInitB++) {
+      int qInitB = vectGet(B->I, indexInitB);
+      afn_ajouter_transition(*C, qFinalA, '&', qInitB + A->Q +1);
+    }
+  }
+
+  free(CSigma);
+  freeVect(finaux);
+}
+
+/**
+ * @brief Construit l'AFN reconnaissant la fermeture de Kleene des langages acceptés par les automates A et B.
+ * 
+ * @param C l'AFN qui acceptera le langage
+ * @param A AFN
+ */
+void afn_kleene(AFN *C, AFN A) {
+
+  Vect *initiaux = createVect(false);
+  vectAdd(initiaux, 0);
+
+  Vect *finaux = createVect(false);
+  vectAdd(finaux, 1 + A->Q + 1);
+
+  *C = afn_init(A->Q + 2, initiaux, finaux, A->Sigma);
+
+  // Ajout des transitions de A vers C
+  afn_spill_transitions(A, *C, 1);
+
+  for (int i = 0; i < A->I->size; i++) {
+    afn_ajouter_transition(*C, 0, '&', vectGet(A->I, i) + 1);
+  }
+
+  for (int i = 0; i < A->F->size; i++) {
+    afn_ajouter_transition(*C, vectGet(A->F, i) + 1, '&', A->Q + 2);
+    for (int j = 0; j < A->I->size; j++) {
+      afn_ajouter_transition(*C, vectGet(A->F, i) + 1, '&', vectGet(A->I, j) + 1);
+    }
+  }
+
+  afn_ajouter_transition(*C, 0, '&', A->Q + 2);
+
+  freeVect(initiaux);
+  freeVect(finaux);
+
+}

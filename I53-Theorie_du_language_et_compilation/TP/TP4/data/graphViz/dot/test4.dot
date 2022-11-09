@@ -1,0 +1,6 @@
+digraph G {
+	n0 [label= "", shape=none,height=.0,width=.0];
+	n0 -> 0;
+	1 [peripheries=2];
+	0 -> 1 [label=" a"];
+}

@@ -4,9 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
-#include <sys/types.h>
-#include <unistd.h>
 
 #include "stack.h"
 #include "utils.h"
@@ -48,34 +45,17 @@ void reachAllNeighborsIteL(size_t s, GraphL graph, unsigned char *reached);
 // Permet de visiter tous les voisins dans une composante connexe du graph correspondant
 
 unsigned char isConnexe(GraphL graph);
-// Renvoie 1 si le graph est connexe, 0 sinon
 
 unsigned int proportionConnexe(int order);
-// Renvoie le nombre de graph connexe pour tous les graphs
-// d'ordre ordre
 
 GraphL intToGraph(unsigned int n, int order, Pair *pairs);
-// Converti un nombre en graph
-// La variable pair vaut generatePairEnum(int order)
 
 void reachAllNeighborsRecLAndRecord(unsigned int s, GraphL graph, unsigned char *reached, unsigned int *sizeComposante);
-// Atteint tous les sommets d'une composante connexe et enregistre
-// le nombre de sommet de la composante analysée
 
 unsigned int geante(GraphL graph);
-// Renvoie la taille de la plus grande composante connexe
 
 unsigned int getDegree(GraphL graph, unsigned int sommet);
-// Renvoie le degré d'un sommet
 
-InfoGraph *getInfosGraph(GraphL graph, int *sizeInfoGraph);
-// Renvoie un tableau de couple (representant, taille de la composante)
-
-void Eulerien(GraphL graph, int s);
-// Affiche à l'écran un chemin eulérien
-
-Stack *promenade(GraphL graph, int s);
-
-GraphL randomGraph(int n, float p);
+InfoGraph *getInfosGraph(GraphL graph);
 
 #endif

@@ -1,8 +1,10 @@
 CC=gcc
 CFLAGS=-Wall -g
 
+createLibs: libaf.a libutils.a libcontainer.a libgraphviz.a libregex.a
+
 # AFN/AFD lib
-libaf.a: afd.o afn.o libutils.a  libcontainer.a
+libaf.a: afd.o afn.o
 	ar crs $@ $^
 
 afd.o: afd.c afd.h
@@ -22,10 +24,30 @@ arrayUtils.o: arrayUtils.c arrayUtils.h
 	$(CC) $(CFLAGS) -c $<
 
 # container lib
-libcontainer.a: stack.o
+libcontainer.a: stack.o vect.o vectArray.o
 	ar crs $@ $^
 
 stack.o: stack.c stack.h
+	$(CC) $(CFLAGS) -c $<
+
+vect.o: vect.c vect.h
+	$(CC) $(CFLAGS) -c $<
+
+vectArray.o: vectArray.c vectArray.h
+	$(CC) $(CFLAGS) -c $<
+
+# graphViz lib
+libgraphviz.a: graphviz.o
+	ar crs $@ $^
+
+graphviz.o: graphviz.c graphviz.h
+	$(CC) $(CFLAGS) -c $<
+
+# regex lib
+libregex.a: compregex.o
+	ar crs $@ $^
+
+compregex.o: compregex.c compregex.h
 	$(CC) $(CFLAGS) -c $<
 
 # Cleaner
