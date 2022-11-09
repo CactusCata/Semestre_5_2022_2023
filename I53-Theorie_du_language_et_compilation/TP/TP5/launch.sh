@@ -1,3 +1,3 @@
 make clean
-make part2
-./part2 lex.yy.c
+make part3
+$1 ./part3 fonction_2.py append

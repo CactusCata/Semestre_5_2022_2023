@@ -360,10 +360,12 @@ struct yy_trans_info
 	flex_int32_t yy_verify;
 	flex_int32_t yy_nxt;
 	};
-static const flex_int16_t yy_accept[14] =
+static const flex_int16_t yy_accept[38] =
     {   0,
-        0,    0,    7,    5,    4,    2,    5,    1,    3,    1,
-        2,    3,    0
+        0,    0,    7,    5,    4,    4,    4,    3,    5,    5,
+        5,    5,    0,    0,    3,    0,    0,    0,    0,    0,
+        0,    0,    0,    0,    0,    0,    0,    1,    0,    3,
+        0,    0,    2,    0,    3,    0,    0
     } ;
 
 static const YY_CHAR yy_ec[256] =
@@ -371,17 +373,17 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    2,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    4,    1,    1,    5,    5,    5,
-        5,    5,    5,    5,    5,    5,    5,    1,    1,    1,
-        1,    1,    1,    1,    6,    6,    6,    6,    6,    6,
-        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
-        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
-        1,    1,    1,    1,    1,    1,    6,    6,    6,    6,
+        1,    4,    1,    1,    1,    1,    1,    1,    1,    5,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
 
-        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
-        6,    6,    6,    6,    6,    6,    6,    6,    6,    6,
-        6,    6,    1,    1,    1,    1,    1,    1,    1,    1,
+        6,    7,    1,    8,    9,    1,    1,   10,    1,    1,
+       11,    1,    1,   12,   13,    1,    1,    1,   14,    1,
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
@@ -398,33 +400,52 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[7] =
+static const YY_CHAR yy_meta[15] =
     {   0,
-        1,    1,    1,    1,    2,    1
+        1,    1,    2,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1
     } ;
 
-static const flex_int16_t yy_base[15] =
+static const flex_int16_t yy_base[41] =
     {   0,
-        0,    0,    9,   11,   11,   11,    0,    0,    4,    0,
-       11,    0,   11,    6
+        0,    0,   68,   11,   13,   76,   15,   21,   26,   17,
+       25,   29,   46,   45,   44,    0,    0,   23,   31,   32,
+       33,   35,   45,   42,   47,   55,   58,   76,    0,    0,
+       34,   61,   76,    0,    0,   61,   76,   22,   71,   73
     } ;
 
-static const flex_int16_t yy_def[15] =
+static const flex_int16_t yy_def[41] =
     {   0,
-       13,    1,   13,   13,   13,   13,   14,   14,   13,   14,
-       13,    9,    0,   13
+       37,    1,   37,   38,   38,   37,   38,   38,   38,    9,
+        9,    9,    9,    9,    9,    7,    9,    9,    9,    9,
+        9,    9,   39,    9,    9,   40,   39,   37,   27,   27,
+        9,   40,   37,   32,   32,    9,    0,   37,   37,   37
     } ;
 
-static const flex_int16_t yy_nxt[18] =
+static const flex_int16_t yy_nxt[91] =
     {   0,
-        4,    5,    6,    7,    8,    9,   11,   10,   13,   12,
-        3,   13,   13,   13,   13,   13,   13
+        4,    5,    6,    7,    8,    9,   10,    4,   11,    4,
+        4,    4,    4,   12,   14,   15,   14,   15,   16,   15,
+       17,   18,   13,   19,   14,   15,   13,   22,   20,   14,
+       15,   23,   13,   22,   13,   21,   24,   23,   13,   24,
+       13,   13,   13,   36,   13,   25,   26,   28,   29,   30,
+       31,   13,   23,   13,   13,   13,   13,   33,   34,   35,
+       28,   29,   30,   33,   34,   35,   26,   37,   37,   37,
+       13,   27,   27,   32,   32,    3,   37,   37,   37,   37,
+       37,   37,   37,   37,   37,   37,   37,   37,   37,   37
     } ;
 
-static const flex_int16_t yy_chk[18] =
+static const flex_int16_t yy_chk[91] =
     {   0,
-        1,    1,    1,    1,    1,    1,    9,   14,    3,    9,
-       13,   13,   13,   13,   13,   13,   13
+        1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    1,    1,    1,    4,    4,    5,    5,    7,    7,
+        7,    7,   38,    7,    8,    8,   10,   10,    7,    9,
+        9,   11,   18,   18,   11,    9,   12,   19,   12,   20,
+       19,   20,   21,   31,   22,   21,   22,   23,   23,   23,
+       24,   24,   25,   15,   14,   13,   25,   26,   26,   26,
+       27,   27,   27,   32,   32,   32,   36,    3,    0,    0,
+       36,   39,   39,   40,   40,   37,   37,   37,   37,   37,
+       37,   37,   37,   37,   37,   37,   37,   37,   37,   37
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -441,20 +462,21 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "prog.lex"
-#line 2 "prog.lex"
+#line 1 "part3.lex"
+#line 2 "part3.lex"
     /* Prologue */
     # include <stdio.h>
     # include <string.h>
-    int longmax = 0;
-    int line = 0;
-    int col = 0;
-    long long int sommeEntier = 0;
-    char motlepluslong [256];
-#line 455 "lex.yy.c"
+    int maxForCount = 0;
+    char indentsTypes[256];
+    int totalIndent = 0;
+
+    char functionName[64];
+    char functionFound = 0;
+#line 477 "lex.yy.c"
 #define YY_NO_INPUT 1
 /* Definitions */
-#line 458 "lex.yy.c"
+#line 480 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -669,9 +691,9 @@ YY_DECL
 		}
 
 	{
-#line 19 "prog.lex"
+#line 19 "part3.lex"
 
-#line 675 "lex.yy.c"
+#line 697 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -698,13 +720,13 @@ yy_match:
 			while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 				{
 				yy_current_state = (int) yy_def[yy_current_state];
-				if ( yy_current_state >= 14 )
+				if ( yy_current_state >= 38 )
 					yy_c = yy_meta[yy_c];
 				}
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 11 );
+		while ( yy_base[yy_current_state] != 76 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];
@@ -729,51 +751,79 @@ do_action:	/* This label is used only to access EOF actions. */
 			goto yy_find_action;
 
 case 1:
+/* rule 1 can match eol */
 YY_RULE_SETUP
-#line 20 "prog.lex"
+#line 20 "part3.lex"
 {
-    printf("Entier actuel: %lld (%s)\n", sommeEntier, yytext);
-    sommeEntier += atoi(yytext);
+    int tabAmount = 0;
+    while (yytext[tabAmount] == ' ') {
+        tabAmount++;
+    }
+    tabAmount /= 4;
+    indentsTypes[tabAmount] = 'i';
+    totalIndent = tabAmount;
 }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 25 "prog.lex"
+#line 30 "part3.lex"
 {
-    line++;
-    col = 0;
+    int tabAmount = 0;
+    while (yytext[tabAmount] == ' ') {
+        tabAmount++;
+    }
+    tabAmount /= 4;
+    indentsTypes[tabAmount] = 'f';
+    totalIndent = tabAmount;
+
+    int forAmount = 0;
+    for (int i = 0; i < tabAmount + 1; i++) {
+        if (indentsTypes[i] == 'f') {
+            forAmount++;
+        }
+    }
+
+    if (forAmount > maxForCount) {
+        maxForCount = forAmount;
+    }
+
 }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 30 "prog.lex"
+#line 52 "part3.lex"
 {
-    if (yyleng > longmax){
-        longmax = yyleng;
-        strcpy(motlepluslong, yytext);
-        printf("%s à %d:%d\n", yytext, line, col);
+    int currentReader = 0;
+    for (int i = 0; i < yyleng; i++) {
+      if (yytext[i] == functionName[currentReader]) {
+        currentReader++;
+      } else if (yytext[i] != ' ' && yytext[i] != '(') {
+        currentReader = 0;
+      }
     }
-    col += yyleng;
+    if (currentReader == strlen(functionName)) {
+        functionFound = 1;
+    }
 }
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 38 "prog.lex"
+#line 66 "part3.lex"
 
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 39 "prog.lex"
+#line 67 "part3.lex"
 
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 40 "prog.lex"
+#line 68 "part3.lex"
 ECHO;
 	YY_BREAK
-#line 777 "lex.yy.c"
+#line 827 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1070,7 +1120,7 @@ static int yy_get_next_buffer (void)
 		while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 			{
 			yy_current_state = (int) yy_def[yy_current_state];
-			if ( yy_current_state >= 14 )
+			if ( yy_current_state >= 38 )
 				yy_c = yy_meta[yy_c];
 			}
 		yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
@@ -1098,11 +1148,11 @@ static int yy_get_next_buffer (void)
 	while ( yy_chk[yy_base[yy_current_state] + yy_c] != yy_current_state )
 		{
 		yy_current_state = (int) yy_def[yy_current_state];
-		if ( yy_current_state >= 14 )
+		if ( yy_current_state >= 38 )
 			yy_c = yy_meta[yy_c];
 		}
 	yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
-	yy_is_jam = (yy_current_state == 13);
+	yy_is_jam = (yy_current_state == 37);
 
 		return yy_is_jam ? 0 : yy_current_state;
 }
@@ -1741,11 +1791,16 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 40 "prog.lex"
+#line 68 "part3.lex"
 
 int main (int argc, char *argv[]) {
     if (argc < 2) {
         printf("Veuillez préciser un nom de fichier !\n");
+        return 1;
+    }
+
+    if (argc < 3) {
+        printf("Veuillez préciser un nom de fonction !\n");
         return 1;
     }
 
@@ -1755,8 +1810,11 @@ int main (int argc, char *argv[]) {
         return 1;
     }
 
+    strcpy(functionName, argv[2]);
+
     yylex();
-    printf("\nMot le plus long: %s, de longueur: %d \n", motlepluslong, longmax);
-    printf("Somme des entiers: %lld\n", sommeEntier);
+    printf("niveau d'imbrication max: %d\n", maxForCount);
+    printf("fonction %s: %d\n", functionName, functionFound);
     return 0;
 }
+

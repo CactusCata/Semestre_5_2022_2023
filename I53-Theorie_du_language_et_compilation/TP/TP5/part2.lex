@@ -1,76 +1,64 @@
 %{
     /* Prologue */
-    # include <stdio.h>
-    # include <string.h>
-    int longmax = 0;
-    int line = 0;
-    int col = 0;
-    long long int sommeEntier = 0;
-    char motlepluslong [256];
+    #include <stdio.h>
+    #include <string.h>
+
+    typedef struct list_symb {
+        char symb[256];
+        int count;
+        struct list_symb *suiv;
+    } list_symb;
+
+    list_symb histogram;
+
+    int inserer(char *nom, list_symb *ptr);
+    void print_list(list_symb *ptr);
+    void freeList(list_symb *ptr);
+
 %}
 %option nounput
 %option noinput
 /* Definitions */
 BLANC [ \t\n]
-LIGNE {MOT}*\n
 LETTRE [a-zA-Z]
 MOT {LETTRE}+
-NOMBRE -?[0-9]+ 
 %%
-{NOMBRE} {
-    printf("Entier actuel: %lld (%s)\n", sommeEntier, yytext);
-    sommeEntier += atoi(yytext);
-}
-
-{LIGNE} {
-    line++;
-    col = 0;
-}
-
 {MOT} {
-    if (yyleng > longmax){
-        longmax = yyleng;
-        strcpy(motlepluslong, yytext);
-        printf("%s à %d:%d\n", yytext, line, col);
-    }
-    col += yyleng;
+    inserer(yytext, &histogram);
 }
+
 {BLANC}
-.
+
+. // dans tous les autres cas, on fait rien
 %%
-
-typedef struct list_symb {
-    char *symb;
-    int count;
-    struct list_symb *suiv;
-} list_symb;
-
 int inserer(char *nom, list_symb *ptr) {
-    if (ptr == NULL) {
-        *ptr = (list_symb *) malloc(sizeof(list_symb));
-        ptr->symb = nom;
-        ptr->count = 1;
-        ptr->suiv = NULL;
-    }
-
     while (ptr->suiv != NULL && (strcmp(nom, ptr->symb) != 0)) {
         ptr = ptr->suiv;
     }
 
     if (strcmp(nom, ptr->symb) == 0) {
         ptr->count++;
+        return 0;
     } else {
         ptr->suiv = (list_symb *) malloc(sizeof(list_symb));
-        ptr->suiv->symb = nom;
+        strcpy(ptr->suiv->symb, nom);
         ptr->suiv->count = 1;
         ptr->suiv->suiv = NULL;
+        return 1;
     }
 }
 
 void print_list(list_symb *ptr) {
     while (ptr != NULL) {
-        printf("mot %s : %d\n", ptr->symb, ptr->count);
+        printf("mot \"%s\" : %d\n", ptr->symb, ptr->count);
         ptr = ptr->suiv;
+    }
+}
+
+void freeList(list_symb *ptr) {
+    if (ptr != NULL) {
+        freeList(ptr->suiv);
+        free(ptr);
     }
 }
 
@@ -85,9 +73,14 @@ int main (int argc, char *argv[]) {
         printf("Le fichier '%s' n'existe pas !\n", argv[1]);
         return 1;
     }
+    histogram.symb[0] = '\0';
+    histogram.count = 0;
+    histogram.suiv = NULL;
 
     yylex();
-    printf("\nMot le plus long: %s, de longueur: %d \n", motlepluslong, longmax);
-    printf("Somme des entiers: %lld\n", sommeEntier);
+    print_list(&histogram);
+    freeList(histogram.suiv);
+    fclose(yyin);
+    yylex_destroy();
     return 0;
 }
