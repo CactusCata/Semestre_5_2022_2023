@@ -1,0 +1,304 @@
+State 6 conflicts: 1 shift/reduce
+State 20 conflicts: 1 shift/reduce
+State 21 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: PROG $end
+
+    1 PROG: EXP FIN
+
+    2 EXP: MULT_DIV
+    3    | EXP PLUS MULT_DIV
+    4    | EXP MOINS MULT_DIV
+
+    5 MULT_DIV: MULT_DIV MULT POWER
+    6         | MULT_DIV DIV POWER
+    7         | POWER
+
+    8 POWER: POWER MULT MULT ESP1
+    9      | ESP1
+
+   10 ESP1: TO_REMOVE ESP1
+   11     | ESP2
+
+   12 ESP2: ESP2 TO_REMOVE
+   13     | NB
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    NB (258) 13
+    PLUS (259) 3
+    MOINS (260) 4
+    MULT (261) 5 8
+    DIV (262) 6
+    FIN (263) 1
+    TO_REMOVE (264) 10 12
+
+
+Nonterminals, with rules where they appear
+
+    $accept (10)
+        on left: 0
+    PROG (11)
+        on left: 1
+        on right: 0
+    EXP (12)
+        on left: 2 3 4
+        on right: 1 3 4
+    MULT_DIV (13)
+        on left: 5 6 7
+        on right: 2 3 4 5 6
+    POWER (14)
+        on left: 8 9
+        on right: 5 6 7 8
+    ESP1 (15)
+        on left: 10 11
+        on right: 8 9 10
+    ESP2 (16)
+        on left: 12 13
+        on right: 11 12
+
+
+State 0
+
+    0 $accept: • PROG $end
+
+    NB         shift, and go to state 1
+    TO_REMOVE  shift, and go to state 2
+
+    PROG      go to state 3
+    EXP       go to state 4
+    MULT_DIV  go to state 5
+    POWER     go to state 6
+    ESP1      go to state 7
+    ESP2      go to state 8
+
+
+State 1
+
+   13 ESP2: NB •
+
+    $default  reduce using rule 13 (ESP2)
+
+
+State 2
+
+   10 ESP1: TO_REMOVE • ESP1
+
+    NB         shift, and go to state 1
+    TO_REMOVE  shift, and go to state 2
+
+    ESP1  go to state 9
+    ESP2  go to state 8
+
+
+State 3
+
+    0 $accept: PROG • $end
+
+    $end  shift, and go to state 10
+
+
+State 4
+
+    1 PROG: EXP • FIN
+    3 EXP: EXP • PLUS MULT_DIV
+    4    | EXP • MOINS MULT_DIV
+
+    PLUS   shift, and go to state 11
+    MOINS  shift, and go to state 12
+    FIN    shift, and go to state 13
+
+
+State 5
+
+    2 EXP: MULT_DIV •
+    5 MULT_DIV: MULT_DIV • MULT POWER
+    6         | MULT_DIV • DIV POWER
+
+    MULT  shift, and go to state 14
+    DIV   shift, and go to state 15
+
+    $default  reduce using rule 2 (EXP)
+
+
+State 6
+
+    7 MULT_DIV: POWER •
+    8 POWER: POWER • MULT MULT ESP1
+
+    MULT  shift, and go to state 16
+
+    MULT      [reduce using rule 7 (MULT_DIV)]
+    $default  reduce using rule 7 (MULT_DIV)
+
+
+State 7
+
+    9 POWER: ESP1 •
+
+    $default  reduce using rule 9 (POWER)
+
+
+State 8
+
+   11 ESP1: ESP2 •
+   12 ESP2: ESP2 • TO_REMOVE
+
+    TO_REMOVE  shift, and go to state 17
+
+    $default  reduce using rule 11 (ESP1)
+
+
+State 9
+
+   10 ESP1: TO_REMOVE ESP1 •
+
+    $default  reduce using rule 10 (ESP1)
+
+
+State 10
+
+    0 $accept: PROG $end •
+
+    $default  accept
+
+
+State 11
+
+    3 EXP: EXP PLUS • MULT_DIV
+
+    NB         shift, and go to state 1
+    TO_REMOVE  shift, and go to state 2
+
+    MULT_DIV  go to state 18
+    POWER     go to state 6
+    ESP1      go to state 7
+    ESP2      go to state 8
+
+
+State 12
+
+    4 EXP: EXP MOINS • MULT_DIV
+
+    NB         shift, and go to state 1
+    TO_REMOVE  shift, and go to state 2
+
+    MULT_DIV  go to state 19
+    POWER     go to state 6
+    ESP1      go to state 7
+    ESP2      go to state 8
+
+
+State 13
+
+    1 PROG: EXP FIN •
+
+    $default  reduce using rule 1 (PROG)
+
+
+State 14
+
+    5 MULT_DIV: MULT_DIV MULT • POWER
+
+    NB         shift, and go to state 1
+    TO_REMOVE  shift, and go to state 2
+
+    POWER  go to state 20
+    ESP1   go to state 7
+    ESP2   go to state 8
+
+
+State 15
+
+    6 MULT_DIV: MULT_DIV DIV • POWER
+
+    NB         shift, and go to state 1
+    TO_REMOVE  shift, and go to state 2
+
+    POWER  go to state 21
+    ESP1   go to state 7
+    ESP2   go to state 8
+
+
+State 16
+
+    8 POWER: POWER MULT • MULT ESP1
+
+    MULT  shift, and go to state 22
+
+
+State 17
+
+   12 ESP2: ESP2 TO_REMOVE •
+
+    $default  reduce using rule 12 (ESP2)
+
+
+State 18
+
+    3 EXP: EXP PLUS MULT_DIV •
+    5 MULT_DIV: MULT_DIV • MULT POWER
+    6         | MULT_DIV • DIV POWER
+
+    MULT  shift, and go to state 14
+    DIV   shift, and go to state 15
+
+    $default  reduce using rule 3 (EXP)
+
+
+State 19
+
+    4 EXP: EXP MOINS MULT_DIV •
+    5 MULT_DIV: MULT_DIV • MULT POWER
+    6         | MULT_DIV • DIV POWER
+
+    MULT  shift, and go to state 14
+    DIV   shift, and go to state 15
+
+    $default  reduce using rule 4 (EXP)
+
+
+State 20
+
+    5 MULT_DIV: MULT_DIV MULT POWER •
+    8 POWER: POWER • MULT MULT ESP1
+
+    MULT  shift, and go to state 16
+
+    MULT      [reduce using rule 5 (MULT_DIV)]
+    $default  reduce using rule 5 (MULT_DIV)
+
+
+State 21
+
+    6 MULT_DIV: MULT_DIV DIV POWER •
+    8 POWER: POWER • MULT MULT ESP1
+
+    MULT  shift, and go to state 16
+
+    MULT      [reduce using rule 6 (MULT_DIV)]
+    $default  reduce using rule 6 (MULT_DIV)
+
+
+State 22
+
+    8 POWER: POWER MULT MULT • ESP1
+
+    NB         shift, and go to state 1
+    TO_REMOVE  shift, and go to state 2
+
+    ESP1  go to state 23
+    ESP2  go to state 8
+
+
+State 23
+
+    8 POWER: POWER MULT MULT ESP1 •
+
+    $default  reduce using rule 8 (POWER)
