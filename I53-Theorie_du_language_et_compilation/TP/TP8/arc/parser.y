@@ -2,12 +2,12 @@
   #include <stdio.h>
   #include <ctype.h>
   #include <unistd.h>
-  
+
   #include "asa.h"
   #include "ts.h"
 
   extern int yylex();
-  
+
 %}
 
 %union{
@@ -19,7 +19,7 @@
 
 %token <nb> NB
 
-%type <noeud> EXP 
+%type <noeud> EXP
 
 %left '+'
 
@@ -27,11 +27,14 @@
 
 %%
 
-PROG : EXP                 { codegen($1); }
+PROG : ALGO INPUT CODE END { codegen($3); }
 ;
 
-EXP : NB                   { $$ = creer_feuilleNb(yylval.nb); }
+ALGO : 
+
+EXP : NB                   { $$ = creer_feuilleNb(yylval.nb); } // $$ = creer_feuilleNb($1);
 | EXP '+' EXP              { $$ = creer_noeudOp('+', $1, $3); }
+|
 ;
 
 %%
@@ -47,4 +50,3 @@ int main( int argc, char * argv[] ) {
   yyparse();
   return 0;
 }
-

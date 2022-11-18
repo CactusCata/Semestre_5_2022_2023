@@ -4,8 +4,8 @@ OBJ = ts.o asa.o parser.o lexer.o
 
 all: arc
 
-arc :  $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $(OBJ) -lfl 
+arc: $(OBJ)
+	$(CC) $(CFLAGS) -o $@ $(OBJ) -lfl
 
 *.o: *.c
 
@@ -18,4 +18,4 @@ lexer.c: lexer.lex parser.h
 	flex -o  $@ $^
 
 clean:
-	rm -rf *~ *.o
+	rm -rf *~ *.o lexer.c parser.c parser.h arc

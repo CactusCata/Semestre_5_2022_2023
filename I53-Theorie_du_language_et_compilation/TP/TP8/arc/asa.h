@@ -10,18 +10,18 @@
 typedef enum {typeNb, typeOp} typeNoeud;
 
 typedef struct {
-  int val;
+  int val; // valeur au noeuf
 } feuilleNb;
 
 typedef struct {
-  int ope;
+  int ope; // operateur
   struct asa * noeud[2];
 } noeudOp;
 
 typedef struct asa{
   typeNoeud type;
   int ninst;
- 
+
   union {
     feuilleNb nb;
     noeudOp op;
