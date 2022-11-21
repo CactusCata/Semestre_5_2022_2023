@@ -1,4 +1,3 @@
-import tkinter as tk
 from tkinter import Button, Tk, Toplevel, Canvas, StringVar, Label, Frame, Scrollbar
 import utils
 
@@ -8,47 +7,57 @@ class MainTk:
         self.colors = colors
         self.sortedRGB = sortedRGB
 
+        # Créé les deux fenêtres
         self.mainRoot = Tk()
-
-
         self.root = Toplevel(self.mainRoot)
+
+        # Paramètres de la fenêtre
         rootDimensions = setupRootGeometry(self.root, ratio=0.3)
         self.root.minsize(rootDimensions[0], rootDimensions[1])
         self.root.maxsize(rootDimensions[0], rootDimensions[1])
         self.root.title("Choix de la couleur")
         self.root.protocol("WM_DELETE_WINDOW", self.root.destroy)
 
+        # Affiche le nom de la couleur choisie
         self.colorSelected = StringVar()
-        self.labelColorSelected = Label(self.root, textvariable=self.colorSelected)
-        self.labelColorSelected.pack()
+        labelColorSelected = Label(self.root, textvariable=self.colorSelected)
+        labelColorSelected.pack()
 
-        self.frameMatrix = Frame(self.root)
-        self.frameMatrix.pack(expand=True, fill="both")
+        # Frame qui contiendra la matrice de couleur et la scrollbar
+        frameMatrix = Frame(self.root)
+        frameMatrix.pack(expand=True, fill="both")
 
-        self.matrixCanvasDimension = (int(0.97 * rootDimensions[0]), int(0.9 * rootDimensions[1]))
-        self.matrixCanvas = Canvas(self.frameMatrix, width=self.matrixCanvasDimension[0], height=self.matrixCanvasDimension[1], bg="white")
+        # Créé et initialise la matrice de couleur
+        self.matrixCanvasDimension = (int(0.97 * rootDimensions[0]), int(0.85 * rootDimensions[1]))
+        self.matrixCanvas = Canvas(frameMatrix, width=self.matrixCanvasDimension[0], height=self.matrixCanvasDimension[1], bg="white")
         self.matrixCanvas.pack(side="left", fill="y")
-
         self.setupMatrixCanvas()
 
-        self.matrixCanvasScrollbar = Scrollbar(self.frameMatrix, command=self.matrixCanvas.yview)
-        self.matrixCanvasScrollbar.pack(side="right", fill="y")
+        # Crée la scrollbar et la lie à la matrice de couleur
+        matrixCanvasScrollbar = Scrollbar(frameMatrix, command=self.matrixCanvas.yview)
+        matrixCanvasScrollbar.pack(side="right", fill="y")
         self.matrixCanvas.configure(scrollregion=self.matrixCanvas.bbox("all"))
-        self.matrixCanvas.configure(yscrollcommand=self.matrixCanvasScrollbar.set)
+        self.matrixCanvas.configure(yscrollcommand=matrixCanvasScrollbar.set)
 
+        # Créé la frame qui contiendra les boutons
+        buttonsFrame = Frame(self.root)
+        buttonsFrame.pack()
 
-        self.buttonsFrame = Frame(self.root)
-        self.buttonsFrame.pack()
+        # Créé le bouton OK
+        buttonOK = Button(buttonsFrame, text="OK", command=lambda:self.okButton())
+        buttonOK.pack(side="left")
 
-        self.buttonOK = Button(self.buttonsFrame, text="OK", command=lambda:self.okButton())
-        self.buttonOK.pack(side="left")
+        # Crée le bouton Annuler
+        buttonCancel = Button(buttonsFrame, text="Annuler", command=lambda:self.cancelButton())
+        buttonCancel.pack(side="left")
 
-        self.buttonCancel = Button(self.buttonsFrame, text="Annuler", command=lambda:self.cancelButton())
-        self.buttonCancel.pack(side="left")
-
+        # Lance la fenêtre
         self.root.mainloop()
 
-    def setupMatrixCanvas(self, rectSizePx=30, spaceBetweenRects=10):
+    def setupMatrixCanvas(self, rectSizePx=10, spaceBetweenRects=3):
+        """
+        Créé la matrice de couleur
+        """
         startDrawPxLeft = spaceBetweenRects
         startDrawPxUp = spaceBetweenRects
         rectPerLine = self.matrixCanvasDimension[0] // (rectSizePx + spaceBetweenRects)
@@ -63,27 +72,46 @@ class MainTk:
                     self.matrixCanvas.tag_bind(colorName, "<Button-1>", lambda c:self.couleurPresse(c))
 
     def okButton(self):
+        """
+        Effets du boutton OK
+        """
+        # Récupère le nom de la couleur
         currentColorName = self.colorSelected.get()
+
+        # Si une couleur a été choisie, met la couleur de fond de la fenêtre
+        # principale en la couleur choisie
         if (currentColorName != ""):
             currentRGBColor = self.colors[currentColorName]
             self.mainRoot.configure(bg=utils.rgbToHex(currentRGBColor))
-        
+
+        # Détruit la fenêtre et ses filles
         self.root.destroy()
 
     def cancelButton(self):
+        """
+        Effets du bouton CANCEL
+        """
+        # Détruit la fenêtre et ses filles
         self.root.destroy()
 
     def couleurPresse(self, event=None):
+        """
+        Effets de l'appuie sur une couleur
+        """
+
         id = self.matrixCanvas.find_withtag("current")
         self.colorSelected.set(self.matrixCanvas.gettags(id)[1])
 
 
 def setupRootGeometry(root, ratio=0.5):
+    """
+    Make ideal windows geometry
+    """
     screenWidth = root.winfo_screenwidth()
     screenHeight = root.winfo_screenheight()
 
     rootHeight = (int) (ratio * screenHeight)
-    rootWidth = (int) (rootHeight * 1.618)
+    rootWidth = (int) (rootHeight * 1.618) # omg the god golden number
 
     # widthxheight+x+y
     root.geometry(f"{rootWidth}x{rootHeight}+{(screenWidth - rootWidth) // 2}+{(screenHeight - rootHeight) // 2}")
