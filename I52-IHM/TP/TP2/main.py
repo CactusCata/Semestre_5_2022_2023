@@ -1,3 +1,3 @@
-from mainTk import MainTk
+from paintTk import PaintTk
 
-MainTk()
+PaintTk()
