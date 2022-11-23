@@ -1,0 +1,5 @@
+DEBUT
+	toto <- 2*(4*3);
+	tata <- 3*toto;
+	AFFICHER toto + tata;
+FIN
