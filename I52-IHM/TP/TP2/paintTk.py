@@ -16,9 +16,10 @@ class PaintTk:
         self.root.minsize(rootDimensions[0], rootDimensions[1])
         self.root.maxsize(rootDimensions[0], rootDimensions[1])
         self.root.title("Paint3.0")
-        self.root.protocol("WM_DELETE_WINDOW", self.root.destroy)
 
         self.initMenuAndGraphics()
+
+        self.root.protocol("WM_DELETE_WINDOW", self.menu.quitFigure)
 
         # Creation l'espace d'information courante en bas de la fenêtre
         self.frameInfo = Frame(self.root)
@@ -32,13 +33,13 @@ class PaintTk:
     def initMenuAndGraphics(self):
         # Creation du menu
         self.frameMenu = Frame(self.root)
-        self.menu = PaintTkMenu(self.frameMenu)
+        self.menu = PaintTkMenu(self.root, self.frameMenu)
         self.frameMenu.pack(side="top", expand=True, fill="x")
 
 
         # Creation de l'interface de dessin
         self.frameDrawnArea = Frame(self.root)
-        frameDrawnAreaDimenstions = (int(0.97 * rootDimensions[0]), int(0.80 * rootDimensions[1]))
+        frameDrawnAreaDimenstions = (int(0.97 * self.root.winfo_screenwidth()), int(0.80 * self.root.winfo_screenheight()))
         self.paintGraphics = PaintTkGraphics(self.frameDrawnArea, frameDrawnAreaDimenstions[0], frameDrawnAreaDimenstions[1], "red")
         self.frameDrawnArea.pack(side="top")
 

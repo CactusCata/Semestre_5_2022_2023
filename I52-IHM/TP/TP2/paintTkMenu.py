@@ -4,7 +4,8 @@ import json
 
 class PaintTkMenu:
 
-    def __init__(self, frame):
+    def __init__(self, root, frame):
+        self.root = root
 
         # Création du conteneur d'onglet
         self.menuButtonFile = Menubutton(frame, text="Fichier")
@@ -33,35 +34,54 @@ class PaintTkMenu:
     def newFigure(self):
 
         # Si l'utilisateur a déjà dessiné, lui proposer de save
-        if self.paintGraphics().hasDrawn():
-            TkActionButton(self.canvas.winfo_toplevel(), "Des modifications ont été apportées, voulez-vous sauvegarder ?", self.saveFigure)
+        if self.paintGraphics.graphicsHadChangedFromLastSave():
+            TkActionButton(self.root, "Des modifications ont été apportées, voulez-vous sauvegarder ?", self.saveFigure)
 
-        self.canvas.delete("all")
+        # Nettoie l'écran
+        self.paintGraphics.clear()
 
 
     def openFigure(self):
 
         # Si l'utilisateur a déjà dessiné, lui proposer de save
-        if self.paintGraphics().hasDrawn():
-            TkActionButton(self.canvas.winfo_toplevel(), "Des modifications ont été apportées, voulez-vous sauvegarder ?", self.saveFigure)
+        if self.paintGraphics.graphicsHadChangedFromLastSave():
+            TkActionButton(self.root, "Des modifications ont été apportées, voulez-vous sauvegarder ?", self.saveFigure)
 
-        # Lire le fichier
-        filename = fd.askopenfilename()
-        // continuer ici et faire quitFigure()
+        # Dessine les figures du fichier choisi
+        file = filedialog.askopenfile(mode="r")
+        if (file is not None):
+            fileFigures = json.load(file)
+            self.paintGraphics.clear()
+            self.paintGraphics.paint(fileFigures)
+            file.close()
 
 
     def saveFigure(self):
-        if not self.paintGraphicsHasBeenInit():
-            raise ValueError("You need to register paintGraphics before all")
+        """
+        Propose de sauvegarder dans un fichier les figures
+        déssinées sur le canvas
+        """
 
-        if not self.paintGraphics.hasDrawn():
-            print("Vous n'avez rien déssiné")
-        else:
-            f = asksaveasfile(initialfile = 'Untitled.graphics', defaultextension=".graphics",filetypes=[("All Files","*.*"),("Graphics file","*.graphics")])
-            figures = self.paintGraphics.getTagFigure()
-            figuresJsoned = json.dumps(figures)
-            f.write(figuresJsoned)
-            f.close()
+        if self.paintGraphics.graphicsHadChangedFromLastSave():
+            f = filedialog.asksaveasfile(mode="w", initialfile = 'Untitled.graphics', defaultextension=".graphics",filetypes=[("All Files","*.*"),("Graphics file","*.graphics")])
+            
+            if (f is not None):
+                figures = self.paintGraphics.getFigures()
+                figuresJsoned = json.dumps(figures)
+                f.write(figuresJsoned)
+                f.close()
+                self.paintGraphics.figuresHasBeenSaved()
 
     def quitFigure(self):
-        pass
+        # Si l'utilisateur a déjà dessiné, lui proposer de save
+        if self.paintGraphics.graphicsHadChangedFromLastSave():
+            print("debut")
+            TkActionButton(self.root, "Des modifications ont été apportées, voulez-vous sauvegarder ?", self.saveFigure)
+            print("fin")
+
+        print("test")
+        # Destruction de la fenêtre
+        self.root.destroy()
+        self.root.update()
+
+        

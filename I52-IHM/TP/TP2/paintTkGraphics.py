@@ -21,24 +21,24 @@ class PaintTkGraphics:
         self.button1Pressed = False
 
         # Compte le nombre de figure dessiné sur le canvas
-        self.figureWritting = 0
+        self.figureWritten = 0
 
         # Tag de la derniere figure surligné
         self.lastFigureHighlightTag = DEFAULT_LAST_FIGURE_HIGHLIGHT_TAG
 
-        # has draw on image
-        self.drawn = False
+        # Des figrues ont-elles été déssinés depuis la dernière sauvegarde
+        self.graphicsChanged = False
 
 
     def ctrlClick(self, eventClick):
         self.button1Pressed = True
 
-        if not self.drawn:
-            self.drawn = True
+        if not self.graphicsChanged:
+            self.graphicsChanged = True
 
     def clickRelease(self, eventClick):
         self.button1Pressed = False
-        self.figureWritting += 1
+        self.figureWritten += 1
 
     def mouseDraw(self, event):
         if not self.button1Pressed:
@@ -53,7 +53,7 @@ class PaintTkGraphics:
                 # Colorie la figure poitée si elle est différente de l'ancienne
                 id = ids[0] # id de l'élément sur la souris
                 tags = self.canvas.gettags(id)
-                tagFigure = getTagFigure(tags) # tag commencant par 'figure'
+                tagFigure = self.getTagFigure(tags) # tag commencant par 'figure'
                 if (self.lastFigureHighlightTag != tagFigure):
                     self.canvas.itemconfigure(self.lastFigureHighlightTag, fill=DEFAULT_LINE_COLOR)
                     self.canvas.itemconfigure(tagFigure, fill=DEFAULT_LINE_COLOR_HIGHTLIGHT)
@@ -67,18 +67,32 @@ class PaintTkGraphics:
 
         else:
             if (self.xLastPos is not None):
-                lineID = self.canvas.create_line(self.xLastPos, self.yLastPos, event.x, event.y, width=4, tags="figure" + str(self.figureWritting))
+                lineID = self.canvas.create_line(self.xLastPos, self.yLastPos, event.x, event.y, width=4, tags="figure" + str(self.figureWritten))
 
             self.xLastPos = event.x
             self.yLastPos = event.y
 
-    def hasDrawn(self):
-        return self.drawn
+    def graphicsHadChangedFromLastSave(self):
+        """
+        Renvoie vrai si des figures ont été dessinées
+        Renvoie faux si aucune figure a été déssinée
+        """
+        return self.graphicsChanged
 
     def clear(self):
+        """
+        Supprime tous les éléments du canvas de dessin
+        """
         self.canvas.delete("all")
+        self.graphicsChanged = False
+        self.figureWritten = 0
+        self.lastFigureHighlightTag = DEFAULT_LAST_FIGURE_HIGHLIGHT_TAG
 
     def getTagFigure(self, tags):
+        """
+        Renvoie le tag complet de la forme "figureX" ou
+        X est un entier parmis une liste de tag
+        """
         n = len(tags)
         i = 0
         while (i < n) and (not tags[i].startswith("figure")):
@@ -86,12 +100,33 @@ class PaintTkGraphics:
         return tags[i]
 
     def getFigures(self):
+        """
+        Renvoie sous forme de dictionnaire les figures
+        du canvas
+        """
         figures = {}
 
-        for i in range(self.figureWritting):
+        for i in range(self.figureWritten):
             figures[i] = []
             figureLines = self.canvas.find_withtag("figure" + str(i))
             for line in figureLines:
                 figures[i].append(self.canvas.coords(line))
 
         return figures
+
+    def paint(self, figures):
+        """
+        Dessine une liste de figure
+        """
+        for tagNumber, figureLinesPos in figures.items():
+            tag = f"figure{tagNumber}"
+            for line in figureLinesPos:
+                self.canvas.create_line(line[0], line[1], line[2], line[3], width=4, tags=tag)
+
+        self.figureWritten = len(figures.keys())
+        self.graphicsChanged = False
+        self.lastFigureHighlightTag = DEFAULT_LAST_FIGURE_HIGHLIGHT_TAG
+
+    def figuresHasBeenSaved(self):
+        self.graphicsChanged = False
+        self.lastFigureHighlightTag = DEFAULT_LAST_FIGURE_HIGHLIGHT_TAG
