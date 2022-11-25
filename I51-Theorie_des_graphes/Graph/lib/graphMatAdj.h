@@ -7,6 +7,7 @@
 typedef struct {
   unsigned int edgeAmount;
   unsigned char **matrixAdj;
+  int *chemin; // sommets empruntés un par un, utilisé uniquement dans acm.h
 } GraphM;
 
 GraphM initGraphM(unsigned int edgeAmount);

@@ -1,45 +1,30 @@
 CC = gcc
 CFLAGS = -g -Wall
+BIN_FOLDER = ../bin
 
-all:
-	make libcontainer.a
-	make libgraph.a
-	make libUtils.a
+SRC_FILES =\
+	acm.c\
+	graphDis.c\
+	graphListAdj.c\
+	graphMatAdj.c\
+	graphTypeConvertor.c\
+	graphUtils.c\
+	list.c\
+	mathUtils.c\
+	stack.c\
+	utils.c\
 
-# Containers
-libcontainer.a: list.o stack.o
-	ar crs $@ $^
+OBJECT_FILES = $(SRC_FILES:%.c=$(BIN_FOLDER)/%.o)
 
-list.o: list.c list.h
-	$(CC) $(CFLAGS) -c $<
-
-stack.o: stack.c stack.h
-	$(CC) $(CFLAGS) -c $<
+all: $(OBJECT_FILES)
 
 test_stack.exe: stack.o test_stack.c
 	$(CC) $(CFLAGS) -o $@ $^
 
 
-# Graph
-libgraph.a: graphMatAdj.o graphListAdj.o graphTypeConvertor.o
-	ar crs $@ $^
-
-graphMatAdj.o: graphMatAdj.c graphMatAdj.h
-	$(CC) $(CFLAGS) -c $<
-
-graphListAdj.o: graphListAdj.c graphListAdj.h
-	$(CC) $(CFLAGS) -c $<
-
-graphTypeConvertor.o: graphTypeConvertor.c graphTypeConvertor.h
-	$(CC) $(CFLAGS) -c $<
-
-# Utils
-libUtils.a: utils.o
-	ar crs $@ $^
-
-utils.o: utils.c utils.h
-	$(CC) $(CFLAGS) -c $<
+$(OBJECT_FILES): $(BIN_FOLDER)/%.o: %.c
+	$(CC) $(CFLAGS) -o $@ -c $<
 
 # Cleaner
 clean:
-	rm -f *.exe *.o *.a
+	rm -f *.exe *.o *.a $(BIN_FOLDER)/*.o

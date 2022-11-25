@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
   freeGraphL(g2);
   */
 
+  /**
   Pair *pairs = generatePairEnum(6);
   GraphL g = intToGraph(623, 6, pairs);
   printGraphL(g);
@@ -33,7 +34,13 @@ int main(int argc, char *argv[]) {
 
   int n = 7;
   printf("Proportion connexe pour n = %d vaut %d\n", n, proportionConnexe(n));
+  */
 
+  point *points = nuages(5);
+  drawPoints("data/", "cloud", points, 5);
+  dotToImage("data/", "cloud");
+  openImage("data/", "cloud", "png");
+  free(points);
 
   return 0;
 }
