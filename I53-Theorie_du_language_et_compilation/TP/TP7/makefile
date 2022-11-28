@@ -26,4 +26,4 @@ lexer.c: lexer.lex
 	flex -o $@ $<
 
 clean:
-	rm -f parser.c lexer.c parser
+	rm -f parser.c lexer.c parser *.o
