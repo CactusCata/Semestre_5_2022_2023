@@ -15,6 +15,7 @@ BLANC [ \t\n]
 "DEBUT"           { return DEBUT; }
 "FIN"             { return FIN; }
 "AFFICHER"        { return AFFICHER; }
+"VAR"             { return VAR; }
 
 "+"               { return PLUS; }
 "-"               { return MOINS; }

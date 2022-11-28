@@ -7,7 +7,8 @@
 
 #include "ts.h"
 
-FILE *ramFile;
+extern FILE *ramFile;
+extern ts table;
 
 typedef enum {typeNb, typeId, typeOp, typeAfficher, typeCreerId, typeAffect} typeNoeud;
 

@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -g -Wall
+BIN_FOLDER = ../bin
 
 SOURCE_FILES =\
 	asa.c\
@@ -7,15 +8,15 @@ SOURCE_FILES =\
 	lexer.c\
 	ts.c
 
-OBJECT_FILES = $(SOURCE_FILES:%.c=%.o)
+OBJECT_FILES = $(SOURCE_FILES:%.c=$(BIN_FOLDER)/%.o)
 
-all: prog.exe
+all: ../prog.exe
 
 # build executable
-prog.exe: $(OBJECT_FILES)
+../prog.exe: $(OBJECT_FILES)
 	$(CC) $(CFLAGS) -o $@ $^ -lfl
 
-$(OBJECT_FILES): %.o: %.c
+$(OBJECT_FILES): $(BIN_FOLDER)/%.o: %.c
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 # parser
@@ -27,4 +28,4 @@ lexer.c: lexer.lex
 	flex -o $@ $<
 
 clean:
-	rm -f parser.c parser.h lexer.c prog.exe *.o
+	rm -f parser.c parser.h lexer.c $(BIN_FOLDER)/*.o

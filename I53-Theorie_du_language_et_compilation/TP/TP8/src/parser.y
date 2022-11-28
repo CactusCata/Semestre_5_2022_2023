@@ -73,6 +73,9 @@ int main( int argc, char * argv[] ) {
   yyin = fopen(argv[1],"r");
   ramFile = fopen(argv[2], "w");
 
+  extern ts table;
+  table = ts_init_table("?");
+
   yyparse();
 
   fclose(yyin);

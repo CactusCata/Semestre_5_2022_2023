@@ -21,7 +21,7 @@ asa * creer_feuilleID(char *identificateur)
     yyerror("echec allocation mémoire");
 
   p->type = typeId;
-  p->ninst = 0; // Peut etre autre chose
+  p->ninst = 2;
   p->id.identificateur = identificateur;
 
   return p;
@@ -51,6 +51,7 @@ asa * creer_noeudAfficher(asa * noeud)
     yyerror("echec allocation mémoire");
 
   p->type = typeAfficher;
+  p->ninst = 1;
   p->afficher.noeud = noeud;
 
   return p;
@@ -78,7 +79,7 @@ asa * creer_noeudAffect(char *identificateur, asa *noeudExp)
       yyerror("echec allocation mémoire");
 
     p->type = typeAffect;
-    p->ninst = 1; // nombre d'instruction de la machine RAM pour charger un identifiant (vaut peut-être une autre valeur)
+    p->ninst = 1;
     p->affect.identificateur = identificateur;
     p->affect.noeudExp = noeudExp;
 
@@ -101,12 +102,6 @@ void free_asa(asa *p)
 }
 
 /**
-
-EXP : EXP PLUS EXP {printf("ADD %d\nSTORE %d\n", cursorMemory - 2, cursorMemory - 2); cursorMemory--;}
-| EXP MOINS EXP {printf("LOAD %d\nSUB %d\nSTORE %d\n", cursorMemory - 2, cursorMemory - 1, cursorMemory - 2); cursorMemory--;}
-| EXP MULT EXP {printf("MUL %d\nSTORE %d\n", cursorMemory - 2, cursorMemory - 2); cursorMemory--;}
-| EXP DIV EXP {printf("LOAD %d\nDIV %d\nSTORE %d\n", cursorMemory - 2, cursorMemory - 1, cursorMemory - 2); cursorMemory--;}
-| PAR_L EXP PAR_R {}
 | ID AFFECT EXP {int id = ts_ajouter_id(table, $1); printf("STORE %d\n", id); cursorMemory--;}
 | ID {int id = ts_retrouver_id(table, $1); printf("LOAD %d\nSTORE %d\n", id, cursorMemory); cursorMemory++;}
 | NB {printf("LOAD #%d\nSTORE %d\n", $1, cursorMemory++);}
@@ -114,13 +109,19 @@ EXP : EXP PLUS EXP {printf("ADD %d\nSTORE %d\n", cursorMemory - 2, cursorMemory 
 
 */
 
+FILE *ramFile;
+
 int stackCursor = 1;
+ts table;
 
 // typedef enum {typeNb, typeId, typeOp, typeAfficher, typeCreerId, typeAffect} typeNoeud;
 void codegen(asa *p)
 {
 
   if (!p) return;
+  
+  int id;
+
   switch(p->type) {
 
   case typeNb:
@@ -138,12 +139,41 @@ void codegen(asa *p)
     switch (p->op.ope) {
       case '+': fprintf(ramFile, "ADD %d\n", stackCursor - 2); break;
       case '-': fprintf(ramFile, "SUB %d\n", stackCursor - 2); break;
-      case '*': fprintf(ramFile, "MULT %d\n", stackCursor - 2); break;
+      case '*': fprintf(ramFile, "MUL %d\n", stackCursor - 2); break;
       case '/': fprintf(ramFile, "DIV %d\n", stackCursor - 2); break;
+      default: fprintf(stderr, "Operation '%c' inconnue.\n", p->op.ope); exit(0);
     }
     fprintf(ramFile, "STORE %d\n", stackCursor - 2);
     stackCursor--;
     break;
+
+  case typeCreerId:
+    printf("Déclaration d'un variable\n");
+    ts_ajouter_id(table, p->creerId.identificateur);
+    break;
+
+  case typeId:
+    printf("Chargement d'un id...\n");
+    id = ts_retrouver_id(table, p->id.identificateur); 
+    fprintf(ramFile, "LOAD %d\n", id);
+    fprintf(ramFile, "STORE %d\n", stackCursor);
+    stackCursor++;
+    break;
+
+  case typeAffect:
+    codegen(p->affect.noeudExp);
+    printf("Affectation à un id.\n");
+    id = ts_retrouver_id(table, p->id.identificateur); 
+    printf("STORE %d\n", id);
+    stackCursor--;
+    break;
+
+  case typeAfficher:
+    codegen(p->afficher.noeud);
+    printf("Affichage demandé.\n");
+    fprintf(ramFile, "WRITE\n");
+    break;
+
   default:
     break;
   }
