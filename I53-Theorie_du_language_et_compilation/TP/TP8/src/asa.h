@@ -44,6 +44,8 @@ typedef struct {
 typedef struct asa{
   typeNoeud type;
   int ninst;
+  struct asa *next;
+
 
   union {
     feuilleNb nb;
@@ -68,6 +70,7 @@ asa * creer_noeudOp( int ope, asa * p1, asa * p2 );
 asa * creer_noeudAfficher(asa * afficher);
 asa * creer_noeudCreerId(char *identificateur);
 asa * creer_noeudAffect(char *identificateur, asa *noeudExp);
+asa * union_noeud(asa *instructs, asa *current);
 
 void free_asa(asa *p);
 

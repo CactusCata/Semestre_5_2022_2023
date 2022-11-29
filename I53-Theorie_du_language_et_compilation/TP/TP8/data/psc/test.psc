@@ -1,10 +1,9 @@
 DEBUT
-	VAR toto;
 	VAR tata;
+	VAR toto;
 
-	toto <- 5*7;
-	tata <- tota + 1;
+	tata <- 5;
+	toto <- tata * 14 - 4;
 
-	AFFICHER toto;
-	AFFICHER tata;
+	AFFICHER 2 * tata + toto - 4;
 FIN

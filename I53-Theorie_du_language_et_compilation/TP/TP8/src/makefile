@@ -21,7 +21,7 @@ $(OBJECT_FILES): $(BIN_FOLDER)/%.o: %.c
 
 # parser
 parser.c: parser.y
-	bison -o $@ -d $<
+	bison -o $@ -d $< -Wcounterexamples
 
 # Lexer
 lexer.c: lexer.lex

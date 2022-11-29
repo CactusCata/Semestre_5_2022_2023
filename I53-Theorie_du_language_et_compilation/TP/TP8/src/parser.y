@@ -32,16 +32,16 @@
 
 %%
 
-PROG : DEBUT INSTRUCTS FIN                 { codegen($2); }
+PROG : DEBUT INSTRUCTS FIN                 { codegen($2); fprintf(ramFile, "STOP");}
 ;
 
-INSTRUCTS : INSTRUCTS INSTRUCT {$$ = $2;}
+INSTRUCTS : INSTRUCTS INSTRUCT {$$ = union_noeud($1, $2);}
 | INSTRUCT {$$ = $1;}
 ;
 
 INSTRUCT : EXP END_INSTRUCT {$$ = $1;}
 | AFFICHER EXP END_INSTRUCT {$$ = creer_noeudAfficher($2);}
-| VAR ID END_INSTRUCT { $$ = creer_noeudCreerId(yylval.id);}
+| VAR ID END_INSTRUCT { $$ = creer_noeudCreerId($2);}
 ;
 
 EXP : EXP PLUS EXP { $$ = creer_noeudOp('+', $1, $3); }
@@ -49,9 +49,9 @@ EXP : EXP PLUS EXP { $$ = creer_noeudOp('+', $1, $3); }
 | EXP MULT EXP { $$ = creer_noeudOp('*', $1, $3); }
 | EXP DIV EXP { $$ = creer_noeudOp('/', $1, $3); }
 | PAR_L EXP PAR_R { $$ = $2;}
-| ID AFFECT EXP { $$ = creer_noeudAffect(yylval.id, $3); }
-| ID { $$ = creer_feuilleID(yylval.id); }
-| NB { $$ = creer_feuilleNb(yylval.nb); }
+| ID AFFECT EXP { $$ = creer_noeudAffect($1, $3); }
+| ID { $$ = creer_feuilleID($1); }
+| NB { $$ = creer_feuilleNb($1); }
 ;
 
 %%
