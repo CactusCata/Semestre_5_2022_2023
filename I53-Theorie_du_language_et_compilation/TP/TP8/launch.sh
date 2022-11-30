@@ -7,7 +7,7 @@ make
 
 cd ../
 $3 ./prog.exe $1 $2
-rm ./prog.exe
+rm -f ./prog.exe
 
 cd src
 make clean

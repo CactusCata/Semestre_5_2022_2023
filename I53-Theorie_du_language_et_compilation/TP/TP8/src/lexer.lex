@@ -16,6 +16,8 @@ BLANC [ \t\n]
 "FIN"             { return FIN; }
 "AFFICHER"        { return AFFICHER; }
 "VAR"             { return VAR; }
+"TQ"              { return TQ; }
+"FAIRE"           { return FAIRE; }
 
 "+"               { return PLUS; }
 "-"               { return MOINS; }

@@ -18,7 +18,7 @@
 
 %define parse.error verbose
 
-%token DEBUT FIN PLUS MOINS MULT DIV PAR_L PAR_R AFFECT END_INSTRUCT AFFICHER VAR
+%token DEBUT FIN PLUS MOINS MULT DIV PAR_L PAR_R AFFECT END_INSTRUCT AFFICHER VAR TQ FAIRE
 %token <nb> NB
 %token <id> ID
 
@@ -32,16 +32,19 @@
 
 %%
 
-PROG : DEBUT INSTRUCTS FIN                 { codegen($2); fprintf(ramFile, "STOP");}
+PROG : DEBUT INSTRUCTS FIN {codegen($2); fprintf(ramFile, "STOP");}
 ;
 
 INSTRUCTS : INSTRUCTS INSTRUCT {$$ = union_noeud($1, $2);}
-| INSTRUCT {$$ = $1;}
+| INSTRUCT {$$ = union_noeud(NULL, $1);}
 ;
 
 INSTRUCT : EXP END_INSTRUCT {$$ = $1;}
 | AFFICHER EXP END_INSTRUCT {$$ = creer_noeudAfficher($2);}
 | VAR ID END_INSTRUCT { $$ = creer_noeudCreerId($2);}
+| TQ EXP FAIRE INSTRUCTS {$$ = creer_noeudTQ($1, $2); }
+//| SI EXP ALORS INSTRUCTS FSI {}
+//| SI EXP ALORS INSTRUCTS SINON INSTRUCTS FSI {}
 ;
 
 EXP : EXP PLUS EXP { $$ = creer_noeudOp('+', $1, $3); }

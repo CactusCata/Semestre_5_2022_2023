@@ -10,7 +10,16 @@
 extern FILE *ramFile;
 extern ts table;
 
-typedef enum {typeNb, typeId, typeOp, typeAfficher, typeCreerId, typeAffect} typeNoeud;
+typedef enum {
+    typeNb,
+    typeId,
+    typeOp,
+    typeAfficher,
+    typeCreerId,
+    typeAffect,
+    typeUnion,
+    typeTq
+} typeNoeud;
 
 // Definition des structures de noeuds
 typedef struct {
@@ -39,12 +48,21 @@ typedef struct {
   struct asa *noeudExp;
 } noeudAffect;
 
+typedef struct {
+  struct asa *instructs;
+  struct asa *instruct;
+} noeudUnion;
+
+typedef struct {
+  struct asa *expression;
+  struct asa *instructs;
+} noeudTq;
+
 
 // Definition de l'arbre
 typedef struct asa{
   typeNoeud type;
   int ninst;
-  struct asa *next;
 
 
   union {
@@ -54,6 +72,8 @@ typedef struct asa{
     noeudAfficher afficher;
     noeudCreerId creerId;
     noeudAffect affect;
+    noeudUnion union_noeud;
+    noeudTq tq;
   };
 } asa;
 
@@ -71,6 +91,7 @@ asa * creer_noeudAfficher(asa * afficher);
 asa * creer_noeudCreerId(char *identificateur);
 asa * creer_noeudAffect(char *identificateur, asa *noeudExp);
 asa * union_noeud(asa *instructs, asa *current);
+asa * creer_noeudTQ(asa *expression, asa *instructs);
 
 void free_asa(asa *p);
 
