@@ -40,7 +40,7 @@ class PaintTk:
         # Creation de l'interface de dessin
         self.frameDrawnArea = Frame(self.root)
         frameDrawnAreaDimenstions = (int(0.97 * self.root.winfo_screenwidth()), int(0.80 * self.root.winfo_screenheight()))
-        self.paintGraphics = PaintTkGraphics(self.frameDrawnArea, frameDrawnAreaDimenstions[0], frameDrawnAreaDimenstions[1], "red")
+        self.paintGraphics = PaintTkGraphics(self.frameDrawnArea, frameDrawnAreaDimenstions[0], frameDrawnAreaDimenstions[1], "red", self.menu)
         self.frameDrawnArea.pack(side="top")
 
         # Connecte la zone graphique au menu
