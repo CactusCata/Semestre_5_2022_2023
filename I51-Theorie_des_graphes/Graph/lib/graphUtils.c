@@ -4,8 +4,8 @@ int compareArete(const void *a1, const void *a2) {
   float sizeA1 = ((arete *) a1)->w;
   float sizeA2 = ((arete *) a2)->w;
 
-  if (sizeA1 < sizeA2) return +1;
-  if (sizeA1 > sizeA2) return -1;
+  if (sizeA1 > sizeA2) return +1;
+  if (sizeA1 < sizeA2) return -1;
   return 0;
 }
 

@@ -10,12 +10,16 @@
 
 #include "graphUtils.h"
 #include "graphMatAdj.h"
+#include "graphAcm.h"
+#include "graphDis.h"
 #include "mathUtils.h"
 
 point *nuages(int n);
 
 // utilise l'algo de krushka
-GraphM acm(point *points, int n);
+GraphAcm acm(point *points, int n);
+
+void approximation(GraphM g, int depart);
 
 void parcours(GraphM *g, int s, int p, int *libre, int *k);
 

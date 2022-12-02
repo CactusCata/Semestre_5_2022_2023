@@ -1,7 +1,7 @@
 graph G {
-	node_0 [pos="-0.394922,0.506097!",shape=circle];
-	node_1 [pos="0.986179,0.473442!",shape=circle];
-	node_2 [pos="-0.473784,-0.414233!",shape=circle];
-	node_3 [pos="0.712041,-0.859535!",shape=circle];
-	node_4 [pos="0.439130,0.921706!",shape=circle];
+	node_0 [pos="-0.361489,-0.407320!",shape=circle];
+	node_1 [pos="-0.934900,-0.056620!",shape=circle];
+	node_2 [pos="-0.325961,0.848627!",shape=circle];
+	node_3 [pos="-0.919739,-0.142978!",shape=circle];
+	node_4 [pos="-0.770924,-0.575370!",shape=circle];
 }

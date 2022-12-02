@@ -1,7 +1,7 @@
 #include "graphDis.h"
 
-graphD *singleton(int s) {
-  graphD *g = (graphD *) malloc(sizeof(graphD));
+GraphD *singleton(int s) {
+  GraphD *g = (GraphD *) malloc(sizeof(GraphD));
   g->s = s;
   g->size = 1;
   g->representant = g;
@@ -10,17 +10,15 @@ graphD *singleton(int s) {
   return g;
 }
 
-// A mettre à jour
-graphD *representant(graphD **tab, int s) {
-  graphD *aux = tab[s];
-  while (aux->next != aux) {
-    aux = aux->next;
-  }
-  return aux;
+/**
+*   Renvoie le représentant d'un des ensembles disjoints
+*/
+GraphD *representant(GraphD **tab, int s) {
+  return tab[s]->representant;
 }
 
-void reunion(graphD *g1, graphD *g2) {
-  graphD *tmp;
+void reunion(GraphD *g1, GraphD *g2) {
+  GraphD *tmp;
   if (g1->size > g2->size) {
     tmp = g1;
     g1 = g2;
@@ -36,12 +34,4 @@ void reunion(graphD *g1, graphD *g2) {
 
   g2->last->next = g1;
   g2->last = g1->last;
-}
-
-graphD *initGraphD(int n) {
-  graphD *g = (graphD *) malloc(sizeof(graphD) * n);
-
-  
-
-  return g;
 }

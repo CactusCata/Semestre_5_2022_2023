@@ -36,9 +36,17 @@ int main(int argc, char *argv[]) {
   printf("Proportion connexe pour n = %d vaut %d\n", n, proportionConnexe(n));
   */
 
-  point *points = nuages(5);
-  drawPoints("data/", "cloud", points, 5);
-  dotToImage("data/", "cloud");
+  int n = atoi( argv[1] );
+  point *points = nuages(n);
+  //drawPoints("data/", "cloud", points, n);
+  //dotToImage("data/", "cloud");
+
+  GraphAcm graphAcm = acm(points, n);
+  approximation(graphAcm.graph, 0);
+  drawGraphAcm(graphAcm, "data/", "acm");
+
+  freeGraphAcm(graphAcm);
+
   openImage("data/", "cloud", "png");
   free(points);
 

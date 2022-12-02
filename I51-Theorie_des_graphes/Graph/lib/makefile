@@ -7,12 +7,13 @@ SRC_FILES =\
 	graphDis.c\
 	graphListAdj.c\
 	graphMatAdj.c\
+	graphAcm.c\
 	graphTypeConvertor.c\
 	graphUtils.c\
 	list.c\
 	mathUtils.c\
 	stack.c\
-	utils.c\
+	utils.c
 
 OBJECT_FILES = $(SRC_FILES:%.c=$(BIN_FOLDER)/%.o)
 

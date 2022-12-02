@@ -10,6 +10,7 @@ SRC_FILES =\
 	graphDis.c\
 	graphListAdj.c\
 	graphMatAdj.c\
+	graphAcm.c\
 	graphTypeConvertor.c\
 	graphUtils.c\
 	list.c\

@@ -3,20 +3,18 @@
 
 #include <stdlib.h>
 
-typedef struct graphD {
+typedef struct GraphD {
   int s;
   int size;
-  struct graphD *next;
-  struct graphD *representant;
-  struct graphD *last;
-} graphD;
+  struct GraphD *next;
+  struct GraphD *representant;
+  struct GraphD *last;
+} GraphD;
 
-graphD *initGraphD(int n);
+GraphD *singleton(int s);
 
-graphD *singleton(int s);
+GraphD *representant(GraphD **tab, int s);
 
-graphD *representant(graphD **tab, int s);
-
-void reunion(graphD *g1, graphD *g2);
+void reunion(GraphD *g1, GraphD *g2);
 
 #endif

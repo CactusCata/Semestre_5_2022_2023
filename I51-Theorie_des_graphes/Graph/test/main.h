@@ -3,6 +3,7 @@
 
 #include "../lib/graphMatAdj.h"
 #include "../lib/graphListAdj.h"
+#include "../lib/graphAcm.h"
 #include "../lib/list.h"
 #include "../lib/acm.h"
 
