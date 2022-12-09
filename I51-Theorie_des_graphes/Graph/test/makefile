@@ -17,6 +17,8 @@ SRC_FILES =\
 	mathUtils.c\
 	stack.c\
 	utils.c\
+	partition.c\
+	clique.c
 
 
 OBJECT_FILES = $(SRC_FILES:%.c=$(BIN_FOLDER)/%.o)
@@ -26,6 +28,9 @@ prog.exe: main.o
 
 main.o: main.c main.h
 	$(CC) $(CFLAGS) -c $<
+
+partition.png: partition.dat partition.plot
+	gnuplot partition.plot
 
 clean:
 	rm -f ../*.exe *.o

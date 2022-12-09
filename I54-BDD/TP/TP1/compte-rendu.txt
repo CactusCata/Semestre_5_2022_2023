@@ -1,0 +1,32 @@
+1)
+
+CREATE TABLE Departement
+(
+  DID VARCHAR(2) PRIMARY KEY,
+  Libelle VARCHAR(20)
+);
+
+CREATE TABLE Employe
+(
+  EID INT CHECK (EID < 100) PRIMARY KEY,
+  Nom VARCHAR(20),
+  Dept VARCHAR(2) REFERENCES Departement
+);
+
+
+2)
+
+INSERT INTO Departement
+VALUES ("va", "Var");
+
+SELECT *
+FROM Departement;
+
+ROLLBACK;
+
+SELECT *
+FROM Departement;
+
+3)
+
+BEGIN TRANSACTION T1;

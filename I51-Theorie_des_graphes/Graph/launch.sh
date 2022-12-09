@@ -1,14 +1,17 @@
+#!/bin/bash
 clear
 
-cd lib
-make clean
-make
+make -BC lib
+make -BC test prog.exe
 
-cd ../test
-make clean
-make prog.exe
+#> partition.dat
+#
+#for i in {1..100}
+#do
+#  #/usr/bin/time --format="cpu:%U" ./prog.exe "$i"
+#  ./prog.exe "$i" >> test/partition.dat
+#done
+#
+#make -BC test partition.png
 
-cd ../
-# Possible de mettre "valgrind" en lancant la commande:
-# ./launch.sh valgrind
-$2 ./prog.exe $1
+./prog.exe

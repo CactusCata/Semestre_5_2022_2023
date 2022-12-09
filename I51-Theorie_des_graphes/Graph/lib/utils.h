@@ -23,4 +23,6 @@ int readNextUInt(char *text, size_t *start);
 
 Pair *generatePairEnum(int max);
 
+void printArray(int *array, int n);
+
 #endif

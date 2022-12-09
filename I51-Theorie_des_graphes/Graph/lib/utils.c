@@ -51,3 +51,14 @@ Pair *generatePairEnum(int order) {
   }
   return pairs;
 }
+
+void printArray(int *array, int n) {
+  printf("[");
+  if (n > 0) {
+    for (int i = 0; i < n - 1; i++) {
+      printf("%d, ", array[i]);
+    }
+    printf("%d", array[n - 1]);
+  }
+  printf("]\n");
+}

@@ -13,7 +13,9 @@ SRC_FILES =\
 	list.c\
 	mathUtils.c\
 	stack.c\
-	utils.c
+	utils.c\
+	partition.c\
+	clique.c
 
 OBJECT_FILES = $(SRC_FILES:%.c=$(BIN_FOLDER)/%.o)
 
