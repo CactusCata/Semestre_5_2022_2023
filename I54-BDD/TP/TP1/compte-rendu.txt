@@ -1,4 +1,23 @@
-1)
+/*
+NOTATION:
+
+REACTION
+POURQUOI
+SOINS
+QUALITE
+*/
+
+-- connexion: psql -h sinfo1
+-- execution d'un fichier: \i compte-rendu.txt
+
+DROP SCHEMA IF EXISTS TP CASCADE;
+CREATE SCHEMA TP;
+SET search_path TO TP;
+
+/*
+        Question 1
+*/
+
 
 CREATE TABLE Departement
 (
@@ -8,25 +27,304 @@ CREATE TABLE Departement
 
 CREATE TABLE Employe
 (
-  EID INT CHECK (EID < 100) PRIMARY KEY,
+  EID INT CHECK (EID < 100),
   Nom VARCHAR(20),
-  Dept VARCHAR(2) REFERENCES Departement
+  Dept VARCHAR(2),
+
+  PRIMARY KEY(EID),
+  FOREIGN KEY(Dept) REFERENCES Departement(DID)
 );
 
+/*
+         Question 2
+*/
+-- REPONSE: ne fait pas de rollback: "WARNING:  there is no transaction in progress"
 
-2)
-
+-- On insere un nouveau département
 INSERT INTO Departement
-VALUES ("va", "Var");
-
+VALUES ('rh', 'Ressources humaines');
+-- On l'affiche
 SELECT *
 FROM Departement;
 
+-- On annule la création du département
+ROLLBACK;
+
+-- On affiche à nouveau la liste des départements
+SELECT *
+FROM Departement;
+
+/*
+         Question 3
+*/
+-- REPONSE: Fait bien le rollback
+
+BEGIN TRANSACTION;
+
+-- On insere un nouveau département
+INSERT INTO Departement
+VALUES ('if', 'Informatique');
+-- On l'affiche
+SELECT *
+FROM Departement;
+
+-- On annule la création du département
+ROLLBACK;
+
+-- On affiche à nouveau la liste des départements
+SELECT *
+FROM Departement;
+
+/*
+          Question 4
+*/
+BEGIN TRANSACTION;
+
+-- On insere un nouveau département
+INSERT INTO Departement
+VALUES ('rs', 'Recherche');
+-- On l'affiche
+SELECT *
+FROM Departement;
+
+-- On annule la création du département
+COMMIT;
+
+-- On affiche à nouveau la liste des départements
+SELECT *
+FROM Departement;
+
+-- Trop tard, on a déjà commit
+ROLLBACK;
+
+/*
+          Question 5
+*/
+-- On insere un nouveau département
+INSERT INTO Departement
+VALUES ('vm', 'Vente et marketing');
+-- On l'affiche
+SELECT *
+FROM Departement;
+
+COMMIT;
+
+-- On affiche à nouveau la liste des départements
+SELECT *
+FROM Departement;
+
+-- Trop tard, on a déjà commit
+ROLLBACK;
+
+
+/*
+          Question 6
+*/
+BEGIN TRANSACTION;
+
+INSERT INTO Departement
+VALUES ('sc', 'Service client');
+
+-- execution la commande "\q" pour se déconnecter
+
+/*
+SELECT * FROM Departement;
+*/
+
+/*
+      Question 7
+*/
+
+INSERT INTO Departement
+VALUES ('cf', 'Compta et finance');
+
+-- execution de la commande "\q" pour se déconnecter
+
+-- Réponse: la modification a bien été prise en compte sans commit
+
+/*
+      Question 8
+*/
+BEGIN TRANSACTION;
+
+TRUNCATE TABLE Departement CASCADE;
 ROLLBACK;
 
 SELECT *
 FROM Departement;
 
-3)
+-- REPONSE: sans commit n'est pas pris en compte
 
-BEGIN TRANSACTION T1;
+/*
+      Question 9
+*/
+BEGIN TRANSACTION;
+
+TRUNCATE TABLE Departement CASCADE;
+COMMIT;
+
+SELECT *
+FROM Departement;
+-- REPONSE: pris en compte
+
+/*
+      Question 10
+*/
+INSERT INTO Departement
+VALUES ('C1', 'Info');
+
+INSERT INTO Employe
+VALUES (01, 'Quentin', 'C1');
+
+/*
+      Question 11
+*/
+/*
+INSERT INTO Departement
+VALUES ('C1', 'Informatique');
+*/
+
+-- REPONSE: Pas possible parce que la clef unique existe déjà:
+-- ERROR:  duplicate key value violates unique constraint "departement_pkey"
+
+/*
+      Question 12
+*/
+/*
+INSERT INTO Employe
+VALUES (02, 'Grégoire', 'C2');
+*/
+
+-- REPONSE: Pas possible car la clef 'C2' n'existe pas dans la
+-- table Departement
+-- Key (dept)=(C2) is not present in table "departement".
+
+/*
+      Question 13
+*/
+/*
+DELETE FROM Departement
+WHERE DID = 'C1';
+*/
+
+-- REPONSE: Pas possible car certaines données de la table employé
+-- font référence à la table employé
+-- Key (did)=(C1) is still referenced from table "employe"
+
+/*
+      Question 14
+*/
+ALTER TABLE Employe
+DROP CONSTRAINT employe_dept_fkey;
+
+DELETE FROM Departement
+WHERE DID = 'C1';
+
+SELECT *
+FROM Departement;
+
+SELECT *
+FROM Employe;
+
+-- REPONSE: une fois que le lien n'existe plus, on peut supprimer
+-- le département C1 sans que ça ne puisse avoir d'impacte sur la
+-- table employé
+
+/*
+      Question 15
+*/
+TRUNCATE TABLE Departement;
+TRUNCATE TABLE Employe;
+
+/*
+      Question 16
+*/
+-- REPONSE: Quand on supprimera une valeur de
+-- Departement en cascade, on supprimera aussi
+-- tous les employés ayant la valeur Dept
+-- égal au département supprimé
+
+ALTER TABLE Employe
+ADD FOREIGN KEY(Dept) REFERENCES Departement(DID)
+ON DELETE CASCADE;
+
+INSERT INTO Departement
+VALUES ('C1', 'Info');
+
+INSERT INTO Employe
+VALUES (01, 'Quentin', 'C1');
+
+/*
+      Question 17
+*/
+DELETE FROM Departement
+WHERE DID = 'C1';
+
+SELECT *
+FROM Departement;
+
+SELECT *
+FROM Employe;
+
+-- REPONSE: tout a bien été supprimé
+
+/*
+Question 18
+*/
+
+INSERT INTO Departement
+VALUES ('C1', 'Info');
+
+INSERT INTO Employe
+VALUES (01, 'Quentin', 'C1');
+
+/*
+      Question 19
+*/
+ALTER TABLE Employe
+DROP CONSTRAINT employe_dept_fkey;
+
+ALTER TABLE Employe
+ADD FOREIGN KEY(Dept) REFERENCES Departement(DID)
+DEFERRABLE;
+
+/*
+      Question 20
+*/
+BEGIN TRANSACTION;
+
+SET CONSTRAINTS employe_dept_fkey DEFERRED;
+
+/*
+      Question 21
+*/
+DELETE FROM Departement
+WHERE DID = 'C1';
+
+COMMIT;
+
+-- REPONSE: deferred permet de remettre à plus tard
+-- une erreur, il lira les requetes meme si elles
+-- créent une erreur
+
+
+-- ========================
+-- =       Partie 2       =
+-- ========================
+
+/*
+      Preambule
+*/
+ALTER TABLE Employe
+DROP CONSTRAINT employe_dept_fkey;
+
+ALTER TABLE Employe
+ADD FOREIGN KEY(Dept) REFERENCES Departement(DID);
+
+TRUNCATE TABLE Departement CASCADE;
+TRUNCATE TABLE Employe CASCADE;
+
+/*
+      Question 1
+*/
+-- DONE
