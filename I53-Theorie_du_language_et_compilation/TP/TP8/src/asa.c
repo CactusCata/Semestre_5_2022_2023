@@ -45,7 +45,7 @@ asa * creer_noeudOp( int ope, asa * p1, asa * p2)
   p->op.ope = ope;
   p->op.noeud[0] = p1;
   p->op.noeud[1] = p2;
-  p->ninst = p1->ninst + p2->ninst +2;
+  p->ninst = p1->ninst + p2->ninst + 2;
 
   return p;
 }
@@ -82,19 +82,19 @@ asa *creer_noeudCreerId(char *identificateur)
     return p;
 }
 
-asa * creer_noeudAffect(char *identificateur, asa *noeudExp)
+asa * creer_noeudAffect(asa *noeudID, asa *noeudExp)
 {
     asa *p;
 
     if ((p = malloc(sizeof(asa))) == NULL)
       yyerror("echec allocation mémoire");
 
-    printf("Creation d'un noeud affectation (%s = ...)\n", identificateur);
+    printf("Creation d'un noeud affectation (%s = ...)\n", noeudID->id.identificateur);
 
     p->type = typeAffect;
     p->ninst = 1;
     p->affect.identificateur = (char *) malloc(sizeof(char) * 32);
-    strcpy(p->affect.identificateur, identificateur);
+    strcpy(p->affect.identificateur, noeudID->id.identificateur);
     p->affect.noeudExp = noeudExp;
 
     return p;
@@ -118,7 +118,138 @@ asa * union_noeud(asa *instructs, asa *current)
 
 }
 
-asa * creer_noeudTQ(asa *expression, asa *instructs); {
+// EXP EGAL EXP { $$ = creer_noeudEgal($1, $3); }
+asa *creer_noeudEgal(asa *expr1, asa* expr2) {
+  asa *p;
+
+  if ((p = malloc(sizeof(asa))) == NULL)
+    yyerror("echec allocation mémoire");
+
+  printf("Creation d'un noeud egal\n");
+
+  p->type = typeEgal;
+  p->op.noeud[0] = expr1;
+  p->op.noeud[1] = expr2;
+  p->ninst = expr1->ninst + expr2->ninst + 5;
+
+  return p;
+}
+
+//| EXP NOT EGAL EXP { $$ = creerNoeudNot($1, $4); } // todo
+asa *creer_NoeudNotEgal(asa *expr1, asa* expr2) {
+  asa *p;
+
+  if ((p = malloc(sizeof(asa))) == NULL)
+    yyerror("echec allocation mémoire");
+
+  printf("Creation d'un noeud egal\n");
+
+  p->type = typeNotEgal;
+  p->op.noeud[0] = expr1;
+  p->op.noeud[1] = expr2;
+  p->ninst = expr1->ninst + expr2->ninst + 5;
+
+  return p;
+}
+
+//| EXP INF EXP { $$ = creer_noeudInf($1, $3); } // todo
+asa *creer_noeudInf(asa *expr1, asa *expr2) {
+  asa *p;
+
+  if ((p = malloc(sizeof(asa))) == NULL)
+    yyerror("echec allocation mémoire");
+
+  printf("Creation d'un noeud egal\n");
+
+  p->type = typeInf;
+  p->op.noeud[0] = expr1;
+  p->op.noeud[1] = expr2;
+  p->ninst = expr1->ninst + expr2->ninst + 5;
+
+  return p;
+}
+
+asa *creer_noeudInfEgal(asa *expr1, asa *expr2) {
+  asa *p;
+
+  if ((p = malloc(sizeof(asa))) == NULL)
+    yyerror("echec allocation mémoire");
+
+  printf("Creation d'un noeud egal\n");
+
+  p->type = typeInfEgal;
+  p->op.noeud[0] = expr1;
+  p->op.noeud[1] = expr2;
+  p->ninst = expr1->ninst + expr2->ninst + 6;
+
+  return p;
+}
+
+asa *creer_noeudSup(asa *expr1, asa *expr2) {
+  asa *p;
+
+  if ((p = malloc(sizeof(asa))) == NULL)
+    yyerror("echec allocation mémoire");
+
+  printf("Creation d'un noeud egal\n");
+
+  p->type = typeSup;
+  p->op.noeud[0] = expr1;
+  p->op.noeud[1] = expr2;
+  p->ninst = expr1->ninst + expr2->ninst + 5;
+
+  return p;
+}
+
+asa *creer_noeudSupEgal(asa *expr1, asa *expr2) {
+  asa *p;
+
+  if ((p = malloc(sizeof(asa))) == NULL)
+    yyerror("echec allocation mémoire");
+
+  printf("Creation d'un noeud egal\n");
+
+  p->type = typeSupEgal;
+  p->op.noeud[0] = expr1;
+  p->op.noeud[1] = expr2;
+  p->ninst = expr1->ninst + expr2->ninst + 6;
+
+  return p;
+}
+
+asa *creer_noeudAnd(asa *expr1, asa *expr2) {
+  asa *p;
+
+  if ((p = malloc(sizeof(asa))) == NULL)
+    yyerror("echec allocation mémoire");
+
+  printf("Creation d'un noeud egal\n");
+
+  p->type = typeAnd;
+  p->op.noeud[0] = expr1;
+  p->op.noeud[1] = expr2;
+  p->ninst = expr1->ninst + expr2->ninst + ?;
+
+  return p;
+}
+
+asa *creer_noeudOr(asa *expr1, asa *expr2) {
+  asa *p;
+
+  if ((p = malloc(sizeof(asa))) == NULL)
+    yyerror("echec allocation mémoire");
+
+  printf("Creation d'un noeud egal\n");
+
+  p->type = typeOr;
+  p->op.noeud[0] = expr1;
+  p->op.noeud[1] = expr2;
+  p->ninst = expr1->ninst + expr2->ninst + ?;
+
+  return p;
+}
+
+asa * creer_noeudTQ(asa *expression, asa *instructs) {
 
   asa *p;
 
@@ -128,9 +259,11 @@ asa * creer_noeudTQ(asa *expression, asa *instructs); {
   printf("Creation d'un noeud tq\n");
 
   p->type = typeTq;
-  p->ninst = 2 + expression.ninst + instructs.ninst;
+  p->ninst = 2 + expression->ninst + instructs->ninst;
   p->tq.expression = expression;
   p->tq.instructs = instructs;
+
+  return p;
 
 }
 
@@ -160,9 +293,9 @@ void codegen(asa *p)
 {
 
   int id;
+  int numeroLigne;
 
   if (p == NULL) {
-    printf("est null\n");
     return;
   }
 
@@ -229,8 +362,131 @@ void codegen(asa *p)
     codegen(p->union_noeud.instruct);
     break;
 
+  case typeEgal:
+    printf("On est tombé sur un égal\n");
+    codegen(p->op.noeud[1]);
+    codegen(p->op.noeud[0]);
+
+    fprintf(ramFile, "SUB %d\n", stackCursor - 2); codeCursor++;
+    fprintf(ramFile, "JUMZ %d\n", codeCursor + 3); codeCursor++;
+
+    fprintf(ramFile, "LOAD #0\n"); codeCursor++;
+    fprintf(ramFile, "JUMP %d\n", codeCursor + 2); codeCursor++;
+
+    fprintf(ramFile, "LOAD #1\n"); codeCursor++;
+
+    stackCursor--;
+    break;
+
+  case typeNotEgal:
+    printf("On est tombé sur un different\n");
+    codegen(p->op.noeud[1]);
+    codegen(p->op.noeud[0]);
+
+    fprintf(ramFile, "SUB %d\n", stackCursor - 2); codeCursor++;
+    fprintf(ramFile, "JUMZ %d\n", codeCursor + 3); codeCursor++;
+
+    fprintf(ramFile, "LOAD #1\n"); codeCursor++;
+    fprintf(ramFile, "JUMP %d\n", codeCursor + 2); codeCursor++;
+
+    fprintf(ramFile, "LOAD #0\n"); codeCursor++;
+
+    stackCursor--;
+
+    break;
+
+  case typeInf:
+    printf("On est tombé sur un inferieur\n");
+    codegen(p->op.noeud[1]);
+    codegen(p->op.noeud[0]);
+
+    fprintf(ramFile, "SUB %d\n", stackCursor - 2); codeCursor++;
+    fprintf(ramFile, "JUML %d\n", codeCursor + 3); codeCursor++;
+
+    fprintf(ramFile, "LOAD #0\n"); codeCursor++;
+    fprintf(ramFile, "JUMP %d\n", codeCursor + 2); codeCursor++;
+
+    fprintf(ramFile, "LOAD #1\n"); codeCursor++;
+
+    stackCursor--;
+
+    break;
+
+  case typeInfEgal:
+    printf("On est tombé sur un inferieur\n");
+    codegen(p->op.noeud[1]);
+    codegen(p->op.noeud[0]);
+
+    fprintf(ramFile, "SUB %d\n", stackCursor - 2); codeCursor++;
+    fprintf(ramFile, "JUML %d\n", codeCursor + 4); codeCursor++;
+    fprintf(ramFile, "JUMZ %d\n", codeCursor + 3); codeCursor++;
+
+    fprintf(ramFile, "LOAD #0\n"); codeCursor++;
+    fprintf(ramFile, "JUMP %d\n", codeCursor + 2); codeCursor++;
+
+    fprintf(ramFile, "LOAD #1\n"); codeCursor++;
+
+    stackCursor--;
+
+    break;
+
+  case typeSup:
+    printf("On est tombé sur un inferieur\n");
+    codegen(p->op.noeud[1]);
+    codegen(p->op.noeud[0]);
+
+    fprintf(ramFile, "SUB %d\n", stackCursor - 2); codeCursor++;
+    fprintf(ramFile, "JUMG %d\n", codeCursor + 3); codeCursor++;
+
+    fprintf(ramFile, "LOAD #0\n"); codeCursor++;
+    fprintf(ramFile, "JUMP %d\n", codeCursor + 2); codeCursor++;
+
+    fprintf(ramFile, "LOAD #1\n"); codeCursor++;
+
+    stackCursor--;
+
+    break;
+
+  case typeSupEgal:
+    printf("On est tombé sur un inferieur\n");
+    codegen(p->op.noeud[1]);
+    codegen(p->op.noeud[0]);
+
+    fprintf(ramFile, "SUB %d\n", stackCursor - 2); codeCursor++;
+    fprintf(ramFile, "JUMG %d\n", codeCursor + 4); codeCursor++;
+    fprintf(ramFile, "JUMZ %d\n", codeCursor + 3); codeCursor++;
+
+
+    fprintf(ramFile, "LOAD #0\n"); codeCursor++;
+    fprintf(ramFile, "JUMP %d\n", codeCursor + 2); codeCursor++;
+
+    fprintf(ramFile, "LOAD #1\n"); codeCursor++;
+
+    stackCursor--;
+
+    break;
+
+  case typeAnd:
+    printf("On est tombé sur un inferieur\n");
+    codegen(p->op.noeud[1]);
+    codegen(p->op.noeud[0]);
+
+    fprintf(ramFile, "SUB %d\n", stackCursor - 2); codeCursor++;
+    fprintf(ramFile, "JUMG %d\n", codeCursor + 4); codeCursor++;
+    fprintf(ramFile, "JUMZ %d\n", codeCursor + 3); codeCursor++;
+
+
+    fprintf(ramFile, "LOAD #0\n"); codeCursor++;
+    fprintf(ramFile, "JUMP %d\n", codeCursor + 2); codeCursor++;
+
+    fprintf(ramFile, "LOAD #1\n"); codeCursor++;
+
+    stackCursor--;
+
+    break;
+
   case typeTq:
-    int numeroLigne = codeCursor;
+    numeroLigne = codeCursor;
     codegen(p->tq.expression);
     fprintf(ramFile, "JMPZ %d\n", numeroLigne + p->ninst);
     codegen(p->tq.instructs);

@@ -1,9 +1,5 @@
 DEBUT
-	VAR tata;
-	VAR toto;
-
-	tata <- 5;
-	toto <- tata * 14 - 4;
-
-	AFFICHER 2 * tata + toto - 4;
+	AFFICHER 5 <= 4;
+	AFFICHER 5 <= 5;
+	AFFICHER 5 <= 6;
 FIN

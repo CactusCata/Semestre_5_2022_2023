@@ -18,6 +18,14 @@ typedef enum {
     typeCreerId,
     typeAffect,
     typeUnion,
+    typeNotEgal,
+    typeEgal,
+    typeInf,
+    typeInfEgal,
+    typeSup,
+    typeSupEgal,
+    typeAnd,
+    typeOr,
     typeTq
 } typeNoeud;
 
@@ -54,6 +62,38 @@ typedef struct {
 } noeudUnion;
 
 typedef struct {
+  struct asa *noeud[2];
+} noeudEgal;
+
+typedef struct {
+  struct asa *noeud[2];
+} noeudNonEgal;
+
+typedef struct {
+  struct asa *noeud[2];
+} noeudInf;
+
+typedef struct {
+  struct asa *noeud[2];
+} noeudInfEgal;
+
+typedef struct {
+  struct asa *noeud[2];
+} noeudSup;
+
+typedef struct {
+  struct asa *noeud[2];
+} noeudSupEgal;
+
+typedef struct {
+  struct asa *noeud[2];
+} noeudAnd;
+
+typedef struct {
+  struct asa *noeud[2];
+} noeudOr;
+
+typedef struct {
   struct asa *expression;
   struct asa *instructs;
 } noeudTq;
@@ -73,6 +113,14 @@ typedef struct asa{
     noeudCreerId creerId;
     noeudAffect affect;
     noeudUnion union_noeud;
+    noeudEgal egal;
+    noeudNonEgal nonEgal;
+    noeudInf inf;
+    noeudInfEgal infEgal;
+    noeudSup sup;
+    noeudSupEgal supEgal;
+    noeudAnd and;
+    noeudOr or;
     noeudTq tq;
   };
 } asa;
@@ -89,8 +137,16 @@ asa * creer_feuilleID( char *identificateur);
 asa * creer_noeudOp( int ope, asa * p1, asa * p2 );
 asa * creer_noeudAfficher(asa * afficher);
 asa * creer_noeudCreerId(char *identificateur);
-asa * creer_noeudAffect(char *identificateur, asa *noeudExp);
+asa * creer_noeudAffect(asa *noeudID, asa *noeudExp);
 asa * union_noeud(asa *instructs, asa *current);
+asa *creer_noeudEgal(asa *expr1, asa* expr2);
+asa *creer_NoeudNotEgal(asa *expr1, asa *expr2);
+asa *creer_noeudInf(asa *expr1, asa *expr2);
+asa *creer_noeudInfEgal(asa *expr1, asa *expr2);
+asa *creer_noeudSup(asa *expr1, asa *expr2);
+asa *creer_noeudSupEgal(asa *expr1, asa *expr2);
+asa *creer_noeudAnd(asa *expr1, asa *expr2);
+asa *creer_noeudOr(asa *expr1, asa *expr2);
 asa * creer_noeudTQ(asa *expression, asa *instructs);
 
 void free_asa(asa *p);
