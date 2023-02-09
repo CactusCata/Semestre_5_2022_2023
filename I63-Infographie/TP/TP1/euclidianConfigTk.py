@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Entry, Button
+from tkinter import Tk, Label, Entry, Button, messagebox
 from screenSpaceTk import ScreenSpaceTk
 
 class EuclidianConfigTk():
@@ -48,13 +48,22 @@ class EuclidianConfigTk():
         """
         Ajoute un espace ecran dans une autre fenetre
         """
-        screenSpaceTk = ScreenSpaceTk(self.root)
+        screenSpaceTk = ScreenSpaceTk(self)
         screenSpaceTk.set_window(50, 50, 150, 100)
         self.screenSpaces.append(screenSpaceTk)
         screenSpaceTk.start()
 
+    def removeAScreenSpaceTk(self, screenSpaceTk):
+        """
+        Supprime un espace ecran
+        """
+        self.screenSpaces.remove(screenSpaceTk)
+
     def start(self):
         self.root.mainloop()
+
+    def getRoot(self):
+        return self.root
 
     def getCoefList(self) -> list:
         coefs = []
@@ -66,6 +75,11 @@ class EuclidianConfigTk():
         return coefs
 
     def applyChanges(self):
+        if (self.entry_function.get() == ""):
+            messagebox.showerror(title="Erreur equation", message="Veuillez entrer une équation")
+            return
+
+
         min_x = int(self.entry_min_x.get())
         min_y = int(self.entry_min_y.get())
         max_x = int(self.entry_max_x.get())

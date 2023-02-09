@@ -4,10 +4,46 @@ import mathUtils
 
 class ScreenSpaceTk(SpaceTk):
 
-    def __init__(self, master, tk_width_pixel=500, tk_height_pixel=400):
-        super().__init__(master, tk_width_pixel, tk_height_pixel)
+    def __init__(self, euclidianConfigTk, tk_width_pixel=500, tk_height_pixel=400):
+        super().__init__(euclidianConfigTk.getRoot(), tk_width_pixel, tk_height_pixel, lambda: self.onRectExpend())
 
         self.last_lines_drew_id = []
+        self.last_coords_eu = []
+        self.last_min_x = -1
+        self.last_min_y = -1
+        self.last_max_x = -1
+        self.last_max_y = -1
+
+        super().getRoot().protocol("WM_DELETE_WINDOW", lambda: self.onClose(euclidianConfigTk))
+
+    def onRectExpend(self):
+        if (len(self.last_lines_drew_id) != 0):
+            self.delete_old_drew_points()
+            coords_sc = self.fromEuclidienToScreen(self.last_coords_eu,
+                self.last_min_x, self.last_min_y, self.last_max_x, self.last_max_y,
+                super().getTopLeftRect()[0],
+                super().getTopLeftRect()[1],
+                super().getBotRightRect()[0],
+                super().getBotRightRect()[1]
+                )
+
+            # Draw f(x) in screen space
+            first_point = coords_sc[0]
+            for coord in coords_sc:
+                line_id = super().getCanvas().create_line(first_point[0], first_point[1], coord[0], coord[1])
+                first_point = coord
+                self.last_lines_drew_id.append(line_id)
+
+    def onClose(self, euclidianConfigTk):
+        euclidianConfigTk.removeAScreenSpaceTk(self)
+        super().getRoot().destroy()
+
+    def move_window(self, dx, dy):
+        final_dx_dy = super().move_window(dx, dy)
+        dx = final_dx_dy[0]
+        dy = final_dx_dy[1]
+        for last_line_drew_id in self.last_lines_drew_id:
+            super().getCanvas().move(last_line_drew_id, dx, dy)
 
     def fromEuclidienToScreen(self, coords_list, min_x_eu, min_y_eu, max_x_eu, max_y_eu, min_x_sc, min_y_sc, max_x_sc, max_y_sc):
         a = min_x_eu
@@ -38,6 +74,17 @@ class ScreenSpaceTk(SpaceTk):
             super().getCanvas().delete(last_line_drew_id)
         self.last_lines_drew_id.clear()
 
+    def compute_f(self, function_coefs):
+        pas_x = (self.last_max_x - self.last_min_x) / self.getRoot().winfo_width()
+        x = self.last_min_x
+        coords_eu = []
+        while x <= self.last_max_x:
+            y = mathUtils.horner(x, function_coefs)
+            if self.last_min_y < y < self.last_max_y:
+                coords_eu.append((x, y))
+            x += pas_x
+        return coords_eu
+
     def draw_function(self, min_x, min_y, max_x, max_y, function_coefs):
         """
         Dessine une fonction f tel que:
@@ -45,18 +92,19 @@ class ScreenSpaceTk(SpaceTk):
             - y E [min_y;max_y]
         """
 
+        self.last_min_x = min_x
+        self.last_min_y = min_y
+        self.last_max_x = max_x
+        self.last_max_y = max_y
+
         # Delete old points
         self.delete_old_drew_points()
+        self.last_coords_eu.clear()
 
         # Compute f(x)
-        pas_x = (max_x - min_x) / self.getRoot().winfo_width()
-        x = min_x
-        coords_eu = []
-        while x <= max_x:
-            y = mathUtils.horner(x, function_coefs)
-            if min_y < y < max_y:
-                coords_eu.append((x, y))
-            x += pas_x
+        coords_eu = self.compute_f(function_coefs)
+
+        self.last_coords_eu = coords_eu
 
         # from euclidian space to screen space
         coords_sc = self.fromEuclidienToScreen(coords_eu,

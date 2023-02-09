@@ -18,9 +18,13 @@ Quand on click gauche ca ecris et met à jour les screenSpace
 
 class SpaceTk():
 
-    def __init__(self, master=None, tk_width_pixel=500, tk_height_pixel=400):
+    def __init__(self, master=None, tk_width_pixel=500, tk_height_pixel=400, callback_on_rect_expend=None):
         tk_width_pixel = max(tk_width_pixel, MIN_ROOT_WIDTH)
         tk_height_pixel = max(tk_height_pixel, MIN_ROOT_HEIGHT)
+
+        self.callback_on_rect_expend = callback_on_rect_expend
+
+        self.cursor_img_status = 0
 
         # Liste de tous les espaces ecran
         self.screenSpaces = []
@@ -61,7 +65,25 @@ class SpaceTk():
     def onMouseMoveEvent(self, event):
         widgets = self.root_canvas_real.find_withtag("current")
         if (len(widgets) == 0):
+            if (self.cursor_img_status != 0):
+                self.root.config(cursor="")
+                self.cursor_img_status = 0
             return
+
+        current_widget = widgets[0]
+
+        if (current_widget == self.img_move_id):
+            if (self.cursor_img_status != 1):
+                self.root.config(cursor="fleur")
+                self.cursor_img_status = 1
+        elif (current_widget == self.window_lines_id[0] or current_widget == self.window_lines_id[1]):
+            if (self.cursor_img_status != 2):
+                self.root.config(cursor="sizing")
+                self.cursor_img_status = 2
+        else:
+            if (self.cursor_img_status != 0):
+                self.root.config(cursor="")
+                self.cursor_img_status = 0
 
         if (self.clicked):
 
@@ -72,11 +94,8 @@ class SpaceTk():
             dx = event.x - self.last_move_point[0]
             dy = event.y - self.last_move_point[1]
 
-            current_widget = widgets[0]
-
             # User tried to move the window
             if (current_widget == self.img_move_id):
-
                 self.move_window(dx, dy)
                 self.last_move_point = (event.x, event.y)
                 return
@@ -118,6 +137,8 @@ class SpaceTk():
                 pass
             elif current_widget == self.window_lines_id[3]: # expend vers l'est
                 pass
+
+            self.callback_on_rect_expend()
 
             self.last_move_point = (event.x, event.y)
 
@@ -185,6 +206,8 @@ class SpaceTk():
         self.root_canvas_real.move(self.window_lines_id[2], dx, dy)
         self.root_canvas_real.move(self.window_lines_id[3], dx, dy)
         self.root_canvas_real.move(self.img_move_id, dx, dy)
+
+        return (dx, dy)
 
     def onRootResizeEvent(self, event):
         """
