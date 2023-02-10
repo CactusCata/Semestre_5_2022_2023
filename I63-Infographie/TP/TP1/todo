@@ -1,2 +1,1 @@
-- Supprime de la liste des screen space quand une fenetre de screen space est fermée
-- Dessiner une fonction
+- Dessiner les view port dans la même fenetre (systeme de window manager)

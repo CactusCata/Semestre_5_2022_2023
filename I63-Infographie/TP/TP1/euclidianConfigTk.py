@@ -1,9 +1,10 @@
 from tkinter import Tk, Label, Entry, Button, messagebox
+from tkinter.ttk import Separator
 from screenSpaceTk import ScreenSpaceTk
 
 class EuclidianConfigTk():
 
-    def __init__(self, x_min, y_min, x_max, y_max) -> None:
+    def __init__(self, x_min=-10, y_min=-10, x_max=10, y_max=10, function_coefs_str="1,0,0", points_segements_str="(1,3),(5,2):(7,3),(4,4)") -> None:
 
         self.root = Tk()
         self.root.geometry(f"{300}x{500}")
@@ -34,15 +35,28 @@ class EuclidianConfigTk():
         self.entry_max_y.insert(0, str(y_max))
         self.entry_max_y.pack()
 
-        label_function = Label(self.root, text="Fonction")
-        label_function.pack()
-        self.entry_function = Entry(self.root)
-        self.entry_function.pack()
+        label_coef_poly = Label(self.root, text="Coefficients du polynome:")
+        label_coef_poly.pack()
+        self.entry_coef_poly = Entry(self.root)
+        self.entry_coef_poly.insert(0, function_coefs_str)
+        self.entry_coef_poly.pack()
 
-        button_apply_changes = Button(self.root, text="Appliquer les changements", command=self.applyChanges)
+        button_apply_changes = Button(self.root, text="Dessiner le polynome", command=self.draw_polynom)
         button_apply_changes.pack()
 
-        self.root.bind("a", lambda event: self.addScreenSpaceTk())
+        separator = Separator(self.root, orient="horizontal")
+        separator.pack()
+
+        label_segements = Label(self.root, text="Dessiner le segement")
+        label_segements.pack()
+        self.entry_segements = Entry(self.root)
+        self.entry_segements.insert(0, points_segements_str)
+        self.entry_segements.pack()
+
+        button_draw_segements = Button(self.root, text="Dessiner les segement", command=self.draw_segement)
+        button_draw_segements.pack()
+
+        self.root.bind("<Return>", lambda event: self.addScreenSpaceTk())
 
     def addScreenSpaceTk(self):
         """
@@ -68,14 +82,30 @@ class EuclidianConfigTk():
     def getCoefList(self) -> list:
         coefs = []
 
-        function_text = self.entry_function.get()
-        coefs_str = function_text.split("+")
+        function_text = self.entry_coef_poly.get()
+        coefs_str = function_text.split(",")
         for coef_str in coefs_str:
             coefs.append(int(coef_str))
         return coefs
 
-    def applyChanges(self):
-        if (self.entry_function.get() == ""):
+    def draw_segement(self):
+        if (self.entry_segements.get() == ""):
+            messagebox.showerror(title="Erreur segement", message="Veuillez entrer deux points")
+            return
+
+        points_segements = self.strToPoints(self.entry_segements.get())
+
+        min_x = int(self.entry_min_x.get())
+        min_y = int(self.entry_min_y.get())
+        max_x = int(self.entry_max_x.get())
+        max_y = int(self.entry_max_y.get())
+
+        for screenSpaceTk in self.screenSpaces:
+            for point_seg in points_segements:
+                screenSpaceTk.draw_segement(point_seg[0], point_seg[1], min_x, min_y, max_x, max_y)
+
+    def draw_polynom(self):
+        if (self.entry_coef_poly.get() == ""):
             messagebox.showerror(title="Erreur equation", message="Veuillez entrer une équation")
             return
 
@@ -88,3 +118,26 @@ class EuclidianConfigTk():
 
         for screenSpaceTk in self.screenSpaces:
             screenSpaceTk.draw_function(min_x, min_y, max_x, max_y, function_coefs)
+
+    def strToPoints(self, sentence: str) -> list:
+        points_segements = []
+
+        for pointStr in sentence.split(":"):
+            print(pointStr)
+            pointStrArray = pointStr.split(",")
+            point1XStr = pointStrArray[0] # (x1
+            point1YStr = pointStrArray[1] # y1)
+            point2XStr = pointStrArray[2] # (x2
+            point2YStr = pointStrArray[3] # y2)
+
+            point1X = int(point1XStr[1:])
+            point1Y = int(point1YStr[:-1])
+            point2X = int(point2XStr[1:])
+            point2Y = int(point2YStr[:-1])
+
+            if (point1X < point2X):
+                points_segements.append(((point1X, point1Y), (point2X, point2Y)))
+            else:
+                points_segements.append(((point2X, point2Y), (point1X, point1Y)))
+
+        return points_segements

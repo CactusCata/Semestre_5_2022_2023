@@ -4,7 +4,7 @@ def horner(x, coefs) -> float:
     Eval the polynom P(x) = ax^4 + bx^3 + cx^2 + dx + e
     """
     sum = coefs[0]
-    for coef in coefs[1:]:
+    for i in range(1, len(coefs)):
         sum *= x
-        sum += coef
+        sum += coefs[i]
     return sum

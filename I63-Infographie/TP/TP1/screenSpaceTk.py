@@ -74,23 +74,33 @@ class ScreenSpaceTk(SpaceTk):
             super().getCanvas().delete(last_line_drew_id)
         self.last_lines_drew_id.clear()
 
-    def compute_f(self, function_coefs):
+    def compute_f(self, function_coefs, x_start=None, x_end=None):
+        if (x_start == None):
+            x_start=self.last_min_x
+        if (x_end == None):
+            x_end = self.last_max_x
+
         pas_x = (self.last_max_x - self.last_min_x) / self.getRoot().winfo_width()
-        x = self.last_min_x
+        x = x_start
         coords_eu = []
-        while x <= self.last_max_x:
+        while x <= x_end:
             y = mathUtils.horner(x, function_coefs)
             if self.last_min_y < y < self.last_max_y:
                 coords_eu.append((x, y))
             x += pas_x
         return coords_eu
 
-    def draw_function(self, min_x, min_y, max_x, max_y, function_coefs):
+    def draw_function(self, min_x, min_y, max_x, max_y, function_coefs, x_start=None, x_end=None):
         """
         Dessine une fonction f tel que:
             - x E [min_x;max_x]
             - y E [min_y;max_y]
         """
+
+        if (x_start == None):
+            x_start = min_x
+        if (x_end == None):
+            x_end = max_x
 
         self.last_min_x = min_x
         self.last_min_y = min_y
@@ -102,9 +112,9 @@ class ScreenSpaceTk(SpaceTk):
         self.last_coords_eu.clear()
 
         # Compute f(x)
-        coords_eu = self.compute_f(function_coefs)
+        coords_eu = self.compute_f(function_coefs, x_start, x_end)
 
-        self.last_coords_eu = coords_eu
+        self.last_coords_eu.extend(coords_eu)
 
         # from euclidian space to screen space
         coords_sc = self.fromEuclidienToScreen(coords_eu,
@@ -121,3 +131,11 @@ class ScreenSpaceTk(SpaceTk):
             line_id = super().getCanvas().create_line(first_point[0], first_point[1], coord[0], coord[1])
             first_point = coord
             self.last_lines_drew_id.append(line_id)
+
+    def draw_segement(self, pointA, pointB, min_x, min_y, max_x, max_y):
+
+        # calcul f(x) = ax + y
+        a = (pointB[1] - pointA[1]) / (pointB[0] - pointA[0])
+        b = pointA[1] - a * pointA[0]
+
+        self.draw_function(min_x, min_y, max_x, max_y, [a, b], pointA[0], pointB[0])
