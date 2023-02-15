@@ -1,0 +1,122 @@
+This is TeX, Version 3.14159265 (TeX Live 2019/Debian) (preloaded format=tex 2021.6.15)  9 FEB 2023 10:00
+**Exercice_1_equations_diff.tex Exercice_2.tex Intro.tex
+(./Exercice_1_equations_diff.tex
+! Undefined control sequence.
+l.1 \documentclass
+                  [10pt, a4paper, parskip=full]{scrartcl}
+? 
+! Undefined control sequence.
+l.5 \usepackage
+               [utf8]{inputenc} % encodage utf-8
+? 
+! Undefined control sequence.
+l.6 \usepackage
+               [T1]{fontenc}
+? 
+! Undefined control sequence.
+l.7 \usepackage
+               [french]{babel} % traduit chapter en chapitre
+? 
+! Undefined control sequence.
+l.8 \usepackage
+               {textcomp}
+? 
+! Undefined control sequence.
+l.9 \usepackage
+               {amsmath,amssymb}
+? 
+! Undefined control sequence.
+l.10 \usepackage
+                {lmodern}
+? 
+! Undefined control sequence.
+l.11 \usepackage
+                {graphicx} % permet d'ajouter des images
+? 
+! Undefined control sequence.
+l.12 \usepackage
+                [dvipsnames,svgnames]{xcolor}
+? 
+! Undefined control sequence.
+l.13 \usepackage
+                {microtype}
+? 
+! Undefined control sequence.
+l.14 \usepackage
+                {lipsum}
+? 
+! Undefined control sequence.
+l.15 \usepackage
+                {showkeys} % permet de debugger les labels
+? 
+! Undefined control sequence.
+l.16 \usepackage
+                {hyperref} % permet de faire des liens href et ref (pour les...
+
+? 
+! Undefined control sequence.
+l.17 \hypersetup
+                {colorlinks=true,linkcolor=Brown,urlcolor=Blue,breaklinks=tr...
+
+? 
+
+Overfull \hbox (55.74615pt too wide) in paragraph at lines 5--19
+[]\tenrm [utf8]inputenc [T1]fontenc [french]babel textcomp ams-math,amssymb lmo
+d-ern graph-icx [dvip-snames,svgnames]xcolor|
+
+\hbox(7.5+2.5)x469.75499, glue set - 1.0
+.\hbox(0.0+0.0)x20.0
+.\tenrm [
+.\tenrm u
+.\tenrm t
+.\tenrm f
+.etc.
+
+
+Overfull \hbox (18.69058pt too wide) in paragraph at lines 5--19
+\tenrm mi-crotype lip-sum showkeys hy-per-ref col-or-links=true,linkcolor=Brown
+,urlcolor=Blue,breaklinks=true,bookmarks|
+
+\hbox(6.94444+1.94444)x469.75499, glue set - 1.0
+.\tenrm m
+.\tenrm i
+.\discretionary
+..\tenrm -
+.\tenrm c
+.\tenrm r
+.etc.
+
+! Undefined control sequence.
+l.21 \title
+           {^^c3^^89quations diff^^c3^^a9rentielles}
+? 
+Missing character: There is no ^^c3 in font cmr10!
+Missing character: There is no ^^89 in font cmr10!
+Missing character: There is no ^^c3 in font cmr10!
+Missing character: There is no ^^a9 in font cmr10!
+! Undefined control sequence.
+l.22 \author
+            {Gloria Faccanoni}
+? 
+! Undefined control sequence.
+l.23 \date
+          {15 janvier 2014}
+? 
+! Undefined control sequence.
+l.25 \begin
+           {document}
+? 
+! Undefined control sequence.
+l.29 \maketitle
+               
+? 
+! Undefined control sequence.
+l.32 \begin
+           {abstract}
+? 
+! Undefined control sequence.
+l.33 \lipsum
+            [1-2]
+? 
+[1] )
+Output written on Exercice_1_equations_diff.dvi (1 page, 688 bytes).

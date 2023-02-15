@@ -1,0 +1,59 @@
+\documentclass[10pt, a4paper, parskip=full]{scrartcl}
+%	PREAMBULE
+
+% Packages
+\usepackage[utf8]{inputenc} % encodage utf-8
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel} % traduit chapter en chapitre
+\usepackage{textcomp}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{graphicx} % permet d'ajouter des images
+\usepackage[dvipsnames,svgnames]{xcolor}
+\usepackage{microtype}
+\usepackage{lipsum}
+\usepackage{showkeys} % permet de debugger les labels
+\usepackage{hyperref} % permet de faire des liens href et ref (pour les label et les URL)
+\hypersetup{colorlinks=true,linkcolor=Brown,urlcolor=Blue,breaklinks=true,bookmarks
+=true,pdfstartview=XYZ} % on redefinit les options pour les href et les ref
+
+% Affectactions au variables (title, author et date)
+\title{Équations différentielles}
+\author{Gloria Faccanoni}
+\date{15 janvier 2014}
+
+\begin{document}
+%Corps du document
+
+% Affiche le contenu des variables title, author et date
+\maketitle
+
+% Abstract
+\begin{abstract}
+\lipsum[1-2]
+\end{abstract}
+
+% Table des matieres
+\tableofcontents
+
+\section*{Introduction}
+\addsec{Introduction}
+\lipsum[1-2]
+
+\section{Rappels}\label{sec.rappels}
+\lipsum[1-2]
+
+\subsection{Condition initiale}
+\lipsum[1-2]
+
+\subsection{Problème de Cauchy}
+\lipsum[1-2]
+
+\section{Exercices}
+\lipsum[1-2]
+Voir à la section~\ref{sec.rappels} à la page \pageref{sec.rappels}.
+
+
+
+
+\end{document}
