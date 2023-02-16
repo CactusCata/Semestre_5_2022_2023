@@ -4,8 +4,11 @@
 *.dll
 *.so
 *.dylib
+*.pyc
 *.o
 *.a
+*.mp4
+*.pptx
 
 # Test binary, built with `go test -c`
 *.test

@@ -1,0 +1,39 @@
+DEBUT
+
+    AFFICHER 30 = 30;
+    AFFICHER 30 = 21;
+    AFFICHER 21 = 30;
+    
+    AFFICHER 30 != 30;
+    AFFICHER 30 != 21;
+    AFFICHER 21 != 30;
+
+    AFFICHER 30 < 30;
+    AFFICHER 30 < 21;
+    AFFICHER 21 < 30;
+
+    AFFICHER 30 <= 30;
+    AFFICHER 30 <= 21;
+    AFFICHER 21 <= 30;
+
+    AFFICHER 30 > 30;
+    AFFICHER 30 > 21;
+    AFFICHER 21 > 30;
+
+    AFFICHER 30 >= 30;
+    AFFICHER 30 >= 21;
+    AFFICHER 21 >= 30;
+
+    AFFICHER 1 ET 1;
+    AFFICHER 1 ET 0;
+    AFFICHER 0 ET 1;
+    AFFICHER 0 ET 0;
+
+
+    AFFICHER 1 OU 1;
+    AFFICHER 1 OU 0;
+    AFFICHER 0 OU 1;
+    AFFICHER 0 OU 0;
+
+
+FIN

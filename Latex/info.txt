@@ -1,0 +1,105 @@
+entre crochet: optionnelles
+entre accolade: obligatoire
+
+documentclass : type de document
+
+Pour aller à la ligne, on à qu'à faire un saut à la ligne (ligne vide)
+
+On peut modifier le style des paragraphes et d'autres objets dans \documentclass[truc] ou dans le préambule.
+
+Les lignes ne doivent pas dépasser 60-70 caractères.
+
+Tous les packages sont disponibles sur https://www.ctan.org
+où la documentation existe
+
+href: pour redirection (tp) dans le document et aussi utilisé pour les url
+Pour les url: urlcolor
+Pour les redirection du document: linkcolor
+
+Pour mettre à jour la table des matières, il faut compiler deux fois
+
+
+Pour mettre sans numero une section on a deux possibilités:
+section*{truc}: ne met pas dans la table des matieres et sans numérotation
+
+\addsec{truc}: met dans la table des matières et sans numérotation 
+
+
+On peut créer plusieurs fichiers qu'on peut compiler ensemble, c'est comme un include d'un .h en c/c++. Ca fera en gros un ctrl-c ctrl-v
+On utilisera \input{fichier.tex}
+
+Si on a bcp de fichiers, on peut utiliser le package subfiles
+
+On peut faire un système de point d'ancrage (label + href)
+
+Le tilde permet de créer un espace sans que ça revienne à la ligne
+
+Pour debugger on peut ajouter le package:
+\usepackage{showkeys} qui affichera la liste des labels
+
+Pour afficher des URL, on utilise \url{http://google.fr}
+Pour mettre un texte affiché à la place de l'URL, il faut faire:
+\href{lien}{txt}
+
+
+Note en fin de page: (utile pour les définitions ou précision de terme)
+\footnote{text}
+On le place après le mot.
+
+On peut ajouter une note dans la marge avec:
+\marginpar{text}
+
+
+Trois types de listes:
+
+1) liste à puce (- text)
+
+\begin{itemize}
+\item {text}
+\item {text}
+\end{itemize}
+
+Pour remplacer les tiret par des ronds •, on fera la commande:
+\frenchsetup{StandardItemLabels=true}
+(à mettre justre après: \usepackage[french]{babel})
+
+2) liste énuméré (1. 2. etc)
+\begin{enumerate}
+\item{text}
+\item{text}
+\end{enumerate}
+
+3) liste description
+\begin{description}
+\item[Titre:] textt
+\item[Durée:] text
+\end{description}
+
+
+Pour mettre des morceaux de code, utiliser le package listing
+listing ne permet pas de mettre des accents mais c'est contournable
+
+\usepackage{listings}
+\lstset{
+language=python,
+backgroundcolor=\color{Navy!10},
+keywordstyle=\color{ForestGreen}\bfseries,
+% numbers=left, numberstyle=\tiny,
+tabsize=4,
+}
+
+\color permet de changer la couleur de fond
+
+
+Aller voir le package pythontex: permet de compiler un code et d'afficher la sortie
+
+
+MODULE python pour faire des calculs: sympy
+installer tab9 sur vscode
+
+
+on met tous les objets images ou tableau dans des blocs "figure"
+On peut modifier l'image comme on veut.
+cf package "grfguide"
+
+On peut fusionner des colonnes avec mulcolumn

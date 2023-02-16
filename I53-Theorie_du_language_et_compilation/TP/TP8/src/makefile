@@ -3,10 +3,13 @@ CFLAGS = -g -Wall
 BIN_FOLDER = ../bin
 
 SOURCE_FILES =\
-	asa.c\
+	asa_utils.c\
+	asa_codegen.c\
+	asa_node_creator.c\
 	parser.c\
 	lexer.c\
-	ts.c
+	ts.c\
+	instruction.c
 
 OBJECT_FILES = $(SOURCE_FILES:%.c=$(BIN_FOLDER)/%.o)
 

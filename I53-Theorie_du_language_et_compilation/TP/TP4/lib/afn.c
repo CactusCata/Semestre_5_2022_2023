@@ -234,8 +234,8 @@ AFN afn_finit(char *fileName) {
     exit(1);
   }
 
-  uint nbEtat;
-  uint nbEtatInitiaux;
+  uint nbEtat; // nombre d'état
+  uint nbEtatInitiaux; // nombre d'état initiaux
 
   fscanf(file, "%d\n", &nbEtat);
   fscanf(file, "%d\n", &nbEtatInitiaux);
@@ -244,20 +244,20 @@ AFN afn_finit(char *fileName) {
   throwMallocErrorIfTrue(lineBuffer == NULL);
   fgets(lineBuffer, 1024, file);
   int *listInitiaux = getAllIntInLine(lineBuffer, nbEtatInitiaux);
-  Vect *vectInitiaux = createVectFromIntArray(listInitiaux, nbEtatInitiaux, false);
+  Vect *vectInitiaux = createVectFromIntArray(listInitiaux, nbEtatInitiaux, false); // liste des initiaux
   free(listInitiaux);
 
   uint nbEtatFinaux;
-  fscanf(file, "%d\n", &nbEtatFinaux);
+  fscanf(file, "%d\n", &nbEtatFinaux); // nombre d'état finaux
 
   fgets(lineBuffer, 1024, file);
   int *listFinals = getAllIntInLine(lineBuffer, nbEtatFinaux);
-  Vect *vectFinaux = createVectFromIntArray(listFinals, nbEtatFinaux, false);
+  Vect *vectFinaux = createVectFromIntArray(listFinals, nbEtatFinaux, false); // liste des états finaux
   free(listFinals);
   free(lineBuffer);
 
   char *Sigma;
-  fscanf(file, "%ms\n", &Sigma);
+  fscanf(file, "%ms\n", &Sigma); // alphabet
 
   AFN B = afn_init(nbEtat, vectInitiaux, vectFinaux, Sigma);
 

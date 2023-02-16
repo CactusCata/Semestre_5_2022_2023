@@ -1,0 +1,6 @@
+\babel@toc {french}{}
+\contentsline {section}{\nonumberline Introduction}{2}{section*.3}%
+\contentsline {section}{\numberline {1}Rappels}{2}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Condition initiale}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Problème de Cauchy}{3}{subsection.1.2}%
+\contentsline {section}{\numberline {2}Exercices}{4}{section.2}%

@@ -1,0 +1,103 @@
+\documentclass[10pt, a4paper, parskip=full]{scrartcl}
+%	PREAMBULE
+
+% Packages
+\usepackage[utf8]{inputenc} % encodage utf-8
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel} % traduit chapter en chapitre
+\usepackage{textcomp}
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{lmodern}
+\usepackage{graphicx} % permet d'ajouter des images
+\usepackage[dvipsnames,svgnames]{xcolor}
+\usepackage{microtype}
+\usepackage{lipsum}
+\usepackage{graphicx} % pour ajouter 
+\usepackage{hyperref} % permet de faire des liens href
+\hypersetup{colorlinks=true,linkcolor=Brown,urlcolor=Blue,breaklinks=true,bookmarks
+=true,pdfstartview=XYZ} % on redefinit les options pour les href
+
+\newcommand{\macommand}{ecris des trucs cools}
+
+% si on veut ajouter des espaces dans le texte des fonctions
+% on peut faire:
+\newcommand{\macommandd}{ecris des trucs cools\xspace}
+
+% On peut ajouter des arguments:
+\newcommand{\macommanddd}[1]{ma commande: "#1" !\xspace}
+
+\newcommand{\nompropre}[2]{#1 \textsc{#2}\xspace}
+
+% Affectactions au variables (title, author et date)
+\title{Mon 1\ier{} document}
+\author{Adam Chareyre}
+%\date{} Date mise à la date de la compilation
+
+\begin{document}
+%Corps du document
+
+% Affiche le contenu des variables title, author et date
+\maketitle
+
+% Abstract
+\begin{abstract}
+\lipsum[1-2]
+\end{abstract}
+
+% Table des matieres
+\tableofcontents
+
+\section{Titre de la section}
+
+% ou
+% \section*{Titre de la section} pour ne pas mettre de numero
+% mais il n'apparaitra pas dans la table des matières, pour l'ajouter, il faut ajouter la ligne:
+% \addsec{Titre de la section}
+
+
+Mon premier document \LaTeX   dsd
+
+\lipsum
+
+{1\ier} document: \href{http://google.com}{truc}
+
+\includegraphics[trim=1cm 1cm 1cm 1cm,clip]{img.jpeg}
+% mettre clip quand l'image se place sur du texte
+
+% OU
+
+% L'image se placera où elle veut
+% on peut lui demander une position idéale, par exemple t, p, etc
+\begin{figure}
+\centering
+\includegraphics[trim=1cm 1cm 1cm 1cm,clip]{img.jpeg}
+\caption{Titre de la figure}\label{img.jpeg}
+\end{figure}
+
+\begin{center} % permet de centrer la figure
+\begin{tabular}{|c|c|c|} % positionne à droite/gauche/milieu de la colonne
+\hline % permet d'ajouter des lignes horizontales
+a b	& c d & e \\
+\hline % permet d'ajouter des lignes horizontales
+f g	& h i & j \\ % le "\\" permet d'ajouter le dernier \hline sans erreur
+\hline
+\end{tabular}
+\end{center}
+
+\macommand{}
+\macommand{}
+\macommandd{}
+\macommandd{}
+
+\macommanddd{lol}
+
+\nompropre{adam}{                                                                                                                                                   chareyre}
+
+\cite{lcfr}
+
+\bibliographystyle{plain}
+\bibliography{biblio}
+
+
+\end{document}

@@ -1,0 +1,2 @@
+\babel@toc {french}{}
+\contentsline {section}{\numberline {1}Titre de la section}{1}{section.1}%

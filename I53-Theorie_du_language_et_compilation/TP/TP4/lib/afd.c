@@ -215,8 +215,8 @@ AFD afd_finit(char *fileName) {
     exit(1);
   }
 
-  int Q;
-  int q0;
+  int Q; // nombre d'état
+  int q0; // s
   int nbFinals;
   fscanf(file, "%d\n", &Q);
   fscanf(file, "%d\n", &q0);

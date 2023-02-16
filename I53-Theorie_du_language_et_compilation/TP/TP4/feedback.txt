@@ -1,0 +1,34 @@
+Feedback du prof:
+Les fichiers Readme sont supposés être au format .txt (ou .md, .rst
+etc) afin d'être lisible avec un simple éditeur de texte. Le pdf n'est
+pas vraiment pratique. Pour le reste, le fichier est bien rédigé. Cela
+dit, tu as rajouté énormément de fonctions et de modules par rapport
+au sujet initial (et même modifier le code de certaines fonctions de
+départ) il aurait été bien de les documents briévement dans le Readme
+afin d'expliquer le roles de chacun des nouveau module.
+
+Très bon travail sur l'organisation du projet et l'ensemble des
+tests. Les fonctions sont bien commentées. L'ajout de nombreuses
+fonctions rend le projet un peu dur à appréhender au départ. Cela dit
+cela permet une écriture et relecture très simple des fonctions
+demandées dans le sujet.
+
+La fonction mygrep fonctionne très bien. Pas de fuites mémoires
+repérées. Le module compregex est cela dit lui aussi un peu
+aride. Expliciter un peu mieux la grammaire et la manière dont tu
+produits l'AF final rendrait le tout plus digeste. En particulier, la
+donnée de la grammaire finale brut de décoffrage dans le Readme sans
+explication n'aide pas à mieux comprendre le code.
+
+Evaluation: Très bon travail. Le principal reproche que l'on puisse
+faire est que tu préfères coder qu'expliquer ton code. Passe un peu
+plus de temps à décrire le fonctionnement global de ton programme
+(notamment le role et l'interconnection des différents modules).
+
+Note: (A)
+
+A retenir:
+ne plus faire de readme en .pdf mais en .md (sans latex)
+Dans le readme, ajouter le rôle de chaque module (chaque fonction ?)
+Décrire le fonctionnement global du programme
+Mettre de petits commentaires dans les fonctions
