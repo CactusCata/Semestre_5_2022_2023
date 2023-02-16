@@ -1,6 +1,7 @@
 import numpy as np
 from PIL import Image
 import matplotlib.pyplot as plt
+from time import time
 
 import infoUtils
 
@@ -11,6 +12,10 @@ def registration(Im1cent, Im2array, niter=100, crop=200, depv=0, deph=0):
   # crop: marge pour le déplacement (default: 200)
   # depv: déplacement vertical initial (default: 0)
   # deph: déplacement horizontal initial (default: 0)
+
+  n = len(Im2array)
+  flagMap = [0] * (n * n)
+  flagMap[(crop + deph) * n + (crop + depv)] = 1
 
   # Itérer niter fois
   for i in range(niter):
@@ -24,21 +29,39 @@ def registration(Im1cent, Im2array, niter=100, crop=200, depv=0, deph=0):
 
       # Extraire chaque partie de l'image 2 décalée d'un pixel dans
       # chacune des 4 directions
-      right = Im2cent[1:,1:-1]
-      left = Im2cent[:-1,1:-1]
-      up = Im2cent[1:-1,:-1]
-      down = Im2cent[1:-1,1:]
+      nmiRight = 0
+      nmiLeft = 0
+      nmiUp = 0
+      nmiDown = 0
+
+      if (not flagMap[(crop + deph + 1) * n + (crop + depv)]):
+          right = Im2cent[1:,1:-1]
+          start = time()
+          nmiRight = infoUtils.NMI(Im1cent, right, 867)
+          print(f"nmi calculus =  {time() - start}")
+          print(f"nmi right = {nmiRight}")
+          flagMap[(crop + deph + 1) * n + (crop + depv)] = 1
+
+      if (not flagMap[(crop + deph - 1) * n + (crop + depv)]):
+          left = Im2cent[:-1,1:-1]
+          nmiLeft = infoUtils.NMI(Im1cent, left, 867)
+          print(f"nmi left = {nmiLeft}")
+          flagMap[(crop + deph - 1) * n + (crop + depv)] = 1
+
+      if (not flagMap[(crop + deph) * n + (crop + depv - 1)]):
+          up = Im2cent[1:-1,:-1]
+          nmiUp = infoUtils.NMI(Im1cent, up, 867)
+          print(f"nmi up = {nmiUp}")
+          flagMap[(crop + deph) * n + (crop + depv - 1)] = 1
+
+      if  (not flagMap[(crop + deph) * n + (crop + depv + 1)]):
+          down = Im2cent[1:-1,1:]
+          nmiDown = infoUtils.NMI(Im1cent, down, 867)
+          print(f"nmi down = {nmiDown}")
+          flagMap[(crop + deph) * n + (crop + depv + 1)] = 1
 
       # Calculer l'information mutuelle normalisée entre l'image 1
       # et chacune des images décalées
-      nmiRight = infoUtils.NMI(Im1cent, right, 867)
-      print(f"nmi right = {nmiRight}")
-      nmiLeft = infoUtils.NMI(Im1cent, left, 867)
-      print(f"nmi left = {nmiLeft}")
-      nmiUp = infoUtils.NMI(Im1cent, up, 867)
-      print(f"nmi up = {nmiUp}")
-      nmiDown = infoUtils.NMI(Im1cent, down, 867)
-      print(f"nmi down = {nmiDown}")
 
 
       # Décider de la direction dans laquelle déplacer l'image et
