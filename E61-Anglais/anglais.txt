@@ -1,0 +1,167 @@
+SUJET: repliement des proteines (protein folding)
+
+permet de créer des médicaments contre des maladies
+
+Qu'est-ce que sont les proteines ?
+Dans le langage courant, ce sont les nutriments que l'on trouve dans
+la nourriture mais en réalité, on mange des proteines pour fabriquer 
+nos
+propres proteines
+Mais en biologie c'est une classe de très grosses molécules appelées macromolécules
+Elles ont beaucoup d'utilités différentes (couteau suisse du corps):
+	- Elles s'occupent de faire bouger les muscles,
+	- controlent le metabolisme
+	- servent d'anti-corps
+	- servent d'enzymes
+quand une celule a besoin d'une poteine, elle "consulte"
+l'adn qui lui fournis la "recette" pour creer la proteine
+Il existe ~10 000 de proteines != chez l'être humain https://i.imgur.com/KVm1rZD.png
+Sur l'ensemble du vivant, on en connait 200 millions https://i.imgur.com/chOQrYp.png
+Elles composent 60% du corps (hors eau)
+
+Ces proteines adoptent une structure en 3D qui leur 
+permet d'assurer ces fonctions biologiques.
+La forme que ces proteines adopteront sera déterminée par
+leur séquence en acides aminés
+Il n'existe que 21 acides aminés dans le domaine du 
+vivant qui permettent de fabriquer toutes les proteines
+Elles ont toute une lettre, par exemple 
+FHJNTRUZJUDORMGSZCHOYR
+
+les acides aminées ont cette forme: C:\Users\adamc\Downloads\acide_aminé
+
+poteines =chaine d'acides aminés
+F(liste d'acides aminés) = https://upload.wikimedia.org/wikipedia/commons/2/27/Human_alfa2beta2_hemoglobin.gif
+-formr de la proteine)
+
+chaque proteine a sa forme propre
+
+la forme de la proteine dépend de sa composition car ce sont les forces des intéractions
+entre les acides aminés qui déterminent la forme finale de la proteine
+
+par exemple , les anti-corps ont une forme de Y 
+permetant de s'accrocher aux agents patogènes (https://i.imgur.com/g31wKR7.png + https://i.imgur.com/9vTc79n.png)
+La malformation de ces proteines peuvent occasionner des maladies
+neuro-dégénératives (alzheimer)
+
+on a dénombré seulement 170k/200000k de proteines dont on connait la structure
+
+Pour déterminer leur structure, il existe plusieurs 
+méthodes:
+- immunohistochimie, par mutagenèse dirigée, 
+par cristallographie aux rayons X, 
+par résonance magnétique nucléaire et 
+par spectrométrie de masse. mais ça coute cher, long, ne marche pas toujouers
+
+
+
+def métabolisme: Le métabolisme est l'ensemble des réactions chimiques 
+qui se déroulent à l'intérieur de chaque cellule d'un être vivant et 
+lui permettant notamment de se maintenir en vie, de se reproduire, 
+de se développer et de répondre aux stimuli de son environnement.
+
+but: avec une chaine d'acides aminés, recreer la forme 
+3d de la proteine
+
+des equipes d'informatiques ont essayé de résoudre ce 
+problème, de la
+on a créé le concours CASP
+IMB a lancé, dans les années 2000 son super ordinateur
+ BlueGene (qui a d'ailleurs
+été le meilleur ordinateur de son temps)
+
+méthode rosetta: rosetta@home qui proposait à quiconque
+de laisser à disposition la puissance de calcul de son
+ordinateur pour contribuer à l'avancé de la recherche 
+dans la structure des proteines
+
+Concours CASP: l'objectif de ce concours est de trouver, 
+à l'aide d'un algorithme, la structure en 3D d'une 
+séquence d'acides aminés
+débute en 1994 grâce à John moult (https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.warpnews.org%2Fcontent%2Fimages%2F2020%2F12%2FJohn-Moult.jpg&f=1&nofb=1&ipt=82caddfa4a4b2e48acc8ea7f8a1d9a14a3a8b9c2e9b05098da1587611666702e&ipo=images)
+et a lieu touus les deux ans et à chaque fois, 
+plus d'une centaine d'équipe participe
+progression jusqu'à 2020: https://i.imgur.com/0Vfgw0o.png
+introduire ici l'ia alpha fold
+https://en.wikipedia.org/wiki/AlphaFold#/media/File:Protein_folding_figure.png
+
+Alphafold vient de la start-up londonienne DeepMind 
+fondée par Demis Hassabis
+DeepMind a été rachetée par la suite par google en 2014
+C'est cette start-up qui a crée AlphaGo, 
+l'ia qui arrive à battre des humains au jeu du Go.
+Elle a ausi concu AlphaZero, beat the most powerful programs playing go, chess and shogi (Japanese chess)
+DeepMind a mis en open source une partie de ses recherches
+
+Se base sur la technologie de deepLearning
+Pour le concours de l'année d'après, tous les 
+concourants utilisent du deep learning
+
+2020: nouvel algo, alphafold2, la différence entre la 
+réalité et la simulation est de 1.6 angustrum (1 atome), 
+on est dans l'ordre de grandeur de la mesure experimentale
+https://en.wikipedia.org/wiki/AlphaFold#/media/File:AlphaFold_2_block_design.png
+
+Les résultats semblaient être tellement bon que les 
+organisateurs ont suspectés qu'il y avait eu de la 
+triche.
+Les organisateurs ont donc demandé une proteine 
+particulièrement difficile sur laquelle les chercheurs
+bloquaient depuis 10 ans. 30 minutes plus tard, 
+ils ont eu la réponse et ça collait
+
+
+Alphafold utilise un algorithme de deeplearning qui, 
+pour résoudre le problème, le découpe en deux:
+
+- une première phase qui permet de passer de la séquence d'acides aminés à une matrice de distance
+- une seconde phase qui permet de construire la forme de la proteine grace à la matrice de distance
+
+La matrice de distance est une matrice de nombre qui, 
+pour deux points, donne une distance 
+(https://i.imgur.com/LSUlXJJ.png)
+mais ici avec les acides aminés de la proteine et en 
+3d (https://lh3.googleusercontent.com/5eVQo_Ozo66_E5RgMQeUFiMPHPSLQtwjoMcqu0L4AjHa0fVnUYJkQttFzpUDWvP_0pxhLtOa0DIOPvRRNlShOIyrYzFeqW8EMbY1=w1440)
+
+But: produire la forme complete de la proteine à partir de la matrice de distance: se fait en calculant l'energie de la molécule et en essayant de
+la minimiser par de petites variations (descente de gradiant)
+
+alphafold 1: réseaux de convolution
+alphafold 2: réseaux d'attention comme dans GPT-3 
+(avant chatGPT), celui qui écrivait des histoires tout
+ seul
+
+
+
+L'année dernière, DeepMind a annoncé qu'AlphaFold avait 
+terminé la prédiction de presque toutes les protéines 
+humaines ainsi que des protéomes entiers de 20 autres
+ organismes largement étudiés. 
+Les structures ont été publiées dans la base de données 
+de structures protéiques AlphaFold. 
+En juillet 2022, il a été annoncé que les prédictions 
+de plus de 200 millions de protéines, représentant 
+pratiquement toutes les protéines connues, 
+seraient publiées dans la base de données AlphaFold.
+
+CONCLUSION DIAPO
+Malheureusement, alphafold2 se trompe encore trop pour
+ pouvoir créer des médicaments à la pelle.
+En plus de ça, les proteines s'associent souvent en 
+complexe et produisent des résultats différents de ceux
+ attendus
+
+Annexe:
+
+Machine learning: l'algorithme s'améliore grace à des exemples
+
+Exemple:
+On a une série de données qui partagent de l'information.
+On veut trouver une règle générale qui pemettra de déterminer à l'avance, en fct de certaines données,
+un résultat
+(phrase d'apprentissage)
+
+DeepLearning: Une façon de faire bien spécifique du machine learning
+
+
+VIDEO: dire que j'ai choisi cette vidéo parce qu'elle nous fournit le potentiel de cette découverte comme le probleme 
