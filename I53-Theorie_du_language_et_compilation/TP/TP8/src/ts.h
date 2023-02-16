@@ -6,7 +6,7 @@
 #include <string.h>
 
 #define TS_MAX_ID_SIZE 31
-#define TS_DEFAULT_ADR 80
+#define TS_DEFAULT_ADR 50
 
 struct ts_node;
 

@@ -2,7 +2,6 @@
 
 int main(int argc, char *argv[]) {
 
-    /*
     AFN A = afn_finit("../data/afn1.afn");
     afn_toPng(A, "test3");
 
@@ -14,7 +13,7 @@ int main(int argc, char *argv[]) {
 
 
     afn_free(A);
-    
+    /*    
 
     AFD C = afd_finit("../data/afd1.afd");
     afd_toPng(C, "test2");
@@ -89,7 +88,7 @@ int main(int argc, char *argv[]) {
    afn_free(Y);
    */
 
-    
+    /*
     initUnitTest();
 
     callAllTest_utils();
@@ -97,7 +96,7 @@ int main(int argc, char *argv[]) {
     callAllTest_vect();
 
     endUnitTest();
-    
+    */
 
     return 0;
 

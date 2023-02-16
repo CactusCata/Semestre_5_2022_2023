@@ -1,9 +1,0 @@
-regler les conflits:
-
-mettre toujours un systele de priorité
-
-operator bison
-left right nonassoc precendence
-
-Faire le and le or.
-Fix les > >= < <= pour fixer le nombre d'instruction

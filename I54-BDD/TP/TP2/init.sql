@@ -29,7 +29,7 @@ CREATE TABLE Reservation (
 
 INSERT INTO Client VALUES
 ('Quentin', 50),
-('Grégoire', 50);
+('Gregoire', 50);
 
 INSERT INTO Spectacle VALUES
 ('Harry Potter', 250, 250, 20);
@@ -38,7 +38,7 @@ INSERT INTO Spectacle VALUES
 
 
 -- On est obligé de mettre la commande de SET SESSION
--- dans à l'intérieur d'une transaction
+-- à l'intérieur d'une transaction
 BEGIN TRANSACTION;
 SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;
 COMMIT;
@@ -47,10 +47,6 @@ CREATE OR REPLACE FUNCTION buyPlaceEvent()
 RETURNS TRIGGER
 AS $$
 DECLARE spec Spectacle%ROWTYPE;
-/*
-DECLARE nbplacelibreA INTEGER;
-DECLARE nbplaceLibreB INTEGER;
-*/
   BEGIN
 
   SELECT * INTO spec
@@ -67,23 +63,6 @@ DECLARE nbplaceLibreB INTEGER;
   ELSE
     RETURN NULL; -- annule la transaction
   END IF;
-
-  /*SELECT SUM(NbplacesReservees) INTO nbplacelibreA
-  FROM Reservation, Spectacle
-  WHERE Reservation.nomS = new.nomS
-  AND Reservation.nomS = Spectacle.nomS;
-
-  SELECT Spectacle.Nbplaces - Spectacle.NbplacesLibres INTO nbplaceLibreB
-  FROM Spectacle
-  WHERE Spectacle.nomS = new.nomS;
-
-  IF (nbplacelibreA = nbplaceLibreB)
-  THEN
-    COMMIT;
-  ELSE
-    ROLLBACK;
-  END IF;
-  */
   END;
 $$
 LANGUAGE plpgsql;
@@ -130,7 +109,7 @@ ON Reservation
 FOR EACH ROW
 EXECUTE PROCEDURE changePlaceAmountEvent();
 
-
+/*
 INSERT INTO Reservation VALUES
 ('Quentin', 'Harry Potter', 100);
 
@@ -150,7 +129,93 @@ FROM Reservation;
 
 SELECT *
 FROM Spectacle;
+*/
 
 BEGIN TRANSACTION;
 SET SESSION TRANSACTION ISOLATION LEVEL SERIALIZABLE;
 END;
+
+-- Fenetre 1 (Quentin)
+/*
+BEGIN TRANSACTION;
+INSERT INTO Reservation VALUES
+('Quentin', 'Harry Potter', 2);
+END;
+*/
+
+-- Fenetre 2 (Gregoire)
+/*
+BEGIN TRANSACTION;
+INSERT INTO Reservation VALUES
+('Gregoire', 'Harry Potter', 5);
+END;
+*/
+
+-- Fenetre 1 (Quentin)
+/*
+SELECT *
+FROM Reservation;
+SELECT *
+FROM Spectacle;
+*/
+
+-- Résultat:
+/*
+postgres=# SELECT *
+postgres-# FROM Reservation;
+   nomc   |     noms     | nbplacesreservees
+----------+--------------+-------------------
+ Quentin  | Harry Potter |                 2
+ Gregoire | Harry Potter |                 5
+(2 lignes)
+
+
+postgres=# SELECT *
+postgres-# FROM Spectacle;
+     noms     | nbplaces | nbplaceslibres | tarif
+--------------+----------+----------------+-------
+ Harry Potter |      250 |            243 | 20.00
+(1 ligne)
+*/
+
+-- Fenetre 2 (Gregoire)
+/*
+SELECT *
+FROM Reservation;
+SELECT *
+FROM Spectacle;
+*/
+
+/*
+postgres=# SELECT *
+postgres-# FROM Reservation;
+   nomc   |     noms     | nbplacesreservees
+----------+--------------+-------------------
+ Quentin  | Harry Potter |                 2
+ Gregoire | Harry Potter |                 5
+(2 lignes)
+
+
+postgres=# SELECT *
+postgres-# FROM Spectacle;
+     noms     | nbplaces | nbplaceslibres | tarif
+--------------+----------+----------------+-------
+ Harry Potter |      250 |            243 | 20.00
+(1 ligne)
+*/
+
+-- Conclusion: Meme chose 
+
+
+-- Fenetre 1 (Quentin)
+/*
+DELETE FROM Spectacle;
+DELETE FROM Reservation;
+*/
+
+-- Fenetre 2 (Gregoire)
+/*
+DELETE FROM Spectacle;
+DELETE FROM Reservation;
+*/
+

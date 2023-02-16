@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "stack.h"
+
 typedef struct {
   unsigned int edgeAmount;
   unsigned char **matrixAdj;
@@ -33,5 +35,13 @@ size_t getComposanteConnexeAmountM(GraphM graph);
 
 void reachAllNeighborsM(size_t s, GraphM graph, unsigned char *reached);
 // Permet de visiter tous les voisins dans une composante connexe du graph correspondant
+
+// Renvoie le degré du sommet s dans le graph g
+int graphM_get_degree(GraphM g, int s);
+
+// affiche dans la console un cycle eulérien
+void eulerien(GraphM g, int s);
+
+Stack promenade(GraphM g, int s);
 
 #endif

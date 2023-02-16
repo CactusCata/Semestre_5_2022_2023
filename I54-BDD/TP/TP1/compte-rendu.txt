@@ -328,3 +328,532 @@ TRUNCATE TABLE Employe CASCADE;
       Question 1
 */
 -- DONE
+
+/*
+      Question 2
+*/
+
+-- Fenetre 1:
+/*
+INSERT INTO Departement
+VALUES ('C1', 'Transaction 1');
+*/
+
+-- Fenêtre 2:
+/*
+INSERT INTO Departement
+VALUES ('C2', 'Transaction 2');
+*/
+
+/*
+      Résultat depuis la fenêtre 1:
+postgres=# SELECT * FROM Departement;
+ did |    libelle
+-----+---------------
+ C1  | Transaction 1
+ C2  | Transaction 2
+(2 lignes)
+*/
+
+/*
+      Résultat depuis la fenêtre 2:
+postgres=# SELECT * FROM Departement;
+ did |    libelle
+-----+---------------
+ C1  | Transaction 1
+ C2  | Transaction 2
+(2 lignes)
+*/
+
+-- Conclusion: les deux opérations ont bien été effective de
+-- chaque côté
+
+/*
+      Question 3
+*/
+
+-- Fenetre 1:
+/*
+BEGIN TRANSACTION;
+*/
+
+-- Fenêtre 2:
+/*
+BEGIN TRANSACTION;
+*/
+
+-- Fenetre 1:
+/*
+INSERT INTO Departement
+VALUES ('C3', 'Transaction 3');
+SELECT * FROM Departement;
+*/
+-- affiche les 3 transaction C1 C2 et C3
+
+-- Fenêtre 2:
+/*
+INSERT INTO Departement
+VALUES ('C4', 'Transaction 4');
+COMMIT;
+*/
+
+-- Fenetre 1:
+/*
+SELECT * FROM Departement;
+*/
+-- C1 C2 C3 C4
+
+-- Fenêtre 2:
+/*
+SELECT * FROM Departement;
+*/
+-- C1 C2 C4 (normal puisque la fenetre 1 n'a pas encore commit)
+
+-- Fenetre 1:
+/*
+COMMIT;
+*/
+
+-- Fenêtre 2:
+/*
+
+*/
+
+-- Fenetre 1:
+/*
+SELECT * FROM Departement;
+*/
+-- C1 C2 C3 C4
+
+-- Fenêtre 2:
+/*
+SELECT * FROM Departement;
+*/
+-- C1 C2 C3 C4 On constate que le commit de la fenêtre 1 a
+-- bien été prit en compte
+
+/*
+      Question 4
+*/
+
+-- Fenetre 1:
+/*
+BEGIN TRANSACTION;
+*/
+
+-- Fenêtre 2:
+/*
+BEGIN TRANSACTION;
+*/
+
+-- Fenetre 1:
+/*
+INSERT INTO Departement
+VALUES ('C5', 'Transaction 5');
+*/
+
+-- Fenêtre 2:
+/*
+INSERT INTO Departement
+VALUES ('C5', 'Transaction 5');
+*/
+-- On constate que la fenêtre 2 se met en attente
+
+-- Fenetre 1:
+/*
+COMMIT;
+*/
+
+-- Fenêtre 2:
+/*
+
+*/
+-- On constate que la fenêtre 2 est débloquée et nous renvoie
+-- un message d'erreur (clef déjà existante):
+/*
+ERREUR:  la valeur d'une clé dupliquée rompt la contrainte unique « departement_pkey »
+DÉTAIL : La clé « (did)=(C5) » existe déjà.
+*/
+
+-- Fenetre 1:
+/*
+
+*/
+
+-- Fenêtre 2:
+/*
+COMMIT;
+*/
+-- On remaque que vu qu'il y a eu une erreur, un
+-- rollback a eu lui pour la fenetre 2
+
+-- Fenetre 1:
+/*
+SELECT * FROM Departement;
+*/
+-- C1 C2 C3 C4 C5
+
+-- Fenêtre 2:
+/*
+SELECT * FROM Departement;
+*/
+-- C1 C2 C3 C4 C5
+-- On constate que C5 est bien là
+
+/*
+      Question 5
+*/
+
+-- Fenetre 1:
+/*
+BEGIN TRANSACTION;
+*/
+
+-- Fenêtre 2:
+/*
+BEGIN TRANSACTION;
+*/
+
+-- Fenetre 1:
+/*
+INSERT INTO Departement
+VALUES ('C6', 'Transaction 6');
+*/
+
+-- Fenêtre 2:
+/*
+INSERT INTO Departement
+VALUES ('C6', 'Transaction 6');
+*/
+
+-- On constate que la fenetre 2 esr bloquée
+
+-- Fenetre 1:
+/*
+ROLLBACK;
+*/
+
+-- Fenêtre 2:
+/*
+
+*/
+-- On constate que la fenetre 2 à bien réalisée l'insertion demandée
+
+-- Fenetre 1:
+/*
+
+*/
+
+-- Fenêtre 2:
+/*
+COMMIT;
+*/
+
+-- Fenetre 1:
+/*
+SELECT * FROM Departement;
+*/
+-- C1 C2 C3 C4 C5 C6
+
+-- Fenêtre 2:
+/*
+SELECT * FROM Departement;
+*/
+-- C1 C2 C3 C4 C5 C6
+-- On constate que C6 est bien là
+
+/*
+      Question 6
+*/
+
+-- Fenêtre 2:
+/*
+BEGIN;
+DELETE FROM Departement;
+COMMIT;
+*/
+
+/*
+      Question 7
+*/
+
+-- Fenetre 1:
+/*
+BEGIN TRANSACTION;
+INSERT INTO Departement
+VALUES ('C1', 'Info');
+COMMIT;
+SELECT * FROM Departement;
+*/
+
+/*
+      Question 8
+*/
+
+-- Fenêtre 2:
+/*
+BEGIN TRANSACTION;
+UPDATE Departement
+SET Libelle = 'Informatique'
+WHERE Departement.DID = 'C1';
+COMMIT;
+*/
+
+/*
+      Question 9
+*/
+
+-- Fenetre 1:
+/*
+SELECT * FROM Departement;
+*/
+-- Bien pris en compte
+
+/*
+      Question 10
+*/
+
+-- Fenetre 1:
+/*
+BEGIN TRANSACTION;
+UPDATE Departement
+SET Libelle = 'Info'
+WHERE Departement.DID = 'C1';
+*/
+
+-- Fenetre 2:
+/*
+BEGIN TRANSACTION;
+UPDATE Departement
+SET Libelle = 'Biologie'
+WHERE Departement.DID = 'C1';
+*/
+-- La fenetre 2 se bloque (attends le résultat de la fenetre 1)
+
+/*
+      Question 11
+*/
+
+-- Fenetre 1:
+/*
+ROLLBACK;
+*/
+
+-- Fenetre 2:
+/*
+
+*/
+
+-- Fenetre 1:
+/*
+SELECT * FROM Departement;
+*/
+
+-- Fenetre 2:
+/*
+SELECT * FROM Departement;
+*/
+
+-- On a bien Informatique dans la fenetre 1
+-- On a bien Biologie dans la fenetre 2
+
+/*
+      Question 12
+*/
+
+-- Fenetre 1:
+/*
+COMMIT;
+*/
+
+-- Fenetre 2:
+/*
+
+*/
+
+-- erreur il n'y a rien a commit
+-- les résultats ne sont pas les même, pour qu'ils
+-- soient pris en compte il aurait fallu que la fenetre 2
+-- fasse un commit
+
+/*
+      Question 13
+*/
+
+-- Fenêtre 2:
+/*
+BEGIN;
+DELETE FROM Departement;
+COMMIT;
+*/
+
+/*
+      Question 14
+*/
+
+-- Fenetre 1:
+/*
+BEGIN;
+INSERT INTO Departement
+VALUES ('C1', 'Info');
+*/
+
+-- Fenetre 2:
+/*
+BEGIN;
+INSERT INTO Employe
+VALUES (01, 'Henri', 'C1');
+*/
+
+-- resultat: ERREUR:  une instruction insert ou update sur la table « employe » viole la contrainte de clé
+--           étrangère « employe_dept_fkey »
+--           DÉTAIL : La clé (dept)=(C1) n'est pas présente dans la table « departement ».
+-- C'est parce que le commit n'a pas encore eu lieu et donc que
+-- pour la fenetre 2, la clef n'existe pas encore.
+
+
+/*
+      Question 15
+*/
+
+-- Fenetre 1:
+/*
+ROLLBACK;
+*/
+
+-- Fenetre 2:
+/*
+
+*/
+
+-- La fenetre 2 reste dans le même état
+
+/*
+      Question 16
+*/
+
+-- Fenetre 1:
+/*
+BEGIN;
+INSERT INTO Departement
+VALUES ('C1', 'Info');
+COMMIT;
+*/
+
+-- Fenetre 2:
+/*
+BEGIN;
+INSERT INTO Employe
+VALUES (01, 'Henri', 'C1');
+COMMIT;
+*/
+
+-- Fenetre 1:
+/*
+SELECT * FROM Departement;
+SELECT * FROM Employe;
+*/
+
+-- Fenetre 2:
+/*
+SELECT * FROM Departement;
+SELECT * FROM Employe;
+*/
+
+/*
+      Question 17
+*/
+
+-- Fenetre 1:
+/*
+DELETE FROM Departement
+WHERE DID = 'C1';
+*/
+
+-- Ca marche pas:
+/*
+Message d'erreur:
+ERREUR:  UPDATE ou DELETE sur la table « departement » viole la contrainte de clé étrangère « employe_dept_fkey » de la table « employe »
+DÉTAIL : La clé (did)=(C1) est toujours référencée à partir de la table « employe ».
+*/
+
+/*
+      Question 18
+*/
+
+-- Fenetre 1:
+/*
+BEGIN;
+INSERT INTO Employe
+VALUES (02, 'Grégoire', 'C1');
+COMMIT;
+*/
+
+/*
+      Question 19
+*/
+
+-- Fenetre 1:
+/*
+BEGIN;
+UPDATE Employe
+SET Nom = 'Coleen'
+WHERE Employe.EID = 01;
+*/
+
+-- Fenetre 2:
+/*
+BEGIN;
+UPDATE Employe
+SET Nom = 'Camille'
+WHERE Employe.EID = 02;
+*/
+
+-- Fenetre 1:
+/*
+SELECT * FROM Employe;
+*/
+
+-- Fenetre 2:
+/*
+SELECT * FROM Employe;
+*/
+
+-- Les noms des employés ont modifiés localement.
+
+/*
+      Question 20
+*/
+
+-- Fenetre 1:
+/*
+COMMIT;
+SELECT * FROM Employe;
+*/
+
+-- Fenetre 2
+/*
+SELECT * FROM Employe;
+*/
+
+-- Fenetre 1:
+/*
+
+*/
+
+-- Fenetre 2
+/*
+COMMIT;
+*/
+
+-- Fenetre 1:
+/*
+SELECT * FROM Employe;
+*/
+
+-- Fenetre 2
+/*
+SELECT * FROM Employe;
+*/
+
+-- Bien mis à jour

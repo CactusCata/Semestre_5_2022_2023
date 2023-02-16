@@ -19,13 +19,13 @@ int ts_retrouver_id(ts tsymb, const char * id){
     if (strcmp(current->id, id) == 0) return current->adr;
     current = current->next;      
   }
-  return -1;
+  return -80;
 }
 int ts_ajouter_id(ts tsymb, const char *id){
   ts current = tsymb;
   if (current == NULL){
     fprintf(stderr,"[warning] Erreur ts_ajouter_id: table vide\n");
-    return -1;
+    return -80;
   }
   while (current->next != NULL){
     if (strcmp(current->id, id) == 0)

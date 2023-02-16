@@ -131,3 +131,37 @@ void reachAllNeighborsM(size_t s, GraphM graph, unsigned char *reached) {
     }
   }
 }
+
+
+// Renvoie le degré du sommet s dans le graph g
+int graphM_get_degree(GraphM g, int s) {
+  int degree = 0;
+  
+  for (int i = 0; i < g.edgeAmount; i++) {
+    if (g.matrixAdj[s][i]) {
+      degree++;
+    }
+  }
+  return degree;
+}
+
+void eulerien(GraphM g, int s) {
+  Stack p = promenade(s);
+
+  while (!stackIsEmpty(p)) {
+    s = pop(p);
+    if (graphM_get_degree(g, s) > 0) {
+      eulerien(g, s);
+    } else {
+      printf("%d ", s);
+    }
+  }
+}
+
+Stack promenade(GraphM g, int s) {
+  Stack rs = createStack();
+  push(rs, s);
+  while (graphM_get_degree(g, s) > 0) {
+    
+  }
+}
