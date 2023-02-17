@@ -1,4 +1,5 @@
 from euclidianConfigTk import EuclidianConfigTk
+from windowManager import WindowManager
 
 import imageManager
 
@@ -7,5 +8,7 @@ if __name__ == "__main__":
 
     euclidianConfigTk = EuclidianConfigTk(-10, -10, 10, 10)
     imageManager.load_images_tk()
-    euclidianConfigTk.addScreenSpaceTk()
+    windowManager = WindowManager(master=euclidianConfigTk.getRoot())
+    euclidianConfigTk.set_window_manager(windowManager)
+    windowManager.add_virtual_window(30, 30, 150, 150)
     euclidianConfigTk.start()

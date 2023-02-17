@@ -1,11 +1,11 @@
-from spaceTk import SpaceTk
+from window import Window
 
 import mathUtils
 
-class ScreenSpaceTk(SpaceTk):
+class GeoViewerWindow(Window):
 
-    def __init__(self, euclidianConfigTk, tk_width_pixel=500, tk_height_pixel=400):
-        super().__init__(euclidianConfigTk.getRoot(), tk_width_pixel, tk_height_pixel, lambda: self.onRectExpend())
+    def __init__(self, window_id, canvas, x1, y1, x2, y2):
+        super().__init__(window_id, canvas, x1, y1, x2, y2)
 
         self.last_lines_drew_id = []
         self.last_coords_eu = []
@@ -14,7 +14,6 @@ class ScreenSpaceTk(SpaceTk):
         self.last_max_x = -1
         self.last_max_y = -1
 
-        super().getRoot().protocol("WM_DELETE_WINDOW", lambda: self.onClose(euclidianConfigTk))
 
     def onRectExpend(self):
         if (len(self.last_lines_drew_id) != 0):
@@ -34,12 +33,8 @@ class ScreenSpaceTk(SpaceTk):
                 first_point = coord
                 self.last_lines_drew_id.append(line_id)
 
-    def onClose(self, euclidianConfigTk):
-        euclidianConfigTk.removeAScreenSpaceTk(self)
-        super().getRoot().destroy()
-
-    def move_window(self, dx, dy):
-        final_dx_dy = super().move_window(dx, dy)
+    def move_window(self, window_width, window_height, dx, dy):
+        final_dx_dy = super().move_window(window_width, window_height, dx, dy)
         dx = final_dx_dy[0]
         dy = final_dx_dy[1]
         for last_line_drew_id in self.last_lines_drew_id:
@@ -76,7 +71,7 @@ class ScreenSpaceTk(SpaceTk):
 
     def compute_f(self, function_coefs, x_start=None, x_end=None):
         if (x_start == None):
-            x_start=self.last_min_x
+            x_start = self.last_min_x
         if (x_end == None):
             x_end = self.last_max_x
 

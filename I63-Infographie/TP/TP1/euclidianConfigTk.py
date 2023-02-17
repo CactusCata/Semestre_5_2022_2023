@@ -1,6 +1,6 @@
 from tkinter import Tk, Label, Entry, Button, messagebox
 from tkinter.ttk import Separator
-from screenSpaceTk import ScreenSpaceTk
+from geo_viewer_window import GeoViewerWindow
 
 class EuclidianConfigTk():
 
@@ -9,7 +9,7 @@ class EuclidianConfigTk():
         self.root = Tk()
         self.root.geometry(f"{300}x{500}")
 
-        self.screenSpaces = []
+        self.window_manager = None
 
         label_min_x = Label(self.root, text="x min:")
         label_min_x.pack()
@@ -58,20 +58,14 @@ class EuclidianConfigTk():
 
         self.root.bind("<Return>", lambda event: self.addScreenSpaceTk())
 
+    def set_window_manager(self, window_manager):
+        self.window_manager = window_manager
+
     def addScreenSpaceTk(self):
         """
         Ajoute un espace ecran dans une autre fenetre
         """
-        screenSpaceTk = ScreenSpaceTk(self)
-        screenSpaceTk.set_window(50, 50, 150, 100)
-        self.screenSpaces.append(screenSpaceTk)
-        screenSpaceTk.start()
-
-    def removeAScreenSpaceTk(self, screenSpaceTk):
-        """
-        Supprime un espace ecran
-        """
-        self.screenSpaces.remove(screenSpaceTk)
+        self.window_manager.add_virtual_window(50, 50, 150, 100)
 
     def start(self):
         self.root.mainloop()
