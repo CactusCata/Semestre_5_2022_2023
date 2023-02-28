@@ -1,0 +1,20 @@
+@startuml
+Alice -> Bob: test
+@enduml
+
+
+
+Exigences:
+
+1. Fonctionnement interne
+  Chargement d'un monde prédéfini:
+      ALLWAYS, systeme charge une carte
+
+
+2.IHM
+
+  - Pose d'un nid
+    si carte chargée et pas d'obstacle,
+
+
+  - Pose d'une ressource
