@@ -76,7 +76,9 @@ def registration(Im1cent, Im2array, niter=100, crop=200, depv=0, deph=0):
       elif(maxNMI == nmiDown):
           depv += 1
 
-  return Im2cent, vec_nmi, depv, deph
+      print(f"\t\tTHE CURRENT NMI = {maxNMI}")
+
+  return Im2cent, [], depv, deph
 
 if __name__ == "__main__":
     Im1 = Image.open('Jezero1.tif')

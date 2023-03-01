@@ -36,9 +36,6 @@ class ImageAlignment():
         # entre l'image A et l'image B
         self.mapNMIPos = None
 
-        # histogramme (valeur de pixel : occurence)
-        self.currentHistogramPixels = None
-
     def loadImages(self):
         """
         Charge les images en mémoire
@@ -73,12 +70,6 @@ class ImageAlignment():
         self.imageMatrixBCropped = self.imageMatrixA[
                                     self.cropValue + deph - 1:-self.cropValue + deph + 1,
                                     self.cropValue + depv - 1:-self.cropValue + depv + 1]
-
-    def initDefaultHistogramImageB(self):
-        self.currentHistogramPixels = [0] * (self.matrixDimensions[0] * self.matrixDimensions[1])
-        for line in range(self.matrixDimensions[0]):
-            for col in range(self.matrixDimensions[1]):
-                self.currentHistogramPixels[self.imageMatrixACropped[line,col] * self.matrixDimensions[0] + self.imageMatrixBCropped[line,col]] += 1
 
     def moveImageB(self, currentX, currentY, dM, axeName):
         imageMatrixBCoppedMoved = self.imageMatrixBCropped
