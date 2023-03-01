@@ -4,15 +4,22 @@ import matplotlib.pyplot as plt
 from time import time
 
 class ImageAlignment():
+    """
+    L'image A est toujours la même.
+    On décale l'image B est on calcul la NMI entre les deux images
+
+    FAIRE UN HISTOGRAMME
+    https://numpy.org/doc/stable/reference/generated/numpy.histogram.html
+    """
 
     def __init__(self, imageNameA, imageNameB):
-        self.imageNameA = imageAName
-        self.imageNameB = imageBName
+        self.imageNameA = imageNameA
+        self.imageNameB = imageNameB
 
         self.imageA = None
         self.imageB = None
 
-        # matrice des pixels
+        # matrice des pixels pour chaque image
         self.imageMatrixA = None
         self.imageMatrixB = None
 
@@ -25,7 +32,8 @@ class ImageAlignment():
         self.imageMatrixACropped = None
         self.imageMatrixBCropped = None
 
-        # retiens les NMI pour chaque pos
+        # retiens les NMI pour chaque décalage possible
+        # entre l'image A et l'image B
         self.mapNMIPos = None
 
         # histogramme (valeur de pixel : occurence)
@@ -46,6 +54,7 @@ class ImageAlignment():
         self.imageMatrixB = np.asarray(self.imageB)
 
         self.matrixDimensions = self.imageMatrixB.shape
+
         self.mapNMIPos = [0] * (self.matrixDimensions[0] * self.matrixDimensions[1])
 
     def setCrop(self, cropValue):
@@ -55,15 +64,15 @@ class ImageAlignment():
         """
         Crop l'image A
         """
-        self.imageMatrixACropped = self.imageMatrixA[self.crop:-self.crop,self.crop:-self.crop]
+        self.imageMatrixACropped = self.imageMatrixA[self.cropValue:-self.cropValue,self.cropValue:-self.cropValue]
 
     def cropImageMatrixB(self, depv, deph):
         """
         Image cropped en (-1, +1) en x et en y
         """
         self.imageMatrixBCropped = self.imageMatrixA[
-                                    self.crop + deph - 1:-self.crop + deph + 1,
-                                    self.crop + depv - 1:-self.crop + depv + 1]
+                                    self.cropValue + deph - 1:-self.cropValue + deph + 1,
+                                    self.cropValue + depv - 1:-self.cropValue + depv + 1]
 
     def initDefaultHistogramImageB(self):
         self.currentHistogramPixels = [0] * (self.matrixDimensions[0] * self.matrixDimensions[1])
@@ -92,7 +101,7 @@ class ImageAlignment():
 
         return (toAdd, toRemove)
 
-    def registration(niter=100, depv=0, deph=0):
+    def registration(self, niter=100, depv=0, deph=0):
         # Im1cent: partie centrale de l'image 1 (2D np array)
         # Im2array: image 2 (2D np array)
         # niter: nombre d'itérations (default: 100)
