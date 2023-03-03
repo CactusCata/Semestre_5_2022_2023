@@ -79,7 +79,7 @@ class Window():
         y2 = self.canvas.coords(self.img_move_id)[1]
         return ((x1, y1), (x2, y2))
 
-    def on_screen_resize(self, root_width, root_height, width, height):
+    def on_screen_resize(self, width, height):
         total_extremities = self.get_total_extremities()
 
         x2 = total_extremities[1][0]
@@ -94,10 +94,13 @@ class Window():
             dy = height - (y2 + window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME)
 
         if (dx != 0 or dy != 0):
-            self.move_window(root_width, root_height, dx, dy)
+            self.move_window(dx, dy)
+
+    def getCanvas(self):
+        return self.canvas
 
 
-    def move_window(self, root_width, root_height, dx, dy):
+    def move_window(self, dx, dy):
         """
         Permet de déplacer la fenetre virtuelle
         """
@@ -112,19 +115,22 @@ class Window():
         if (x1 + dx < window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME): # trop à gauche
             dx = x1 - window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME
 
-        elif (x2 + dx > root_width - window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME): #trop à droite
-            dx = root_width - (x2 + window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME)
+        elif (x2 + dx > window_utils.CURRENT_ROOT_WIDTH - window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME): #trop à droite
+            dx = window_utils.CURRENT_ROOT_WIDTH - (x2 + window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME)
 
         if (y1 + dy < window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME): # trop en haut
             dy = y1 - window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME
 
-        elif (y2 + dy > root_height - window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME): # trop en bas
-            dy = root_height - (y2 + window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME)
+        elif (y2 + dy > window_utils.CURRENT_ROOT_HEIGHT - window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME): # trop en bas
+            dy = window_utils.CURRENT_ROOT_HEIGHT - (y2 + window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME)
 
 
         self.canvas.move(self.window_id, dx, dy)
 
         return (dx, dy)
+
+    def draw_pixel(self, x, y):
+        return self.canvas.create_rectangle(x, y, x, y)
 
     def expend_window_left_line(self, current_widget, dx):
         x_cross = self.canvas.coords(self.img_move_id)[0]
@@ -138,6 +144,7 @@ class Window():
             dx = window_utils.MIN_DISTANCE_BETWEEN_WINDOW_AND_FRAME - x_cross
         elif (x2 - (x1 + dx) < window_utils.MIN_GAP_BETWEEN_BOUNDS):
             dx = x1 - x2 + window_utils.MIN_GAP_BETWEEN_BOUNDS
+
         self.canvas.move(current_widget, dx, 0)
         self.canvas.coords(self.window_lines_id[1], x1 + dx, line_north_coords[1], line_north_coords[2], line_north_coords[3])
         self.canvas.coords(self.window_lines_id[2], x1 + dx, line_south_coords[1], line_south_coords[2], line_south_coords[3])

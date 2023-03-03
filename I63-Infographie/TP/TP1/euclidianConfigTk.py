@@ -56,6 +56,9 @@ class EuclidianConfigTk():
         button_draw_segements = Button(self.root, text="Dessiner les segement", command=self.draw_segement)
         button_draw_segements.pack()
 
+        button_clear_figures = Button(self.root, text="Supprimer", command=self.clear_figures)
+        button_clear_figures.pack()
+
         self.root.bind("<Return>", lambda event: self.addScreenSpaceTk())
 
     def set_window_manager(self, window_manager):
@@ -82,6 +85,10 @@ class EuclidianConfigTk():
             coefs.append(int(coef_str))
         return coefs
 
+    def clear_figures(self):
+        for screenSpaceTk in self.window_manager.get_all_window():
+            screenSpaceTk.clear_figures()
+
     def draw_segement(self):
         if (self.entry_segements.get() == ""):
             messagebox.showerror(title="Erreur segement", message="Veuillez entrer deux points")
@@ -94,7 +101,7 @@ class EuclidianConfigTk():
         max_x = int(self.entry_max_x.get())
         max_y = int(self.entry_max_y.get())
 
-        for screenSpaceTk in self.screenSpaces:
+        for screenSpaceTk in self.window_manager.get_all_window():
             for point_seg in points_segements:
                 screenSpaceTk.draw_segement(point_seg[0], point_seg[1], min_x, min_y, max_x, max_y)
 
@@ -110,7 +117,7 @@ class EuclidianConfigTk():
         max_y = int(self.entry_max_y.get())
         function_coefs = self.getCoefList()
 
-        for screenSpaceTk in self.screenSpaces:
+        for screenSpaceTk in self.window_manager.get_all_window():
             screenSpaceTk.draw_function(min_x, min_y, max_x, max_y, function_coefs)
 
     def strToPoints(self, sentence: str) -> list:

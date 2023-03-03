@@ -6,10 +6,18 @@ MIN_GAP_BETWEEN_BOUNDS = 10
 MIN_ROOT_WIDTH = 200
 MIN_ROOT_HEIGHT = 200
 
+CURRENT_ROOT_WIDTH = 0
+CURRENT_ROOT_HEIGHT = 0
+
 FLAG_WEST_LINE = "WEST_LINE"
 FLAG_NORTH_LINE = "NORTH_LINE"
 FLAG_MOUVABLE_LINE = "MOUVABLE_LINE"
 FLAG_IMG = "IMG"
+
+def set_root_dimensions(width: int, height: int) -> None:
+    global CURRENT_ROOT_WIDTH, CURRENT_ROOT_HEIGHT
+    CURRENT_ROOT_WIDTH = width
+    CURRENT_ROOT_HEIGHT = height
 
 def convert_window_id_to_flag(id: int) -> str:
     """

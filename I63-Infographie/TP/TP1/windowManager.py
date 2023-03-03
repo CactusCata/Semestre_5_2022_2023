@@ -30,6 +30,7 @@ class WindowManager():
 
         self.tk_width_pixel = tk_width_pixel
         self.tk_height_pixel = tk_height_pixel
+        window_utils.set_root_dimensions(self.tk_width_pixel, self.tk_height_pixel)
         self.root.minsize(width=window_utils.MIN_ROOT_WIDTH, height=window_utils.MIN_ROOT_HEIGHT)
         self.root.geometry(f"{tk_width_pixel}x{tk_height_pixel}")
 
@@ -78,7 +79,7 @@ class WindowManager():
 
             # User tried to move the window
             if (window_utils.have_flag(self.canvas, current_widget, window_utils.FLAG_IMG)):
-                self.windows[window_id].move_window(self.tk_width_pixel, self.tk_height_pixel, dx, dy)
+                self.windows[window_id].move_window(dx, dy)
                 self.last_move_point = (event.x, event.y)
                 return
 
@@ -106,6 +107,9 @@ class WindowManager():
         self.clicked = False
         self.last_move_point = (-1, -1)
 
+    def get_all_window(self):
+        return self.windows.values()
+
     def add_virtual_window(self, x1, y1, x2, y2):
         """
         Crée une fenetre virtuelle
@@ -129,7 +133,7 @@ class WindowManager():
         self.canvas.config(width=event.width, height=event.height)
 
         for window in self.windows.values():
-            window.on_screen_resize(self.tk_width_pixel, self.tk_height_pixel, event.width, event.height)
+            window.on_screen_resize(event.width, event.height)
 
     def getRoot(self):
         return self.root
