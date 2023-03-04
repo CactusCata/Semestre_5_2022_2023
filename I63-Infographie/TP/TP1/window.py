@@ -1,5 +1,6 @@
 import window_utils
 import imageManager
+from tkinter import Canvas
 
 class Window():
 
@@ -13,7 +14,19 @@ class Window():
              +-----------+ (x2, y2)
     """
 
-    def __init__(self, window_id, canvas, x1, y1, x2, y2):
+    def __init__(self, window_id: str, canvas: Canvas, x1: int, y1: int, x2: int, y2: int):
+        """
+        Créer une fenêtre virtuelle en ((x1,y1),(x2,y2)) où x1,y1,x2,y2 sont des positions de pixel
+        sur l'écran virtuel. (repère indirect)
+
+        :window_id: string correspondant à l'identifiant de la fenêtre (utile pour les differencier pour tkinter)
+        :canvas: instance du canvas de l'écran virtuel Tkinter
+        :x1: position en abscisse du pixel en haut à gauche de la fenêtre virtuelle
+        :y1: position en ordonnée du pixel en haut à gauche de la fenêtre virtuelle
+        :x2: position en abscisse du pixel en bas à droite de la fenêtre virtuelle
+        :x2: position en ordonnée du pixel en bas à droite de la fenêtre virtuelle 
+        """
+
         self.window_id = window_id
         self.canvas = canvas
 
@@ -36,6 +49,9 @@ class Window():
         canvas.itemconfig(self.img_move_id, tags=(self.window_id, window_utils.FLAG_IMG))
 
     def get_window_id(self) -> str:
+        """
+        Renvoie l'identifiant de la fenêtre virtuelle
+        """
         return self.window_id
 
     def get_rect_extremities(self) -> tuple:
@@ -97,12 +113,16 @@ class Window():
             self.move_window(dx, dy)
 
     def getCanvas(self):
+        """
+        Renvoie l'instance du canvas de l'écran virtuel Tkinter
+        """
         return self.canvas
 
 
     def move_window(self, dx, dy):
         """
-        Permet de déplacer la fenetre virtuelle
+        Simule le déplacement de la fenêtre virtuelle dans l'écran
+        virtuel
         """
 
         total_extremities = self.get_total_extremities()
@@ -130,9 +150,15 @@ class Window():
         return (dx, dy)
 
     def draw_pixel(self, x, y):
+        """
+        Dessine un pixel sur la fenêtre virtuelle
+        """
         return self.canvas.create_rectangle(x, y, x, y)
 
     def expend_window_left_line(self, current_widget, dx):
+        """
+        Simule l'élargissement de la fenêtre virtuelle sur la gauche
+        """
         x_cross = self.canvas.coords(self.img_move_id)[0]
         x1 = self.canvas.coords(self.window_lines_id[0])[0]
         x2 = self.canvas.coords(self.window_lines_id[3])[0]
@@ -151,6 +177,9 @@ class Window():
         self.canvas.move(self.img_move_id, dx, 0)
 
     def expend_window_top_line(self, current_widget, dy):
+        """
+        Simule l'élargissement de la fenêtre virtuelle vers le haut
+        """
         y_cross = self.canvas.coords(self.img_move_id)[1]
         y1 = self.canvas.coords(self.window_lines_id[0])[1]
         y2 = self.canvas.coords(self.window_lines_id[3])[3]

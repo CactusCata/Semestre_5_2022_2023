@@ -12,8 +12,11 @@ class GeoViewerWindow(Window):
         # à l'écran
         self.last_pixel_drew_id = []
 
-        # Ensemble des coordonnées de l'espace euclidien
-        self.last_coords_eu = []
+        # Ensemble des coordonnées de l'espace euclidien pour les polynomes
+        self.last_coords_poly_eu = []
+        # Ensemble contenant les positions des points extrémités des segements
+        # de l'espace euclidien
+        self.last_coords_segements_eu = []
 
         # Echelle mathématique pour qu'on ai:
         #
@@ -29,33 +32,23 @@ class GeoViewerWindow(Window):
         self.last_max_y = -1
 
     def clear_figures(self):
+        """
+        Supprime tous les points sur l'écran virtuel
+        """
         if (len(self.last_pixel_drew_id) != 0):
             self.delete_old_drew_points()
-            self.last_coords_eu.clear()
+            self.last_coords_poly_eu.clear()
+            self.last_coords_segements_eu.clear()
 
     def on_window_expend(self):
         """
-        Permet de mettre à jour les points de la courbe si la fenêtre
-        est étendue.
-
-        - Supprime tous les anciens points
-        - Calcul
+        Evenement déclanché lorsque l'utilisateur étent la fenêtre virtuelle.
+        Met à jour les points de la courbe si la fenêtre est étendue.
         """
         if (len(self.last_pixel_drew_id) != 0):
             self.delete_old_drew_points()
-
-            window_extremities = super().get_rect_extremities()
-            coords_screen = mathUtils.fromEuclidienToScreen(self.last_coords_eu,
-                self.last_min_x, self.last_min_y, self.last_max_x, self.last_max_y,
-                window_extremities[0][0],
-                window_extremities[0][1],
-                window_extremities[1][0],
-                window_extremities[1][1]
-                )
-
-            for coord in coords_screen:
-                pixel_id = super().draw_pixel(coord[0], coord[1])
-                self.last_pixel_drew_id.append(pixel_id)
+            self.redraw_polynoms()
+            self.redraw_segements()
 
     def expend_window_left_line(self, current_widget, dx):
         """
@@ -85,15 +78,32 @@ class GeoViewerWindow(Window):
 
     def delete_old_drew_points(self):
         """
-        Supprime tous les points de l'espace écran déssinés
+        Supprime tous les points de l'espace écran déssinés précédemment
         """
         for pixel_drew_id in self.last_pixel_drew_id:
             super().getCanvas().delete(pixel_drew_id)
         self.last_pixel_drew_id.clear()
 
+    def euclidian_space_dim_changed(self, min_x: int, min_y: int, max_x: int, max_y: int):
+        """
+        min_x: correspond au x à gauche de la fenêtre
+        min_y: correspond au y en bas de la fenêtre
+        max_x: correspond au x à droite de la fenêtre
+        max_y: correspond au y en haut de la fenêtre
+        """
+        self.last_min_x = min_x
+        self.last_min_y = min_y
+        self.last_max_x = max_x
+        self.last_max_y = max_y
+
+        if (len(self.last_pixel_drew_id) != 0):
+            self.delete_old_drew_points()
+            self.redraw_polynoms()
+            self.redraw_segements()
+
     def compute_f(self, function_coefs, x_start, x_end):
         """
-        Calcul l'ensemble E = {f(x) | x E [x_start;x_end]}
+        Calcul l'ensemble E = {f(x) | x E [x_start;x_end]} d'une fonction polynomiale
         """
 
         pas_x = (self.last_max_x - self.last_min_x) / window_utils.CURRENT_ROOT_WIDTH
@@ -105,39 +115,22 @@ class GeoViewerWindow(Window):
                 coords_eu.append((x, y))
             x += pas_x
         return coords_eu
-
-    def draw_function(self, min_x, min_y, max_x, max_y, function_coefs, x_start=None, x_end=None):
+    
+    def redraw_polynoms(self):
         """
-        Dessine une fonction polynomiale f:
-            min_x: correspond au x à gauche de la fenêtre
-            min_y: correspond au y en bas de la fenêtre
-            max_x: correspond au x à droite de la fenêtre
-            max_y: correspond au y en haut de la fenêtre
-            function_coefs: liste des coefficients du polynome
-            (x_start, x_end): permet de dessiner un portion de la courbe (de x_start à x_end)
+        Dessine les points des polynomes
         """
+        self.draw_polynom(self.last_coords_poly_eu)
 
-        if (x_start == None):
-            x_start = min_x
-        if (x_end == None):
-            x_end = max_x
-
-
-        self.last_min_x = min_x
-        self.last_min_y = min_y
-        self.last_max_x = max_x
-        self.last_max_y = max_y
-
-        # Delete old points
-        self.delete_old_drew_points()
-
-        # Compute f(x)
-        self.last_coords_eu.extend(self.compute_f(function_coefs, x_start, x_end))
+    def draw_polynom(self, polynom_points):
+        """
+        Dessine les point d'un polynome en particulier
+        """
 
         # from euclidian space to screen space
         window_extremities = super().get_rect_extremities()
-        coords_screen = mathUtils.fromEuclidienToScreen(self.last_coords_eu,
-            min_x, min_y, max_x, max_y,
+        coords_screen = mathUtils.fromEuclidienToScreen(polynom_points,
+            self.last_min_x, self.last_min_y, self.last_max_x, self.last_max_y,
             window_extremities[0][0],
             window_extremities[0][1],
             window_extremities[1][0],
@@ -148,6 +141,30 @@ class GeoViewerWindow(Window):
         for coord in coords_screen:
             pixel_id = super().draw_pixel(coord[0], coord[1])
             self.last_pixel_drew_id.append(pixel_id)
+
+    def add_polynom(self, function_coefs, x_start=None, x_end=None):
+        """
+        Dessine une fonction polynomiale f:
+
+            function_coefs: liste des coefficients du polynome
+            (x_start, x_end): permet de dessiner un portion de la courbe (de x_start à x_end)
+        """
+
+        if (x_start == None):
+            x_start = self.last_min_x
+        if (x_end == None):
+            x_end = self.last_max_x
+
+
+        # Delete old points
+        #self.delete_old_drew_points()
+
+        polynom_points = self.compute_f(function_coefs, x_start, x_end)
+
+        # Compute f(x)
+        self.last_coords_poly_eu.extend(polynom_points)
+
+        self.draw_polynom(polynom_points)
 
     def draw_segement_Bresenham(self, xa, ya, xb, yb):
         """
@@ -195,24 +212,45 @@ class GeoViewerWindow(Window):
 
         return pixels_coord
 
-    def draw_segement(self, pointA, pointB, min_x, min_y, max_x, max_y):
+    def redraw_segements(self):
+        """
+        Redessine tous les segements
+        """
+        for i in range(0, len(self.last_coords_segements_eu), 2):
+            pointA = self.last_coords_segements_eu[i]
+            pointB = self.last_coords_segements_eu[i+1]
+            self.draw_segement(pointA, pointB)
+
+    def draw_segement(self, pointA, pointB):
+        """
+        Dessine un unique segement allant du point A au point B
+        """
         window_extremities = super().get_rect_extremities()
-        coords_AB = mathUtils.fromEuclidienToScreen([pointA, pointB],
-            min_x, min_y, max_x, max_y,
+        coords_AB_sc = mathUtils.fromEuclidienToScreen([pointA, pointB],
+            self.last_min_x, self.last_min_y, self.last_max_x, self.last_max_y,
             window_extremities[0][0],
             window_extremities[0][1],
             window_extremities[1][0],
             window_extremities[1][1]
         )
         pixels_coord = self.draw_segement_Bresenham(
-            coords_AB[0][0], coords_AB[0][1],
-            coords_AB[1][0], coords_AB[1][1]
+            coords_AB_sc[0][0], coords_AB_sc[0][1],
+            coords_AB_sc[1][0], coords_AB_sc[1][1]
         )
-        print("wtf")
         for coord in pixels_coord:
             pixel_id = super().draw_pixel(coord[0], coord[1])
             self.last_pixel_drew_id.append(pixel_id)
 
+
+    def add_segement(self, pointA: tuple[int, int], pointB: tuple[int, int]):
+        """
+        Dessine un nouveau segement sur la fenêtre virtuelle
+
+        :pointA: (xa, ya)
+        :pointB: (xb, yb)
+        """
+        self.last_coords_segements_eu.extend([pointA, pointB])
+        self.draw_segement(pointA, pointB)
 
     def draw_segement_old(self, pointA, pointB, min_x, min_y, max_x, max_y):
 

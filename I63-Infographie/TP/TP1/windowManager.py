@@ -1,12 +1,17 @@
 from tkinter import Tk, Canvas, Toplevel
-import imageManager
-from window import Window
 from geo_viewer_window import GeoViewerWindow
 import window_utils
 
 class WindowManager():
 
     def __init__(self, master=None, tk_width_pixel=500, tk_height_pixel=400):
+        """
+        Créer la fenêtre Tkinter associée au window manager, applique ses dimensions et bind des evenements.
+
+        :param master: La fenêtre mère
+        :param tk_width_pixel: La largeur de la fenêtre Tkinter en pixel
+        :param tk_height_pixel: La hauteur de la fenêtre Tkinter en pixel
+        """
         tk_width_pixel = max(tk_width_pixel, window_utils.MIN_ROOT_WIDTH)
         tk_height_pixel = max(tk_height_pixel, window_utils.MIN_ROOT_HEIGHT)
 
@@ -28,9 +33,7 @@ class WindowManager():
         else:
             self.root = Toplevel(master)
 
-        self.tk_width_pixel = tk_width_pixel
-        self.tk_height_pixel = tk_height_pixel
-        window_utils.set_root_dimensions(self.tk_width_pixel, self.tk_height_pixel)
+        window_utils.set_root_dimensions(tk_width_pixel, tk_height_pixel)
         self.root.minsize(width=window_utils.MIN_ROOT_WIDTH, height=window_utils.MIN_ROOT_HEIGHT)
         self.root.geometry(f"{tk_width_pixel}x{tk_height_pixel}")
 
@@ -43,9 +46,20 @@ class WindowManager():
         self.root.bind("<Configure>", lambda event: self.onRootResizeEvent(event))
 
     def start(self):
+        """
+        +----------------+
+        | Partie Tkinter |
+        +----------------+
+
+        Démarre la fenêtre Tkinter de la configuration de l'espace euclidien
+        """
         self.root.mainloop()
 
     def onMouseMoveEvent(self, event):
+        """
+        Evenement déclanché lorsque l'utilisateur bouge la souris
+        sur l'écran
+        """
         widgets = self.canvas.find_withtag("current")
         if (len(widgets) == 0):
             if (self.cursor_img_status != 0):
@@ -108,11 +122,15 @@ class WindowManager():
         self.last_move_point = (-1, -1)
 
     def get_all_window(self):
+        """
+        Renvoie la liste de toutes les fenêtres virtuelles du window manager
+        """
         return self.windows.values()
 
-    def add_virtual_window(self, x1, y1, x2, y2):
+    def add_virtual_window(self, x1: int, y1: int, x2: int, y2: int):
         """
-        Crée une fenetre virtuelle
+        Ajoute une fenêtre virtuelle au window manager qui sera définit
+        par les positions des pixels x1,y1,x2,y2:
 
         (x1, y1) +-----------+
                  |           |
@@ -136,7 +154,21 @@ class WindowManager():
             window.on_screen_resize(event.width, event.height)
 
     def getRoot(self):
+        """
+        +----------------+
+        | Partie Tkinter |
+        +----------------+
+
+        Renvoie l'instance de root
+        """
         return self.root
 
     def getCanvas(self):
+        """
+        +----------------+
+        | Partie Tkinter |
+        +----------------+
+
+        Renvoie l'instance du Canvas
+        """
         return self.canvas

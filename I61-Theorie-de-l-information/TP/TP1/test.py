@@ -3,6 +3,7 @@ from PIL import Image
 from time import time
 import sys
 import os
+from sortedList import SortedList
 
 def get_entropy(distribution):
     copiedDistribution = np.copy(distribution)
@@ -11,10 +12,10 @@ def get_entropy(distribution):
     product = np.multiply(distribution, logged)
     return -np.sum(product)
 
-def conjointe(histo1, histo2, biggestValue=256):
+def conjointe(imageMatrix1, imageMatrix2, biggestValue=256):
     # Flatten the distributions and stack them vertically
-    flat1 = histo1.flatten()
-    flat2 = histo2.flatten()
+    flat1 = imageMatrix1.flatten()
+    flat2 = imageMatrix2.flatten()
     stacked = np.stack((flat1, flat2), axis=-1)
 
     # Compute the joint distribution using bincount and np.ravel_multi_index
@@ -23,29 +24,48 @@ def conjointe(histo1, histo2, biggestValue=256):
 
     return joint
 
-def NMI(distribution1, imageMatrixHisto1, distribution2, imageMatrixHisto2, biggestValue=256):
-    start = time()
+def NMI(distribution1, imageMatrix1, distribution2, imageMatrix2, biggestValue=256):
     entropyIm1 = get_entropy(distribution1)
-    print(f"entropyIm1:\t\t {time() - start}s")
-
-    start = time()
     entropyIm2 = get_entropy(distribution2)
-    print(f"entropyIm2:\t\t {time() - start}s")
 
-    start = time()
-    conjointeIm1xIm2 = conjointe(imageMatrixHisto1, imageMatrixHisto2, biggestValue)
-    print(f"conjointeIm1xIm2:\t {time() - start}s")
-
-    start = time()
+    conjointeIm1xIm2 = conjointe(imageMatrix1, imageMatrix2, biggestValue)
     entropyIm1xIm2 = get_entropy(conjointeIm1xIm2)
-    print(f"entropyIm1xIm2:\t\t {time() - start}s")
-
 
     IM_Im1xIm2 = entropyIm1 + entropyIm2 - entropyIm1xIm2
 
     nmi = (2 * IM_Im1xIm2) / (entropyIm1 + entropyIm2)
 
     return nmi
+
+def search_best_shift(imageMatrix1, imageMatrix2, crop, maxValue, iteration=100):
+    binsSequence = [x for x in range(maxValue + 1)]
+    imageMatrix1Cropped = imageMatrix1[crop:-crop,crop:-crop]
+    imageMatrix1Cropped = imageMatrix1.flatten()
+    imageMatrixDistribution1, _ = np.histogram(imageMatrix1Cropped, bins=binsSequence, density=True)
+
+    activeNMI = SortedList(0)
+    imageMatrix2Cropped = imageMatrix2[crop:-crop,crop:-crop]
+    imageMatrix2Cropped = imageMatrix2.flatten()
+    imageMatrixDistribution2, _ = np.histogram(imageMatrix2Cropped, bins=binsSequence, density=True)
+    nmi = NMI(imageMatrixDistribution1, imageMatrix1Cropped, imageMatrixDistribution2, imageMatrix2Cropped, maxValue)
+    activeNMI.append((nmi, (0, 0)))
+
+    for i in range(iteration):
+        bestNMIInfo = activeNMI.array[-1]
+        bestNMIPos = bestNMIInfo[1]
+        print(f"Best pos is: {bestNMIPos} with NMI = {bestNMIInfo[0]}")
+    
+        for mvt in {(-1, 0), (1, 0), (0, -1), (0, 1)}:
+            dx = bestNMIPos[0] + mvt[0]
+            dy = bestNMIPos[1] + mvt[1]
+            imageMatrix2Cropped = imageMatrix2[crop+dx:-crop+dx,crop+dy:-crop+dy]
+            imageMatrix2Cropped = imageMatrix2.flatten()
+            imageMatrixDistribution2, _ = np.histogram(imageMatrix2Cropped, bins=binsSequence, density=True)
+            nmi = NMI(imageMatrixDistribution1, imageMatrix1Cropped, imageMatrixDistribution2, imageMatrix2Cropped, maxValue)
+            print(f"NMI for {(dx, dy)} = {nmi}")
+            activeNMI.append((nmi, (dx, dy)))
+
+        
 
 def compare_images(imageMatrix1, imageMatrix2, crop, maxValue):
     if (crop != 0):
@@ -105,7 +125,8 @@ if __name__ == "__main__":
         imageMatrix1 = np.asarray(image1)
         imageMatrix2 = np.asarray(image2)
         start = time()
-        nmi = compare_images(imageMatrix1, imageMatrix2, 200, 868)
+        print(f"Usualy NMI = {compare_images(imageMatrix1, imageMatrix2, 200, 868)}")
+        nmi = search_best_shift(imageMatrix1, imageMatrix2, 200, 868)
         print(f"NMI done in {time() - start}s")
         print(f"NMI = {nmi}")
     else:
