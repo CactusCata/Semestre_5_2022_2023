@@ -11,7 +11,7 @@ class EuclidianConfigTk():
         - y_max
     """
 
-    def __init__(self, x_min=-10, y_min=-10, x_max=10, y_max=10, function_coefs_str="1,0,0", points_segements_str="(1,3),(5,2):(7,3),(4,4)"):
+    def __init__(self, x_min=0, y_min=0, x_max=20, y_max=20, function_coefs_str="1,0,0", points_segements_str="(10,10),(18,12):(10,10),(12,18):(10,10),(18,8):(10,10),(12,2):(10,10),(2,13):(10,10),(8,2):(10,10),(2,8):(10,10),(8,20)"):
         """
         Créer une fenêtre Tkinter avec de nombreuses boites de dialogues et bouttons
         
@@ -179,10 +179,7 @@ class EuclidianConfigTk():
             point2X = int(point2XStr[1:])
             point2Y = int(point2YStr[:-1])
 
-            if (point1X < point2X):
-                points_segements.append(((point1X, point1Y), (point2X, point2Y)))
-            else:
-                points_segements.append(((point2X, point2Y), (point1X, point1Y)))
+            points_segements.append(((point1X, point1Y), (point2X, point2Y)))
 
         return points_segements
 

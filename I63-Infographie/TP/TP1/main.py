@@ -6,7 +6,7 @@ import imageManager
 if __name__ == "__main__":
     imageManager.load_images()
 
-    euclidianConfigTk = EuclidianConfigTk(-10, -10, 10, 10)
+    euclidianConfigTk = EuclidianConfigTk()
     imageManager.load_images_tk()
     windowManager = WindowManager(master=euclidianConfigTk.getRoot())
     euclidianConfigTk.set_window_manager(windowManager)
