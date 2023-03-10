@@ -12,6 +12,7 @@ CURRENT_ROOT_HEIGHT = 0
 FLAG_WEST_LINE = "WEST_LINE"
 FLAG_NORTH_LINE = "NORTH_LINE"
 FLAG_MOUVABLE_LINE = "MOUVABLE_LINE"
+FLAG_BEZIER_CONTROL_POINT = "BEZIER_CONTROL_POINT"
 FLAG_IMG = "IMG"
 
 def set_root_dimensions(width: int, height: int) -> None:
@@ -54,3 +55,120 @@ def get_window_id_from_widget(canvas, widget_id) -> int:
         if is_window_id(tag):
             return int(tag[1:-1])
     return -1
+
+def draw_segement_Bresenham(xa, ya, xb, yb):
+    """
+    Renvoie un ensemble de coordonnées pour l'espace écran
+    """
+    print(f"{(xa,ya)} à {(xb,yb)}")
+    pixels_coord = []
+    dx = xb - xa
+    dy = yb - ya
+
+    if (xb < xa): # Quartier 3,4,5,6
+        if (yb < ya): # Quartier 5,6
+            if (-dy < -dx): # Quartier 5
+                print("Quartier 5")
+                dec = -dx - 2 * -dy
+                x = xa
+                y = ya
+                while (x >= xb):
+                    pixels_coord.append((x, y))
+                    if dec < 0:
+                        dec += 2 * -dx
+                        y -= 1
+                    dec -= 2 * -dy
+                    x -= 1
+            else: # Quartier 6
+                print("Quartier 6")
+                dec = -dy + 2 * dx
+                x = xa
+                y = ya
+                while (y >= yb):
+                    pixels_coord.append((x, y))
+                    if dec < 0:
+                        dec += 2 * -dy
+                        x -= 1
+                    dec += 2 * dx
+
+                    y -= 1
+        else: # Quartier 3,4
+            if (dy < -dx): # Quartier 4
+                print("Quartier 4")
+                dec = -dx - 2 * dy
+                x = xa
+                y = ya
+                while (x >= xb):
+                    pixels_coord.append((x, y))
+                    if dec < 0:
+                        dec += 2 * -dx
+                        y += 1
+                    dec -= 2 * dy
+                    x -= 1
+            else: # Quartier 3
+                print("Quartier 3")
+                dec = dy + 2 * dx
+                x = xa
+                y = ya
+                while (y <= yb):
+                    pixels_coord.append((x, y))
+                    if dec < 0:
+                        dec += 2 * dy
+                        x -= 1
+                    dec -= 2 * -dx
+                    y += 1
+
+    else: # Quartier 1,2,7,8
+        if (yb < ya): # Quartier 7,8
+            if (-dy < dx): # Quartier 8
+                print("Quartier 8")
+                dec = dx + 2 * dy
+                x = xa
+                y = ya
+                while (x <= xb):
+                    pixels_coord.append((x, y))
+                    if dec < 0:
+                        dec += 2 * dx
+                        y -= 1
+                    dec += 2 * dy
+                    x += 1
+            else: # Quartier 7
+                print("Quartier 7")
+                dec = -dy + 2 * dx
+                x = xa
+                y = ya
+                while (y >= yb):
+                    pixels_coord.append((x, y))
+                    if dec < 0:
+                        dec -= 2 * dy
+                        x += 1
+                    dec -= 2 * dx
+                    y -= 1
+
+        else: # Quartier 1,2
+            if (dy < dx): # Quartier 1
+                print("Quartier 1")
+                dec = dx - 2 * dy
+                x = xa
+                y = ya
+                while (x <= xb):
+                    pixels_coord.append((x, y))
+                    if dec < 0:
+                        dec += 2 * dx
+                        y += 1
+                    dec -= 2 * dy
+                    x += 1
+            else: # Quartier 2
+                print("Quartier 2")
+                dec = dy - 2 * dx
+                x = xa
+                y = ya
+                while (y <= yb):
+                    pixels_coord.append((x, y))
+                    if dec < 0:
+                        dec += 2 * dy
+                        x += 1
+                    dec -= 2 * dx
+                    y += 1
+
+    return pixels_coord

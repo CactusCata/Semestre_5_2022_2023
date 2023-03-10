@@ -24,7 +24,7 @@ class Window():
         :x1: position en abscisse du pixel en haut à gauche de la fenêtre virtuelle
         :y1: position en ordonnée du pixel en haut à gauche de la fenêtre virtuelle
         :x2: position en abscisse du pixel en bas à droite de la fenêtre virtuelle
-        :x2: position en ordonnée du pixel en bas à droite de la fenêtre virtuelle 
+        :x2: position en ordonnée du pixel en bas à droite de la fenêtre virtuelle
         """
 
         self.window_id = window_id
@@ -149,11 +149,12 @@ class Window():
 
         return (dx, dy)
 
-    def draw_pixel(self, x, y):
+    def draw_pixel(self, x, y, color="black", size=0):
         """
         Dessine un pixel sur la fenêtre virtuelle
         """
-        return self.canvas.create_rectangle(x, y, x, y)
+        size //= 2
+        return self.canvas.create_rectangle(x-size, y-size, x+size, y+size, fill=color)
 
     def expend_window_left_line(self, current_widget, dx):
         """

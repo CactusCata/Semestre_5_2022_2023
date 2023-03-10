@@ -104,6 +104,10 @@ class WindowManager():
                 elif (window_utils.have_flag(self.canvas, current_widget, window_utils.FLAG_NORTH_LINE)):
                     self.windows[window_id].expend_window_top_line(current_widget, dy)
 
+            # User tried to move a bezier_control_point
+            if (window_utils.have_flag(self.canvas, current_widget, window_utils.FLAG_BEZIER_CONTROL_POINT)):
+                self.windows[window_id].move_bezier_control_point(current_widget, dy, dy)
+
             self.last_move_point = (event.x, event.y)
 
     def onLeftClickEvent(self):

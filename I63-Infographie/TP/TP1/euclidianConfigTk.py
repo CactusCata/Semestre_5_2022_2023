@@ -1,4 +1,5 @@
 from tkinter import Tk, Label, Entry, Button, messagebox
+import tkUtils
 
 class EuclidianConfigTk():
     """
@@ -11,10 +12,10 @@ class EuclidianConfigTk():
         - y_max
     """
 
-    def __init__(self, x_min=0, y_min=0, x_max=20, y_max=20, function_coefs_str="1,0,0", points_segements_str="(10,10),(18,12):(10,10),(12,18):(10,10),(18,8):(10,10),(12,2):(10,10),(2,13):(10,10),(8,2):(10,10),(2,8):(10,10),(8,20)"):
+    def __init__(self, x_min=0, y_min=0, x_max=20, y_max=20, function_coefs_str="1,0,0", points_segements_str="(10,10),(18,12):(10,10),(12,18):(10,10),(18,8):(10,10),(12,2):(10,10),(2,13):(10,10),(8,2):(10,10),(2,8):(10,10),(8,20)", points_bezier="(5,5):(5,15):(15,15):(15,5)"):
         """
         Créer une fenêtre Tkinter avec de nombreuses boites de dialogues et bouttons
-        
+
         :param x_min: x minimal de l'espace mathématique par défaut
         :param y_min: y minimal de l'espace mathématique par défaut
         :param x_max: x maximal de l'espace mathématique par défaut
@@ -74,6 +75,16 @@ class EuclidianConfigTk():
         button_draw_segements = Button(self.root, text="Dessiner les segement", command=self.draw_segement)
         button_draw_segements.pack()
 
+        label_points_bezier = Label(self.root, text="Points de la courbe de Bezier")
+        label_points_bezier.pack()
+        self.entry_points_bezier = Entry(self.root)
+        self.entry_points_bezier.insert(0, points_bezier)
+        self.entry_points_bezier.pack()
+        button_draw_points_bezier = Button(self.root, text="Dessiner points bezier", command=self.draw_bezier_control_points)
+        button_draw_points_bezier.pack()
+        button_draw_curve_bezier = Button(self.root, text="Dessiner courbe bezier", command=self.draw_bezier_curve)
+        button_draw_curve_bezier.pack()
+
         button_clear_figures = Button(self.root, text="Supprimer", command=self.clear_figures)
         button_clear_figures.pack()
 
@@ -110,10 +121,20 @@ class EuclidianConfigTk():
 
     def clear_figures(self):
         """
-        Nettoie chaque fenetre du window manager 
+        Nettoie chaque fenetre du window manager
         """
         for screenSpaceTk in self.window_manager.get_all_window():
             screenSpaceTk.clear_figures()
+
+    def draw_bezier_control_points(self):
+        points = tkUtils.get_list_serialized(self.entry_points_bezier.get())
+        for screenSpaceTk in self.window_manager.get_all_window():
+            screenSpaceTk.add_control_bezier_points(points)
+            screenSpaceTk.draw_control_bezier_points()
+
+    def draw_bezier_curve(self):
+        for screenSpaceTk in self.window_manager.get_all_window():
+            screenSpaceTk.draw_bezier_curve()
 
     def update_euclidian_dimensions(self):
         """

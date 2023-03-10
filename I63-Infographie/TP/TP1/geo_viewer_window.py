@@ -31,6 +31,9 @@ class GeoViewerWindow(Window):
         self.last_max_x = -1
         self.last_max_y = -1
 
+        self.points_bezier_eu = []
+        self.points_bezier_id = {}
+
     def clear_figures(self):
         """
         Supprime tous les points sur l'écran virtuel
@@ -39,6 +42,8 @@ class GeoViewerWindow(Window):
             self.delete_old_drew_points()
             self.last_coords_poly_eu.clear()
             self.last_coords_segements_eu.clear()
+            self.points_bezier_eu.clear()
+            self.points_bezier_id.clear()
 
     def on_window_expend(self):
         """
@@ -49,6 +54,8 @@ class GeoViewerWindow(Window):
             self.delete_old_drew_points()
             self.redraw_polynoms()
             self.redraw_segements()
+            self.draw_control_bezier_points()
+            self.draw_bezier_curve()
 
     def expend_window_left_line(self, current_widget, dx):
         """
@@ -84,6 +91,11 @@ class GeoViewerWindow(Window):
             super().getCanvas().delete(pixel_drew_id)
         self.last_pixel_drew_id.clear()
 
+    def move_bezier_control_point(current_widget, dx, dy):
+        self.points_bezier_id[point_id][0] += dx
+        self.points_bezier_id[point_id][1] += dy
+        super().getCanvas().move(point_id, dx, dy)
+
     def euclidian_space_dim_changed(self, min_x: int, min_y: int, max_x: int, max_y: int):
         """
         min_x: correspond au x à gauche de la fenêtre
@@ -101,6 +113,52 @@ class GeoViewerWindow(Window):
             self.redraw_polynoms()
             self.redraw_segements()
 
+    def add_control_bezier_points(self, points_control_bezier_eu):
+        self.points_control_bezier_eu = points_control_bezier_eu
+
+    def draw_control_bezier_points(self):
+        window_extremities = super().get_rect_extremities()
+        points_control_bezier_sc = mathUtils.fromEuclidienToScreen(self.points_control_bezier_eu,
+            self.last_min_x, self.last_min_y, self.last_max_x, self.last_max_y,
+            window_extremities[0][0],
+            window_extremities[0][1],
+            window_extremities[1][0],
+            window_extremities[1][1]
+        )
+        for point_control_bezier_sc in points_control_bezier_sc:
+            point_id = super().draw_pixel(point_control_bezier_sc[0], point_control_bezier_sc[1], size=3, color="blue")
+            self.last_pixel_drew_id.append(point_id)
+            self.points_bezier_id[point_id] = point_control_bezier_sc
+
+    def draw_bezier_curve(self):
+        points_bezier_curve_eu_amount = 20
+        points_bezier_curve_eu = []
+
+        n = len(self.points_control_bezier_eu)
+
+        for k in range(points_bezier_curve_eu_amount + 1):
+            points_bezier_matrix = []
+            for i in range(n):
+                points_bezier_matrix.append([self.points_control_bezier_eu[i]])
+            u = k / points_bezier_curve_eu_amount
+            for j in range(1, n):
+                for i in range(0, n - j):
+                    p1 = points_bezier_matrix[i][j-1]
+                    p1 = (u * p1[0], u * p1[1])
+                    p2 = points_bezier_matrix[i+1][j-1]
+                    p2 = ((1-u) * p2[0], (1-u) * p2[1])
+                    p = (p1[0] + p2[0], p1[1] + p2[1])
+                    points_bezier_matrix[i].append(p)
+
+            points_bezier_curve_eu.append(points_bezier_matrix[0][n-1])
+
+        old = points_bezier_curve_eu[0]
+        for i in range(1, len(points_bezier_curve_eu)):
+            self.draw_segement(old, points_bezier_curve_eu[i])
+            old = points_bezier_curve_eu[i]
+
+
+
     def compute_f(self, function_coefs, x_start, x_end):
         """
         Calcul l'ensemble E = {f(x) | x E [x_start;x_end]} d'une fonction polynomiale
@@ -115,7 +173,7 @@ class GeoViewerWindow(Window):
                 coords_eu.append((x, y))
             x += pas_x
         return coords_eu
-    
+
     def redraw_polynoms(self):
         """
         Dessine les points des polynomes
@@ -166,124 +224,6 @@ class GeoViewerWindow(Window):
 
         self.draw_polynom(polynom_points)
 
-    def draw_segement_Bresenham(self, xa, ya, xb, yb):
-        """
-        Renvoie un ensemble de coordonnées pour l'espace écran
-        """
-        print(f"{(xa,ya)} à {(xb,yb)}")
-        pixels_coord = []
-        dx = xb - xa
-        dy = yb - ya
-
-        if (xb < xa): # Quartier 3,4,5,6
-            if (yb < ya): # Quartier 5,6
-                if (-dy < -dx): # Quartier 5
-                    print("Quartier 5")
-                    dec = -dx - 2 * -dy
-                    x = xa
-                    y = ya
-                    while (x >= xb):
-                        pixels_coord.append((x, y))
-                        if dec < 0:
-                            dec += 2 * -dx
-                            y -= 1
-                        dec -= 2 * -dy
-                        x -= 1
-                else: # Quartier 6
-                    print("Quartier 6")
-                    dec = -dy + 2 * dx
-                    x = xa
-                    y = ya
-                    while (y >= yb):
-                        pixels_coord.append((x, y))
-                        if dec < 0:
-                            dec += 2 * -dy
-                            x -= 1
-                        dec += 2 * dx
-                        
-                        y -= 1
-            else: # Quartier 3,4
-                if (dy < -dx): # Quartier 4
-                    print("Quartier 4")
-                    dec = -dx - 2 * dy
-                    x = xa
-                    y = ya
-                    while (x >= xb):
-                        pixels_coord.append((x, y))
-                        if dec < 0:
-                            dec += 2 * -dx
-                            y += 1
-                        dec -= 2 * dy
-                        x -= 1
-                else: # Quartier 3
-                    print("Quartier 3")
-                    dec = dy + 2 * dx
-                    x = xa
-                    y = ya
-                    while (y <= yb):
-                        pixels_coord.append((x, y))
-                        if dec < 0:
-                            dec += 2 * dy
-                            x -= 1
-                        dec -= 2 * -dx
-                        y += 1
-
-        else: # Quartier 1,2,7,8
-            if (yb < ya): # Quartier 7,8
-                if (-dy < dx): # Quartier 8
-                    print("Quartier 8")
-                    dec = dx + 2 * dy
-                    x = xa
-                    y = ya
-                    while (x <= xb):
-                        pixels_coord.append((x, y))
-                        if dec < 0:
-                            dec += 2 * dx
-                            y -= 1
-                        dec += 2 * dy
-                        x += 1
-                else: # Quartier 7
-                    print("Quartier 7")
-                    dec = -dy + 2 * dx
-                    x = xa
-                    y = ya
-                    while (y >= yb):
-                        pixels_coord.append((x, y))
-                        if dec < 0:
-                            dec -= 2 * dy
-                            x += 1
-                        dec -= 2 * dx
-                        y -= 1
-
-            else: # Quartier 1,2
-                if (dy < dx): # Quartier 1
-                    print("Quartier 1")
-                    dec = dx - 2 * dy
-                    x = xa
-                    y = ya
-                    while (x <= xb):
-                        pixels_coord.append((x, y))
-                        if dec < 0:
-                            dec += 2 * dx
-                            y += 1
-                        dec -= 2 * dy
-                        x += 1
-                else: # Quartier 2
-                    print("Quartier 2")
-                    dec = dy - 2 * dx
-                    x = xa
-                    y = ya
-                    while (y <= yb):
-                        pixels_coord.append((x, y))
-                        if dec < 0:
-                            dec += 2 * dy
-                            x += 1
-                        dec -= 2 * dx
-                        y += 1
-
-        print(f"res = {pixels_coord}")
-        return pixels_coord
-
     def redraw_segements(self):
         """
         Redessine tous les segements
@@ -297,6 +237,7 @@ class GeoViewerWindow(Window):
     def draw_segement(self, pointA, pointB):
         """
         Dessine un unique segement allant du point A au point B
+        (A et B sont dans l'espace euclidien)
         """
         window_extremities = super().get_rect_extremities()
         coords_AB_sc = mathUtils.fromEuclidienToScreen([pointA, pointB],
@@ -306,7 +247,7 @@ class GeoViewerWindow(Window):
             window_extremities[1][0],
             window_extremities[1][1]
         )
-        pixels_coord = self.draw_segement_Bresenham(
+        pixels_coord = window_utils.draw_segement_Bresenham(
             coords_AB_sc[0][0], coords_AB_sc[0][1],
             coords_AB_sc[1][0], coords_AB_sc[1][1]
         )
@@ -315,7 +256,7 @@ class GeoViewerWindow(Window):
             self.last_pixel_drew_id.append(pixel_id)
 
 
-    def add_segement(self, pointA: tuple[int, int], pointB: tuple[int, int]):
+    def add_segement(self, pointA, pointB):
         """
         Dessine un nouveau segement sur la fenêtre virtuelle
 
