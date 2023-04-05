@@ -1,0 +1,8 @@
+a) implanter le code de la chain rule
+  a1) construction de l'hyper_cube à partir de l'OBS
+  a2) projection des dico
+  a3) chaine rule
+
+b) tester H(X^N)
+c) écrire IM(OBSXN -> OBSYN)
+d) tester IM(X^N -> Y^N) (données réelles)
