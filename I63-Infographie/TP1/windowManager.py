@@ -45,6 +45,19 @@ class WindowManager():
         self.root.bind("<ButtonRelease-1>", lambda event: self.onLeftClickReleaseEvent())
         self.root.bind("<Configure>", lambda event: self.onRootResizeEvent(event))
 
+        self.m = Menu(self.root, tearoff=0)
+        self.m.add_command(label="Ajouter un point de controle", command= lambda: self.add_control_point())
+        self.root.bind("<Button-3>", lambda event: self.test(event))
+
+        self.last_pos_mouse = (0, 0)
+
+
+    def test(self, event):
+        self.last_pos_mouse = (event.x_root, event.y_root)
+        self.m.tk_popup(event.x_root, event.y_root)
+
+    def add_control_point(self):
+        pass
 
     def start(self):
         """

@@ -1,6 +1,6 @@
 import window_utils
 import imageManager
-from tkinter import Canvas, Menu
+from tkinter import Canvas
 
 class Window():
 
@@ -47,15 +47,6 @@ class Window():
         canvas.itemconfig(self.window_lines_id[2], tags=(self.window_id,))
         canvas.itemconfig(self.window_lines_id[3], tags=(self.window_id,))
         canvas.itemconfig(self.img_move_id, tags=(self.window_id, window_utils.FLAG_IMG))
-
-
-
-        # Right click menu
-        self.menu_cmd = Menu(self.canvas, tearoff=False)
-
-        # Used to give px and py coords to commands options
-        self.canvas.bind("<Button-3>", lambda event: self.on_right_click_event(event))
-        self.last_pxpy_click = (0, 0)
 
     def get_window_id(self) -> str:
         """
@@ -158,13 +149,13 @@ class Window():
 
         return (dx, dy)
 
-    def draw_pixel(self, px, py, color="black", size=0, tags=()):
+    def draw_pixel(self, x, y, color="black", size=0, tags=()):
         """
         Dessine un pixel sur la fenêtre virtuelle
         """
         tags += (self.window_id,)
         size //= 2
-        return self.canvas.create_rectangle(px-size, py-size, px+size, py+size, fill=color, tags=tags)
+        return self.canvas.create_rectangle(x-size, y-size, x+size, y+size, fill=color, tags=tags)
 
     def expend_window_left_line(self, current_widget, dx):
         """
@@ -205,10 +196,3 @@ class Window():
         self.canvas.move(current_widget, 0, dy)
         self.canvas.coords(self.window_lines_id[0], line_ouest_coords[0], y1 + dy, line_ouest_coords[2], line_ouest_coords[3])
         self.canvas.coords(self.window_lines_id[3], line_est_coords[0], y1 + dy, line_est_coords[2], line_est_coords[3])
-
-    def add_command(self, cmd_name, cmd):
-        self.menu_cmd.add_command(label=cmd_name, command=lambda: cmd(self.last_pxpy_click[0], self.last_pxpy_click[1]))
-
-    def on_right_click_event(self, event):
-        self.last_pxpy_click = (event.x, event.y)
-        self.menu_cmd.tk_popup(event.x_root, event.y_root)

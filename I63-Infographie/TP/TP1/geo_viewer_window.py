@@ -1,12 +1,20 @@
 from window import Window
 import window_utils
 
+from segementsViewer import SegementsViewer
+from polynomsViewer import PolynomsViewer
+from bezier_viewer import BezierViewer
+
 import mathUtils
 
 class GeoViewerWindow(Window):
 
     def __init__(self, window_id, canvas, x1, y1, x2, y2):
         super().__init__(window_id, canvas, x1, y1, x2, y2)
+
+        self.segements = SegementsViewer(self)
+        self.polynom = PolynomsViewer(self)
+        self.bezier = BezierViewer(self)
 
         # Ensemble contenant les id des pixels dessinés
         # à l'écran
@@ -31,31 +39,27 @@ class GeoViewerWindow(Window):
         self.last_max_x = -1
         self.last_max_y = -1
 
-        self.points_bezier_eu = []
-        self.points_bezier_id = {}
+        self.points_control_bezier_sc = []
+        # Liste des identifiants des carrés (pixels) représentant les points de controle
+        # pour la courbe de Bezier  
+        self.points_bezier_id = []
 
     def clear_figures(self):
         """
         Supprime tous les points sur l'écran virtuel
         """
-        if (len(self.last_pixel_drew_id) != 0):
-            self.delete_old_drew_points()
-            self.last_coords_poly_eu.clear()
-            self.last_coords_segements_eu.clear()
-            self.points_bezier_eu.clear()
-            self.points_bezier_id.clear()
+        self.segements.clear_figures()
+        self.polynom.clear_figures()
+        self.bezier.clear_figures()
 
-    def on_window_expend(self):
+    def on_window_expend(self, dpx, dpy):
         """
         Evenement déclanché lorsque l'utilisateur étent la fenêtre virtuelle.
         Met à jour les points de la courbe si la fenêtre est étendue.
         """
-        if (len(self.last_pixel_drew_id) != 0):
-            self.delete_old_drew_points()
-            self.redraw_polynoms()
-            self.redraw_segements()
-            self.draw_control_bezier_points()
-            self.draw_bezier_curve()
+        self.segements.on_extend_sc(dpx, dpy)
+        self.polynom.on_extend_sc(dpx, dpy)
+        self.bezier.on_extend_sc(dpx, dpy)
 
     def expend_window_left_line(self, current_widget, dx):
         """
@@ -63,7 +67,7 @@ class GeoViewerWindow(Window):
         gauche.
         """
         super().expend_window_left_line(current_widget, dx)
-        self.on_window_expend()
+        self.on_window_expend(dx, 0)
 
     def expend_window_top_line(self, current_widget, dy):
         """
@@ -71,30 +75,15 @@ class GeoViewerWindow(Window):
         droite.
         """
         super().expend_window_top_line(current_widget, dy)
-        self.on_window_expend()
+        self.on_window_expend(0, dy)
 
-    def move_window(self, dx, dy):
-        """
-        Evenement déclanché lorsque l'utilisateur déplace le fenêtre.
-        """
-        final_dx_dy = super().move_window(dx, dy)
-        dx = final_dx_dy[0]
-        dy = final_dx_dy[1]
-        for last_line_drew_id in self.last_pixel_drew_id:
-            super().getCanvas().move(last_line_drew_id, dx, dy)
-
-    def delete_old_drew_points(self):
-        """
-        Supprime tous les points de l'espace écran déssinés précédemment
-        """
+    """
+    def move_bezier_control_point(self, current_widget, dx, dy):
         for pixel_drew_id in self.last_pixel_drew_id:
             super().getCanvas().delete(pixel_drew_id)
-        self.last_pixel_drew_id.clear()
-
-    def move_bezier_control_point(current_widget, dx, dy):
-        self.points_bezier_id[point_id][0] += dx
-        self.points_bezier_id[point_id][1] += dy
-        super().getCanvas().move(point_id, dx, dy)
+        super().getCanvas().move(current_widget, dx, dy)
+        self.redraw_bezier_curve()
+    """
 
     def euclidian_space_dim_changed(self, min_x: int, min_y: int, max_x: int, max_y: int):
         """
@@ -108,168 +97,57 @@ class GeoViewerWindow(Window):
         self.last_max_x = max_x
         self.last_max_y = max_y
 
-        if (len(self.last_pixel_drew_id) != 0):
-            self.delete_old_drew_points()
-            self.redraw_polynoms()
-            self.redraw_segements()
+        self.segements.on_dim_eu_changed()
+        self.polynom.on_dim_eu_changed()
+        self.bezier.on_dim_eu_changed()
 
-    def add_control_bezier_points(self, points_control_bezier_eu):
-        self.points_control_bezier_eu = points_control_bezier_eu
+    def get_min_x_eu(self):
+        return self.last_min_x
+    
+    def get_min_y_eu(self):
+        return self.last_min_y
+    
+    def get_max_x_eu(self):
+        return self.last_max_x
+    
+    def get_max_y_eu(self):
+        return self.last_max_y
+    
+    def get_segements_viewer(self):
+        return self.segements
+    
+    def get_polynom_viewer(self):
+        return self.polynom
+    
+    def get_bezier_viewer(self):
+        return self.bezier
 
-    def draw_control_bezier_points(self):
-        window_extremities = super().get_rect_extremities()
-        points_control_bezier_sc = mathUtils.fromEuclidienToScreen(self.points_control_bezier_eu,
-            self.last_min_x, self.last_min_y, self.last_max_x, self.last_max_y,
+    def is_out_of_bounds_eu(self, x, y):
+        """
+        Renvoie True si le point est en dehors de la fenêtre
+        """
+        return x < self.get_min_x_eu() or x >= self.get_max_x_eu() or y < self.get_min_y_eu() or y >= self.get_max_y_eu()
+        
+
+    def from_eu_to_sc(self, points):
+        window_extremities = self.get_rect_extremities()
+        return mathUtils.fromEuclidienToScreen(points,
+            self.get_min_x_eu(), self.get_min_y_eu(), 
+            self.get_max_x_eu(), self.get_max_y_eu(),
             window_extremities[0][0],
             window_extremities[0][1],
             window_extremities[1][0],
             window_extremities[1][1]
         )
-        for point_control_bezier_sc in points_control_bezier_sc:
-            point_id = super().draw_pixel(point_control_bezier_sc[0], point_control_bezier_sc[1], size=3, color="blue")
-            self.last_pixel_drew_id.append(point_id)
-            self.points_bezier_id[point_id] = point_control_bezier_sc
 
-    def draw_bezier_curve(self):
-        points_bezier_curve_eu_amount = 20
-        points_bezier_curve_eu = []
-
-        n = len(self.points_control_bezier_eu)
-
-        for k in range(points_bezier_curve_eu_amount + 1):
-            points_bezier_matrix = []
-            for i in range(n):
-                points_bezier_matrix.append([self.points_control_bezier_eu[i]])
-            u = k / points_bezier_curve_eu_amount
-            for j in range(1, n):
-                for i in range(0, n - j):
-                    p1 = points_bezier_matrix[i][j-1]
-                    p1 = (u * p1[0], u * p1[1])
-                    p2 = points_bezier_matrix[i+1][j-1]
-                    p2 = ((1-u) * p2[0], (1-u) * p2[1])
-                    p = (p1[0] + p2[0], p1[1] + p2[1])
-                    points_bezier_matrix[i].append(p)
-
-            points_bezier_curve_eu.append(points_bezier_matrix[0][n-1])
-
-        old = points_bezier_curve_eu[0]
-        for i in range(1, len(points_bezier_curve_eu)):
-            self.draw_segement(old, points_bezier_curve_eu[i])
-            old = points_bezier_curve_eu[i]
-
-
-
-    def compute_f(self, function_coefs, x_start, x_end):
-        """
-        Calcul l'ensemble E = {f(x) | x E [x_start;x_end]} d'une fonction polynomiale
-        """
-
-        pas_x = (self.last_max_x - self.last_min_x) / window_utils.CURRENT_ROOT_WIDTH
-        x = x_start
-        coords_eu = []
-        while x <= x_end:
-            y = mathUtils.horner(x, function_coefs)
-            if self.last_min_y < y < self.last_max_y:
-                coords_eu.append((x, y))
-            x += pas_x
-        return coords_eu
-
-    def redraw_polynoms(self):
-        """
-        Dessine les points des polynomes
-        """
-        self.draw_polynom(self.last_coords_poly_eu)
-
-    def draw_polynom(self, polynom_points):
-        """
-        Dessine les point d'un polynome en particulier
-        """
-
-        # from euclidian space to screen space
-        window_extremities = super().get_rect_extremities()
-        coords_screen = mathUtils.fromEuclidienToScreen(polynom_points,
-            self.last_min_x, self.last_min_y, self.last_max_x, self.last_max_y,
-            window_extremities[0][0],
-            window_extremities[0][1],
-            window_extremities[1][0],
-            window_extremities[1][1]
-            )
-
-        # Draw f(x) in screen space
-        for coord in coords_screen:
-            pixel_id = super().draw_pixel(coord[0], coord[1])
-            self.last_pixel_drew_id.append(pixel_id)
-
-    def add_polynom(self, function_coefs, x_start=None, x_end=None):
-        """
-        Dessine une fonction polynomiale f:
-
-            function_coefs: liste des coefficients du polynome
-            (x_start, x_end): permet de dessiner un portion de la courbe (de x_start à x_end)
-        """
-
-        if (x_start == None):
-            x_start = self.last_min_x
-        if (x_end == None):
-            x_end = self.last_max_x
-
-
-        # Delete old points
-        #self.delete_old_drew_points()
-
-        polynom_points = self.compute_f(function_coefs, x_start, x_end)
-
-        # Compute f(x)
-        self.last_coords_poly_eu.extend(polynom_points)
-
-        self.draw_polynom(polynom_points)
-
-    def redraw_segements(self):
-        """
-        Redessine tous les segements
-        """
-        print(f"Points extremities des segements: {self.last_coords_segements_eu}")
-        for i in range(0, len(self.last_coords_segements_eu), 2):
-            pointA = self.last_coords_segements_eu[i]
-            pointB = self.last_coords_segements_eu[i+1]
-            self.draw_segement(pointA, pointB)
-
-    def draw_segement(self, pointA, pointB):
-        """
-        Dessine un unique segement allant du point A au point B
-        (A et B sont dans l'espace euclidien)
-        """
-        window_extremities = super().get_rect_extremities()
-        coords_AB_sc = mathUtils.fromEuclidienToScreen([pointA, pointB],
-            self.last_min_x, self.last_min_y, self.last_max_x, self.last_max_y,
+    def from_sc_to_eu(self, points):
+        window_extremities = self.get_rect_extremities()
+        return mathUtils.fromScreenToEuclidien(points,
+            self.get_min_x_eu(), self.get_min_y_eu(), 
+            self.get_max_x_eu(), self.get_max_y_eu(),
             window_extremities[0][0],
             window_extremities[0][1],
             window_extremities[1][0],
             window_extremities[1][1]
         )
-        pixels_coord = window_utils.draw_segement_Bresenham(
-            coords_AB_sc[0][0], coords_AB_sc[0][1],
-            coords_AB_sc[1][0], coords_AB_sc[1][1]
-        )
-        for coord in pixels_coord:
-            pixel_id = super().draw_pixel(coord[0], coord[1])
-            self.last_pixel_drew_id.append(pixel_id)
-
-
-    def add_segement(self, pointA, pointB):
-        """
-        Dessine un nouveau segement sur la fenêtre virtuelle
-
-        :pointA: (xa, ya)
-        :pointB: (xb, yb)
-        """
-        self.last_coords_segements_eu.extend([pointA, pointB])
-        self.draw_segement(pointA, pointB)
-
-    def draw_segement_old(self, pointA, pointB, min_x, min_y, max_x, max_y):
-
-        # calcul f(x) = ax + y
-        a = (pointB[1] - pointA[1]) / (pointB[0] - pointA[0])
-        b = pointA[1] - a * pointA[0]
-
-        self.draw_function(min_x, min_y, max_x, max_y, [a, b], pointA[0], pointB[0])
+        

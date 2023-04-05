@@ -27,7 +27,7 @@ if __name__ == "__main__":
         print(f"Creating profilling file...")
         stats = Stats(pr).dump_stats(filename='profiling.prof')
         print(f"Profilling file created !")
-        # Pour afficher le profile, utiliser la commande $ snakeviz profilling.prof
+        # Pour afficher le profile, utiliser la command $ snakeviz profilling.prof
         
     else:
         print(f"Unknow option \"{sys.argv[1]}\"")

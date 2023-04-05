@@ -1,0 +1,25 @@
+OpenGL
+
+Il existe 4 modes:
+
+1) Mode direct
+Calcul l'image à rendre sur l'écran à chaque rafraichissement
+
+2) Mode DisplayList
+Si ce qui est affiché à l'écran n'a pas besoin d'être re-calculé
+alors on le stock dans une liste d'openGL et la rendu se fait à
+chaque rafraichissement, sans nouveau calcul.
+
+3) VBO (Vertex Buffer Object) (et CBO pour Color Buffer Object)
+On utilise des buffers pour stocker les informations des sommets
+(plus rapide)
+on peut aussi mettre à jour
+
+4) VAO = plusieurs buffer dans un vbo 
+Pour mettre à jour dans notre liste: on choisi le VBO qu'on veut
+et on modifie dessus
+
+Question: Comment est définie la normale d'un sommet ?
+Il n'est pas nécéssaire d'avoir à la fois le sommet et la surface pour
+calculer la normale ? Donc seulement quand tous les points sont calculés,
+donc indépendance ne peut pas exister.

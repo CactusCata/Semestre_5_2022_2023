@@ -1,0 +1,6 @@
+OpenGL:
+    - bibliothèque orientée uniquement sur la spécification et la manipulation d'objets 2D/3D de leurs attributs
+    - Les opérations se font par l'intermédiaire de commande
+    - Les primitives sont définis par l'intermédiaire de sommet
+    - Les sommets sont définis par: une position, une normale, une couleur et une texture
+    - Chaque sommet est calculé indendamment (?)

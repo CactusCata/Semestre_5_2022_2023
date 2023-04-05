@@ -12,7 +12,7 @@ class EuclidianConfigTk():
         - y_max
     """
 
-    def __init__(self, x_min=0, y_min=0, x_max=1, y_max=1, function_coefs_str="1,0,0", points_segements_str="(10,10),(18,12):(10,10),(12,18):(10,10),(18,8):(10,10),(12,2):(10,10),(2,13):(10,10),(8,2):(10,10),(2,8):(10,10),(8,20)", points_bezier="(0,0):(0,1):(1,1):(1,0)"):
+    def __init__(self, x_min=0, y_min=0, x_max=20, y_max=20, function_coefs_str="1,0,0", points_segements_str="(10,10),(18,12):(10,10),(12,18):(10,10),(18,8):(10,10),(12,2):(10,10),(2,13):(10,10),(8,2):(10,10),(2,8):(10,10),(8,20)", points_bezier="(5,5):(5,15):(15,15):(15,5)"):
         """
         Créer une fenêtre Tkinter avec de nombreuses boites de dialogues et bouttons
 
@@ -80,7 +80,7 @@ class EuclidianConfigTk():
         self.entry_points_bezier = Entry(self.root)
         self.entry_points_bezier.insert(0, points_bezier)
         self.entry_points_bezier.pack()
-        button_draw_points_bezier = Button(self.root, text="Dessiner points bezier", command=self.add_bezier_control_points)
+        button_draw_points_bezier = Button(self.root, text="Dessiner points bezier", command=self.draw_bezier_control_points)
         button_draw_points_bezier.pack()
         button_draw_curve_bezier = Button(self.root, text="Dessiner courbe bezier", command=self.draw_bezier_curve)
         button_draw_curve_bezier.pack()
@@ -126,16 +126,15 @@ class EuclidianConfigTk():
         for screenSpaceTk in self.window_manager.get_all_window():
             screenSpaceTk.clear_figures()
 
-    def add_bezier_control_points(self):
+    def draw_bezier_control_points(self):
         points = tkUtils.get_list_serialized(self.entry_points_bezier.get())
-        print(f"Points are: {points}")
         for screenSpaceTk in self.window_manager.get_all_window():
-            screenSpaceTk.get_bezier_viewer().add_bezier_control_points_eu(points)
-            screenSpaceTk.get_bezier_viewer().draw_bezier_control_points()
+            screenSpaceTk.add_control_bezier_points(points)
+            screenSpaceTk.draw_control_bezier_points()
 
     def draw_bezier_curve(self):
         for screenSpaceTk in self.window_manager.get_all_window():
-            screenSpaceTk.get_bezier_viewer().draw()
+            screenSpaceTk.draw_bezier_curve()
 
     def update_euclidian_dimensions(self):
         """
@@ -160,9 +159,9 @@ class EuclidianConfigTk():
 
         points_segements = self.__convert_text_to_point_array(self.entry_segements.get())
 
-        for geo_viewer_window in self.window_manager.get_all_window():
-            geo_viewer_window.get_segements_viewer().add_segements_eu(points_segements)
-            geo_viewer_window.get_segements_viewer().draw()
+        for screenSpaceTk in self.window_manager.get_all_window():
+            for point_seg in points_segements:
+                screenSpaceTk.add_segement(point_seg[0], point_seg[1])
 
     def draw_polynom(self):
         """
@@ -174,11 +173,10 @@ class EuclidianConfigTk():
             messagebox.showerror(title="Erreur equation", message="Veuillez entrer une équation")
             return
 
-        all_coefs = self.__get_all_coefs_function()
+        function_coefs = self.__getCoefList()
 
-        for geo_viewer_window in self.window_manager.get_all_window():
-            geo_viewer_window.get_polynom_viewer().add_polynoms_eu(all_coefs)
-            geo_viewer_window.get_polynom_viewer().draw()
+        for screenSpaceTk in self.window_manager.get_all_window():
+            screenSpaceTk.add_polynom(function_coefs)
 
     #   +-------------------+
     #   | Fonctions privées |
@@ -189,40 +187,32 @@ class EuclidianConfigTk():
         Renvoie la liste des points contenue dans la boite à dialogue associée
         """
         points_segements = []
-        sentence = sentence.replace("(", "").replace(")", "")
 
         for pointStr in sentence.split(":"):
             pointStrArray = pointStr.split(",")
-            point1X = int(pointStrArray[0])
-            point1Y = int(pointStrArray[1])
-            point2X = int(pointStrArray[2])
-            point2Y = int(pointStrArray[3])
+            point1XStr = pointStrArray[0] # (x1
+            point1YStr = pointStrArray[1] # y1)
+            point2XStr = pointStrArray[2] # (x2
+            point2YStr = pointStrArray[3] # y2)
 
-            points_segements.append((point1X, point1Y))
-            points_segements.append((point2X, point2Y))
+            point1X = int(point1XStr[1:])
+            point1Y = int(point1YStr[:-1])
+            point2X = int(point2XStr[1:])
+            point2Y = int(point2YStr[:-1])
+
+            points_segements.append(((point1X, point1Y), (point2X, point2Y)))
 
         return points_segements
-    
-    def __get_all_coefs_function(self) -> list:
-        """
-        Renvoie la liste des coeficients pour
-        chaque fonction 
-        """
-        all_coefs = []
-        functions_text = self.entry_coef_poly.get().split(":")
-        for function_coefs_str in functions_text:
-            all_coefs.append(self.__getCoefList(function_coefs_str))
-        return all_coefs
 
-
-    def __getCoefList(self, coefs_str) -> list:
+    def __getCoefList(self) -> list:
         """
         Récupère la coefficiens dans la boite de dialogue "Coefficients du polynome"
         et renvoie la liste des coefficients dans le même ordre
         """
         coefs = []
 
-        coefs_str = coefs_str.split(",")
+        function_text = self.entry_coef_poly.get()
+        coefs_str = function_text.split(",")
         for coef_str in coefs_str:
             coefs.append(int(coef_str))
         return coefs

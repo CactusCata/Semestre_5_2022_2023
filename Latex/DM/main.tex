@@ -1,0 +1,333 @@
+\documentclass[10pt,a4paper]{scrartcl}
+
+%  +---------------------+
+%  |   PACKAGES IMPORT   |
+%  +---------------------+
+\usepackage[utf8]{inputenc} % encodage sur linux
+%\usepackage[latin1]{inputenc} % encodage sur windows
+\usepackage[T1]{fontenc} % Permet d'écrire avec des accents de la langue française
+\usepackage[english,french]{babel} % Assure les règles typographiques françaises par défaut et anglaise sinon
+\usepackage{textcomp} % Ajoute des caractères spéciaux
+\usepackage{mathtools} % Permet de rédiger des formules mathématiques (charge amsmath et corrige ses bugs)
+\usepackage{amssymb} % Ajoute des symboles en math
+\usepackage{lmodern} % Police d'écriture
+\usepackage{microtype} % Améliorations typographiques (A METTRE APRES UN PACKAGE DE POLICE D'ECRITURE)
+\usepackage{graphbox} % Permet d'ajouter des images (charge graphicx mais sans bugs)
+\usepackage[useregional]{datetime2} % Permet de faire la commande \today
+\usepackage{lipsum} % permet de générer du texte
+\usepackage{minted} % insère des blocs de code
+\usepackage{array} % Corrige des bugs graphiques pour les tableaux
+\usepackage{fancyhdr} % pour ajouter facilement des headers et footers
+\usepackage[dvipsnames]{xcolor}
+
+\usepackage{amsthm} % permet de creer des boites 
+\usepackage{graphicx}
+\usepackage{xkeyval}
+\usepackage{ifthen}
+\usepackage{ifpdf}
+\usepackage{etoolbox}
+\usepackage{tikz}
+\usepackage[tikz]{bclogo} % packages utilises pour le bclogo
+
+\usepackage{listings} % permet d'afficher du code
+\definecolor{codegreen}{rgb}{0.2,0.8,0.2}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\small,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python
+}
+
+\lstset{style=pythonstyle} % definition de l'affichage pour le python
+
+
+
+\usepackage{hyperref} % Permet l'ajout de lien (A TOUJOURS METTRE EN DERNIER)
+%  +--------------+
+%  |   COMMANDS   |
+%  +--------------+
+\newcommand{\citationFR}[1]{
+\og #1\fg
+}
+
+%  +------------+
+%  |   HEADER   |
+%  +------------+
+\title{Quaternions}
+\author{Chareyre Adam}
+\date{\today}
+
+%  +--------------------+
+%  |   PACKAGE CONFIG   |
+%  +--------------------+
+\hypersetup{hidelinks, pdfstartview=XYZ}
+\frenchsetup{StandardItemLabels=true}
+
+\pagestyle{fancy} % permet l'utilisation du package
+\fancyhead{} % clear tous ceux par defaut
+\fancyhead[L]{\leftmark} % L pour left
+\fancyhead[C]{\rightmark} % C pour center
+\fancyfoot[L]{Adam Chareyre}
+\fancyfoot[R]{\today} % R pour right
+\renewcommand{\footrulewidth}{0.4pt} % ajoute une ligne de separation text/footer
+
+
+%  +----------+
+%  |   BODY   |
+%  +----------+
+\begin{document}
+
+    \maketitle
+
+    \begin{abstract}
+        En mathématiques, le système de nombres quaternions étend les nombres complexes. Les quaternions ont été décrits pour la première fois par le mathématicien irlandais William Rowan Hamilton en 1843\cite{1}\cite{2} et appliqués à la mécanique dans un espace tridimensionnel. Hamilton a défini un quaternion comme le quotient de deux lignes dirigées dans un espace tridimensionnel\footnote{Hamilton. Hodges et Smith. 1853. p. 60. "quaternion quotient lignes espace temps tridimensionnel"} ou, de manière équivalente, comme le quotient de deux vecteurs\footnote{Hardy 1881. Ginn, Heath, \& co. 1881. p. 32. ISBN 9781429701860}. La multiplication des quaternions est non commutative.
+    \end{abstract}
+
+    \newpage
+    \tableofcontents
+    \newpage
+
+    \section{Introduction}
+
+        Les quaternions sont généralement représentés sous la forme: \[a + bi + cj + dk\] où a, b, c et d sont des nombres réels ; et 1, i, j et k sont les vecteurs de base ou les éléments de base\footnote{Curtis, Morton L. (1984), Matrix Groups (2e éd.), New York : Springer-Verlag, p. 10, ISBN 978-0-387-96074-6}.
+
+
+        \begin{table}
+            \renewcommand{\arraystretch}{1.2}
+            \renewcommand{\tabcolsep}{0.3cm}
+            \begin{center}
+                \begin{tabular}{|c|c|c|c|c|}
+                    \hline
+                      & 1 & i & j & k \\
+                    \hline
+                    1 & 1 & i & j & k \\
+                    \hline
+                    i & i & -1 & k & -j \\
+                    \hline
+                    j & j & -k & -1 & i \\
+                    \hline
+                    k & k & j & -i & -1 \\
+                    \hline
+                \end{tabular}
+                \caption{Quaternion multiplication table (Il s'agit d'une table de multiplication, et non d'une table de Cayley, car les inverses n'apparaissent pas dans les en-têtes de ligne ou de colonne.)}
+                \label{tab:my_label}
+            \end{center}
+        \end{table}
+        
+        Les quaternions sont utilisés en mathématiques pures, mais ont également des utilisations pratiques en mathématiques appliquées, en particulier pour les calculs impliquant des rotations tridimensionnelles, comme dans l'infographie tridimensionnelle, la vision par ordinateur et l'analyse de texture cristallographique\footnote{Kunze, Karsten ; Schaeben, Helmut (novembre 2004). "La distribution de Bingham des quaternions et sa transformée de radon sphérique dans l'analyse de texture". Géologie mathématique. 36 (8) : 917–943. doi:10.1023/B:MATG.0000048799.56445.59. S2CID 55009081}. Ils peuvent être utilisés parallèlement à d'autres méthodes de rotation, comme les angles d'Euler et les matrices de rotation, ou en remplacement de celles-ci, selon l'application.
+
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.3\textwidth,height=0.3\textwidth]{Cayley_Q8_quaternion_multiplication_graph}
+            \caption{Graphe de Cayley Q8 montrant les six cycles de multiplication par i, j et k.}
+            \label{fig:Cayley_Q8_quaternion_multiplication_graph}
+        \end{figure}
+
+        \begin{figure}
+            \centering
+            \includegraphics[width=0.3\textwidth,height=0.3\textwidth]{Quaternion_2}
+            \caption{Représentation graphique des produits d'unités quaternaires sous forme de rotations de $90\circ$ dans les plans de l'espace quadridimensionnel couverts par deux des {1, i, j, k}. On peut considérer que le facteur gauche est tourné par le facteur droit pour obtenir le produit. Visuellement, $i \times j = -(j \times i)$}
+            \label{fig:my_label}
+        \end{figure}
+
+        En langage mathématique moderne, les quaternions forment une algèbre de division associative normée à quatre dimensions sur les nombres réels, et donc un anneau, étant à la fois un anneau de division et un domaine.
+        L'algèbre des quaternions est souvent désignée par H (pour Hamilton), ou en gras tableau noir par $\mathbb{H}$.
+        Elle peut aussi être donnée par les classifications de l'algèbre de Clifford \[\operatorname{Cl}_{0,2}(\mathbb{R}) \cong \operatorname {Cl}_{3,0}^{+}(\mathbb{R})\]. En fait, c'est la première algèbre de division non commutative à être découverte.
+
+        Selon le théorème de Frobenius, l'algèbre $\mathbb{H}$ est l'un des deux seuls anneaux de division de dimension finie contenant un sous anneau propre isomorphe aux nombres réels, l'autre étant les nombres complexes. Ces anneaux sont également des algèbres de Hurwitz euclidiennes, dont les quaternions sont la plus grande algèbre associative (et donc le plus grand anneau). En étendant davantage les quaternions, on obtient les octonions non associatifs, qui sont la dernière algèbre de division normée sur les nombres réels. (Les sédénions, l'extension des octonions, ont zéro diviseur et ne peuvent donc pas être une algèbre de division normée)\footnote{Smith, Frank (Tony). "Why not sedenion?". Retrieved 8 June 2018.}.
+
+        Les quaternions unitaires peuvent être considérés comme un choix de structure de groupe sur la 3-sphère $S^3$ qui donne le groupe Spin(3), qui est isomorphe à SU(2) et aussi à la couverture universelle de SO(3).
+
+    \section{Histoire}
+
+    \begin{figure}
+        \centering
+        \includegraphics{discovery_of_Quaternions.jpg}
+        \caption{Plaque quaternaire sur le pont Brougham (Broom), Dublin, sur laquelle on peut lire : Ici, alors qu'il passaitle 16 octobre 1843 Sir William Rowan Hamilton dans un éclair de génie a découvert la formule fondamentale de la multiplication des quaternions $i^{2} = j^{2} = k^{2} = ijk = -1$ et l'a gravée sur une pierre de ce pont}
+        \label{fig:my_label1}
+    \end{figure}
+
+        Les quaternions ont été introduits par Hamilton en 1843.\footnote{See Hazewinkel, Gubareni \& Kirichenko 2004, p. 12} Parmi les précurseurs importants de ces travaux, on peut citer l'identité à quatre carrés d'Euler (1748) et la paramétrisation des rotations générales par quatre paramètres d'Olinde Rodrigues (1840), mais aucun de ces auteurs n'a traité les rotations à quatre paramètres comme une algèbre.\footnote{Conway \& Smith 2003, p. 9}\footnote{Bradley, Robert E.; Sandifer, Charles Edward (2007). Leonhard Euler: life, work and legacy. p. 193. ISBN 978-0-444-52728-8. They mention Wilhelm Blaschke's claim in 1959 that "the quaternions were first identified by L. Euler in a letter to Goldbach written on 4 May 1748," and they comment that "it makes no sense whatsoever to say that Euler "identified" the quaternions in this letter ... this claim is absurd.} Carl Friedrich Gauss avait également découvert les quaternions en 1819, mais ce travail n'a pas été publié avant 1900.\footnote{ Pujol, J., "Hamilton, Rodrigues, Gauss, Quaternions, and Rotations: A Historical Reassessment" Communications in Mathematical Analysis (2012), 13(2), 1–14}\footnote{Gauss, C.F. (1900). "Mutationen des Raumes [Transformations of space] (c. 1819)". In Martin Brendel (ed.). Carl Friedrich Gauss Werke [The works of Carl Friedrich Gauss]. Vol. 8. article edited by Prof. Stäckel of Kiel, Germany. Göttingen, DE: Königlichen Gesellschaft der Wissenschaften [Royal Society of Sciences]. pp. 357–361.}
+    
+        Hamilton savait que les nombres complexes pouvaient être interprétés comme des points dans un plan, et il cherchait un moyen de faire de même pour des points dans un espace tridimensionnel. Les points dans l'espace peuvent être représentés par leurs coordonnées, qui sont des triplets de nombres, et depuis de nombreuses années, il savait comment additionner et soustraire des triplets de nombres. Cependant, pendant longtemps, il était resté bloqué sur le problème de la multiplication et de la division. Il n'arrivait pas à comprendre comment calculer le quotient des coordonnées de deux points dans l'espace. En fait, Ferdinand Georg Frobenius a prouvé plus tard en 1877 que pour qu'une algèbre de division sur les nombres réels soit de dimension finie et associative, elle ne peut pas être tridimensionnelle, et il n'existe que trois algèbres de division de ce type : $\mathbb{R,C}$ (nombres complexes) et $\mathbb{H}$ (quaternions) qui ont respectivement une dimension de 1, 2 et 4.
+        
+        La grande percée des quaternions a finalement eu lieu le lundi 16 octobre 1843 à Dublin, alors que Hamilton se rendait à la Royal Irish Academy où il devait présider une réunion du conseil. Alors qu'il marchait sur le chemin de halage du Royal Canal avec sa femme, les concepts des quaternions prenaient forme dans son esprit. Lorsque la réponse lui est apparue, Hamilton n'a pas pu résister à l'envie de graver la formule des quaternions, \[i^{2} = j^{2} = k^{2} = ijk = -1\] dans la pierre du pont Brougham alors qu'il s'y arrêtait. Bien que la gravure ait disparu depuis, un pèlerinage annuel a lieu depuis 1989, appelé la marche de Hamilton, pour les scientifiques et les mathématiciens qui marchent de l'observatoire de Dunsink au pont du canal royal en souvenir de la découverte de Hamilton.
+
+        Le lendemain, Hamilton a écrit une lettre à son ami et collègue mathématicien, John T. Graves, décrivant le cheminement de ses pensées qui l'a conduit à sa découverte. Cette lettre a été publiée plus tard dans une lettre adressée au London, Edinburgh, and Dublin Philosophical Magazine and Journal of Science ;\footnote{Hamilton, W.R. (1844). "Letter". London, Edinburgh, and Dublin Philosophical Magazine and Journal of Science. Vol. xxv. pp. 489–495.} Hamilton déclare :
+
+        \citationFR{Et c'est là que m'est apparue l'idée que nous devons admettre, en quelque sorte, une quatrième dimension de l'espace pour calculer avec des triples... Un circuit électrique semble se fermer et une étincelle jaillit.}
+
+        Hamilton a appelé un quadruple avec ces règles de multiplication un quaternion, et il a consacré la majeure partie du reste de sa vie à les étudier et à les enseigner. Le traitement de Hamilton est plus géométrique que l'approche moderne, qui met l'accent sur les propriétés algébriques des quaternions. Il a fondé une école de "quaternionistes" et a tenté de populariser les quaternions dans plusieurs ouvrages. Le dernier et le plus long de ses livres, Elements of Quaternions\footnote{Hamilton, Sir W.R. (1866). Hamilton, W.E. (ed.). Elements of Quaternions. London: Longmans, Green, \& Co.}, comptait 800 pages ; il a été édité par son fils et publié peu après sa mort.
+
+        Après la mort de Hamilton, le physicien mathématicien écossais Peter Tait est devenu le principal défenseur des quaternions. À cette époque, les quaternions étaient un sujet d'examen obligatoire à Dublin. Les sujets de physique et de géométrie qui seraient désormais décrits à l'aide de vecteurs, tels que la cinématique dans l'espace et les équations de Maxwell, étaient entièrement décrits en termes de quaternions. Il existait même une association professionnelle de recherche, la Quaternion Society, consacrée à l'étude des quaternions et d'autres systèmes numériques hypercomplexes.
+
+        À partir du milieu des années 1880, les quaternions ont commencé à être remplacés par l'analyse vectorielle, qui avait été développée par Josiah Willard Gibbs, Oliver Heaviside et Hermann von Helmholtz. L'analyse vectorielle décrit les mêmes phénomènes que les quaternions, et emprunte donc généreusement certaines idées et terminologies à la littérature sur les quaternions. Cependant, l'analyse vectorielle était plus simple sur le plan conceptuel et plus propre sur le plan de la notation, et les quaternions ont fini par être relégués à un rôle mineur en mathématiques et en physique. Un effet secondaire de cette transition est que le travail de Hamilton est difficile à comprendre pour de nombreux lecteurs modernes. Les définitions originales de Hamilton ne sont pas familières et son style d'écriture était verbeux et difficile à suivre.
+
+        Cependant, les quaternions ont connu un regain d'intérêt depuis la fin du 20e siècle, principalement en raison de leur utilité dans la description des rotations spatiales. Les représentations des rotations par quaternions sont plus compactes et plus rapides à calculer que les représentations par matrices. En outre, contrairement aux angles d'Euler, ils ne sont pas susceptibles de se bloquer. C'est pourquoi les quaternions sont utilisés en infographie\footnote{Graphics. 19 (3) : 245–254. doi:10.1145/325165.325242. Présenté à SIGGRAPH '85.}\footnote{Tomb Raider (1996) est souvent cité comme le premier jeu informatique grand public à avoir utilisé des quaternions pour réaliser des rotations tridimensionnelles fluides. Voir, par exemple, Nick Bobick (juillet 1998). "Rotation d'objets à l'aide de quaternions". Game Developer.}, en vision par ordinateur, en robotique\footnote{McCarthy, J.M. (1990). An Introduction to Theoretical Kinematics (Introduction à la cinématique théorique). MIT Press. ISBN 978-0-262-13252-7.}, en théorie du contrôle, en traitement du signal, en contrôle d'attitude, en physique, en bio-informatique, en dynamique moléculaire, en simulations informatiques et en mécanique orbitale. Par exemple, il est courant que les systèmes de contrôle d'attitude des engins spatiaux soient commandés en termes de quaternions. Les quaternions ont reçu un nouvel élan de la part de la théorie des nombres en raison de leurs relations avec les formes quadratiques\footnote{Hurwitz, A. (1919), Vorlesungen über die Zahlentheorie der Quaternionen, Berlin : J. Springer, JFM 47.0106.01, concerning Hurwitz quaternions}.
+
+        \subsection{Quaternions dans la physique}
+            L'essai de P.R. Girard intitulé Le groupe des quaternions et la physique moderne\footnote{Girard, P.R. (1984). "The quaternion group and modern physics". European Journal of Physics. 5 (1): 25–32. Bibcode:1984EJPh....5...25G. doi:10.1088/0143-0807/5/1/007. S2CID 250775753.}, publié en 1984, aborde certains rôles des quaternions en physique. L'essai montre comment divers groupes de covariance physiques, à savoir \textbf{SO}(3), le groupe de Lorentz, le groupe de la théorie générale de la relativité, l'algèbre de Clifford \textbf{SU}(2) et le groupe conforme, peuvent facilement être reliés au groupe des quaternions dans l'algèbre moderne. Girard a commencé par discuter des représentations de groupes et par représenter certains groupes d'espace de la cristallographie. Il a ensuite abordé la cinématique du mouvement des corps rigides. Il a ensuite utilisé des quaternions complexes (biquaternions) pour représenter le groupe de Lorentz de la relativité restreinte, y compris la précession de Thomas. Il a cité cinq auteurs, à commencer par Ludwik Silberstein, qui a utilisé une fonction potentielle d'une variable quaternion pour exprimer les équations de Maxwell en une seule équation différentielle. En ce qui concerne la relativité générale, il a exprimé le vecteur de Runge-Lenz. Il a mentionné les biquaternions de Clifford (split-biquaternions) comme un exemple d'algèbre de Clifford. Enfin, en invoquant la réciproque d'un biquaternion, Girard a décrit les cartes conformes sur l'espace-temps. Parmi les cinquante références, Girard inclut Alexander Macfarlane et son Bulletin of the Quaternion Society. En 1999, il a montré comment les équations de la relativité générale d'Einstein pouvaient être formulées dans une algèbre de Clifford directement liée aux quaternions.\footnote{Girard, Patrick R. (1999). "Les équations d'Einstein et l'algèbre de Clifford" (PDF). Progrès dans les algèbres de Clifford appliquées. 9 (2) : 225–230. doi:10.1007/BF03042377. S2CID 122211720. Archivé de l'original (PDF) le 17 décembre 2010.}.
+
+            La découverte en 1924 qu'en mécanique quantique le spin d'un électron et d'autres particules de matière (appelées spinors) peut être décrit à l'aide de quaternions (sous la forme des célèbres matrices de spin de Pauli) a renforcé leur intérêt ; les quaternions ont aidé à comprendre comment les rotations d'électrons de 360° peuvent être distinguées de celles de 720° (le "truc de la plaque")\footnote{Huerta, John (27 septembre 2010). " Introduction aux quaternions " (PDF). Archivé (PDF) de l'original le 2014-10-21. Consulté le 8 juin 2018.}\footnote{Wood, Charlie (6 September 2018). "The Strange Numbers That Birthed Modern Algebra". Abstractions blog. Quanta Magazine.} En 2018, leur utilisation n'a pas supplanté celle des groupes de rotation\marginpar{Note 1 : Un point de vue plus personnel sur les quaternions a été écrit par Joachim Lambek en 1995. Il a écrit dans son essai Si Hamilton avait prévalu : les quaternions en physique : "Mon propre intérêt en tant qu'étudiant diplômé a été éveillé par le livre inspirant de Silberstein". Il conclut en déclarant : "Je crois fermement que les quaternions peuvent fournir un raccourci aux mathématiciens purs qui souhaitent se familiariser avec certains aspects de la physique théorique". Lambek, J. (1995). "If Hamilton had prevailed: Quaternions in physics". Math. Intelligencer. Vol. 17, no. 4. pp. 7–15.
+            doi:10.1007/
+            BF03024783.}.
+    \section{Définition}
+        Un quaternion est une expression de la forme \[a+b\textbf{i}+c\textbf{j}+d\textbf{k}\]\label{equation de base} où \textit{a}, \textit{b}, \textit{c}, \textit{d}, sont des nombres réels, et \textbf{i}, \textbf{j}, \textbf{k}, sont des symboles qui peuvent être interprétés comme des vecteurs unitaires pointant le long des trois axes spatiaux. En pratique, si l'un des a, b, c, d est égal à 0, le terme correspondant est omis ; si a, b, c, d sont tous nuls, le quaternion est le quaternion zéro, noté 0 ; si l'un des b, c, d est égal à 1, le terme correspondant est écrit simplement i, j, ou k.
+        Une structure de groupe multiplicative, appelée produit de Hamilton, désignée par juxtaposition, peut être définie sur les quaternions de la manière suivante :
+        \begin{itemize}
+            \item  Le quaternion réel \textbf{1} est l'élément d'identité.
+            \item Les quaternions \textbf{réels} commuent avec tous les autres quaternions, c'est-à-dire aq = qa pour tout quaternion q et tout quaternion réel a. En terminologie algébrique, cela revient à dire que le champ des quaternions réels est le centre de cette algèbre de quaternions.
+            \item Le produit est d'abord donné pour les éléments de base (voir la sous-section suivante), puis étendu à tous les quaternions en utilisant la propriété distributive et la propriété du centre des quaternions réels. Le produit de Hamilton n'est pas commutatif, mais associatif, et les quaternions forment donc une algèbre associative sur les nombres réels.
+            \item En outre, tout quaternion non nul possède un inverse par rapport au produit de Hamilton : 
+    
+            \begin{equation}
+            (a+b\mathbf{i}+c\mathbf{j}+d\mathbf{k})^{-1}={\frac{1}{a^{2}+b^{2}+c^{2}+d^{2}}}(a-b\mathbf{i}-c\mathbf{j}-d\mathbf{k})
+            \end{equation}\label{algebre de division}
+
+            Les quaternions forment donc une algèbre de division.
+        \end{itemize}
+
+    \section{Propriétés algébriques}
+        L'ensemble $\mathbb{H}$ de tous les quaternions est un espace vectoriel sur les nombres réels de dimension 4.\marginpar{Note 2 :  En comparaison, les nombres réels $\mathbb{R}$ ont une dimension 1, les nombres complexes $\mathbb{C}$ ont une dimension 2, et les octonions $\mathbb{O}$ ont une dimension 8.} La multiplication des quaternions est associative et se distribue sur l'addition des vecteurs, mais à l'exception du sous-ensemble scalaire, elle n'est pas commutative. Par conséquent, les quaternions $\mathbb{H}$ sont une algèbre associative non commutative sur les nombres réels. Même si $\mathbb{H}$ contient des copies des nombres complexes, il ne s'agit pas d'une algèbre associative sur les nombres complexes.
+
+        Comme il est possible de diviser les quaternions, ils forment une algèbre de division. Il s'agit d'une structure similaire à un champ, à l'exception de la non-commutativité de la multiplication. Les algèbres de division associatives à dimension finie sur les nombres réels sont très rares. Le théorème de Frobenius indique qu'il en existe exactement trois : $\mathbb{R}$ , $\mathbb{C}$ et $\mathbb{H}$. La norme fait des quaternions une algèbre normée, et les algèbres de division normées sur les nombres réels sont également très rares : le théorème de Hurwitz dit qu'il n'y en a que quatre : $\mathbb{R}$ , $\mathbb{C}$, $\mathbb{H}$, et $\mathbb{O}$ (les octonions). Les quaternions sont également un exemple d'algèbre de composition et d'algèbre de Banach unitaire.
+
+        \begin{bclogo}[couleur=green!20, epBord=2]{Théorème de Hurwitz}
+            En mathématiques, le théorème d'Hurwitz est un théorème d'Adolf Hurwitz (1859-1919), publié à titre posthume en 1923, qui résout le problème d'Hurwitz pour les algèbres non associatives réelles unidimensionnelles finies dotées d'une forme quadratique définie positive. Le théorème stipule que si la forme quadratique définit un homomorphisme dans les nombres réels positifs sur la partie non nulle de l'algèbre, alors l'algèbre doit être isomorphe aux nombres réels, aux nombres complexes, aux quaternions ou aux octonions. De telles algèbres, parfois appelées algèbres de Hurwitz, sont des exemples d'algèbres de composition.
+        \end{bclogo}
+    \section{Représentation matricielle}
+        Tout comme les nombres complexes, les quaternions peuvent être représentés sous forme de matrices. Il existe au moins deux façons de représenter les quaternions sous forme de matrices de telle sorte que l'addition et la multiplication des quaternions correspondent à l'addition et à la multiplication des matrices. L'une consiste à utiliser des matrices complexes 2 $\times$ 2 et l'autre des matrices réelles 4 $\times$ 4. Dans chaque cas, la représentation donnée fait partie d'une famille de représentations linéairement apparentées. Dans la terminologie de l'algèbre abstraite, il s'agit d'homomorphismes injectifs de $\mathbb{H}$ vers les anneaux matriciels M(2,\textbf{C}) et M(4,\textbf{R}), respectivement.
+        En utilisant des matrices complexes 2 $\times$ 2, et la relation vue en \ref{algebre de division} le quaternion $a + b\textbf{i} + c\textbf{j} + d\textbf{k}$ peut être représenté comme suit :
+
+        \begin{equation*}
+            \begin{bmatrix}
+                a+b\textbf{i} & c+d\textbf{i}\\
+                -c+d\textbf{i} & a-b\textbf{i}
+            \end{bmatrix}
+        \end{equation*}\label{matrice}
+
+        Notez que le "i" des nombres complexes est distinct du "i" des quaternions.
+
+        Cette représentation possède les propriétés suivantes :
+
+        \begin{enumerate}
+            \item La contrainte de deux quelconques de \textit{b}, \textit{c} et \textit{d} à zéro produit une représentation des nombres complexes. Par exemple, en fixant $c = d = 0$, on obtient une représentation matricielle complexe diagonale des nombres complexes, et en fixant $b = d = 0$, on obtient une représentation matricielle réelle.
+            \item La norme d'un quaternion (la racine carrée du produit avec son conjugué, comme pour les nombres complexes) est la racine carrée du déterminant de la matrice correspondante.
+            \item Le conjugué d'un quaternion correspond à la transposée conjuguée de la matrice.
+            \item Par restriction, cette représentation produit un isomorphisme entre le sous-groupe des quaternions unitaires et leur image SU(2). Topologiquement, les quaternions unitaires sont la sphère 3, donc l'espace sous-jacent de SU(2) est aussi une sphère 3. Le groupe \textbf{SU}(2) est important pour décrire le spin en mécanique quantique ; voir matrices de Pauli.
+            \item En remplaçant 1 par \textit{a}, i par \textit{b}, j par \textit{c} et k par \textit{d} et en supprimant les en-têtes des lignes et des colonnes, on obtient une représentation matricielle de l'équation vue en \ref{equation de base} à la page \pageref{equation de base}.
+        \end{enumerate}
+
+    \section{Théorème des quatre carrés de Lagrange}
+
+        \begin{bclogo}[couleur=green!20, epBord=2, logo=\bccube]{Théorème}
+            Les quaternions sont également utilisés dans l'une des preuves du théorème des quatre carrés de Lagrange en théorie des nombres, qui stipule que tout nombre entier non négatif est la somme de quatre carrés entiers. En plus d'être un théorème élégant en soi, le théorème des quatre carrés de Lagrange a des applications utiles dans des domaines mathématiques autres que la théorie des nombres, tels que la théorie de la conception combinatoire. La preuve basée sur les quaternions utilise les quaternions de Hurwitz, un sous-anneau de l'anneau de tous les quaternions pour lequel il existe un analogue de l'algorithme d'Euclide.
+        \end{bclogo}
+        
+    \section{Les quaternions comme paires de nombres complexes}
+        Les quaternions peuvent être représentés comme des paires de nombres complexes. De ce point de vue, les quaternions sont le résultat de l'application de la construction de Cayley-Dickson aux nombres complexes. Il s'agit d'une généralisation de la construction des nombres complexes comme paires de nombres réels.
+
+        Soit ${\mathbb C}^{2}$ un espace vectoriel à deux dimensions sur les nombres complexes. Choisissez une base constituée de deux éléments 1 et j (voir la matrice en \ref{matrice}). Un vecteur dans ${\mathbb C}^{2}$ peut être écrit en termes d'éléments de base 1 et \textbf{j} comme suit : \[(a+bi)1+(c+di)\textbf{j}\].
+
+        Si l'on définit \textbf{j}$^2$ = -1 et i\textbf{j} = \textbf{-j}i, on peut multiplier deux vecteurs en utilisant la loi distributive. L'utilisation de \textbf{k} comme notation abrégée pour le produit i\textbf{j} conduit aux mêmes règles de multiplication que les quaternions habituels. Par conséquent, le vecteur de nombres complexes ci-dessus correspond au quaternion vu en \ref{equation de base}. Si nous écrivons les éléments de ${\mathbb C}^{2}$ sous forme de paires ordonnées et les quaternions sous forme de quadruples, la correspondance est la suivante : \[(a+bi,c+di)\leftrightarrow (a,b,c,d)\].
+
+        \begin{bclogo}[couleur=blue!10, epBord=1, logo=\bcinfo]{Remarque}
+            Les quaternions sont "essentiellement" la seule algèbre centrale simple (ACS) (non triviale) sur les nombres réels, en ce sens que toute ACS sur les nombres réels est équivalente à Brauer soit aux nombres réels, soit aux quaternions. Explicitement, le groupe de Brauer des nombres réels consiste en deux classes, représentées par les nombres réels et les quaternions, où le groupe de Brauer est l'ensemble de toutes les ASC, jusqu'à la relation d'équivalence d'une ASC étant un anneau matriciel sur une autre. D'après le théorème d'Artin-Wedderburn (en particulier la partie de Wedderburn), les ASC sont toutes des algèbres de matrices sur une algèbre de division, et donc les quaternions sont la seule algèbre de division non triviale sur les nombres réels.
+
+            Les CSA - anneaux de dimension finie sur un corps, qui sont des algèbres simples (n'ayant pas d'idéaux à deux côtés non triviaux, comme pour les corps) dont le centre est exactement le corps - sont un analogue non commutatif des champs d'extension, et sont plus restrictifs que les extensions générales d'anneaux. Le fait que les quaternions soient les seuls CSA non triviaux sur les nombres réels (jusqu'à l'équivalence) peut être comparé au fait que les nombres complexes soient la seule extension finie non triviale des nombres réels.
+        \end{bclogo}
+    \section{Exemples de codes Python}
+
+        \subsection{Normalisation}
+        
+        \subsection{q\_mult}
+        \begin{lstlisting}
+            def q_mult(q1, q2):
+                w1, x1, y1, z1 = q1
+                w2, x2, y2, z2 = q2
+                w = w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2
+                x = w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2
+                y = w1 * y2 + y1 * w2 + z1 * x2 - x1 * z2
+                z = w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2
+                return w, x, y, z
+        \end{lstlisting}
+
+        \subsection{q\_conjugate}
+        \begin{lstlisting}
+            def q_conjugate(q):
+                w, x, y, z = q
+                return (w, -x, -y, -z)
+        \end{lstlisting}
+        
+        \subsection{qv\_mult}
+        \begin{lstlisting}
+            def qv_mult(q1, v1):
+                q2 = (0.0,) + v1
+                return q_mult(q_mult(q1, q2), q_conjugate(q1))[1:]
+        \end{lstlisting}
+        
+        \subsection{axisangle\_to\_q}
+        \begin{lstlisting}
+            def axisangle_to_q(v, theta):
+                v = normalize(v)
+                x, y, z = v
+                theta /= 2
+                w = cos(theta)
+                x = x * sin(theta)
+                y = y * sin(theta)
+                z = z * sin(theta)
+                return w, x, y, z
+        \end{lstlisting}
+        
+        \subsection{q\_to\_axisangle}
+        \begin{lstlisting}
+            def q_to_axisangle(q):
+                w, v = q[0], q[1:]
+                theta = acos(w) * 2.0
+                return normalize(v), theta
+        \end{lstlisting}
+        
+        \subsection{Exemple d'utilisation}
+        \begin{lstlisting}
+            x_axis_unit = (1, 0, 0)
+            y_axis_unit = (0, 1, 0)
+            z_axis_unit = (0, 0, 1)
+            r1 = axisangle_to_q(x_axis_unit, numpy.pi / 2)
+            r2 = axisangle_to_q(y_axis_unit, numpy.pi / 2)
+            r3 = axisangle_to_q(z_axis_unit, numpy.pi / 2)
+            
+            v = qv_mult(r1, y_axis_unit)
+            v = qv_mult(r2, v)
+            v = qv_mult(r3, v)
+            
+            print v
+            # output: (0.0, 1.0, 2.220446049250313e-16)
+    
+            v = qv_mult(r1, x_axis_unit)
+            v = qv_mult(r2, v)
+            v = qv_mult(r3, v)
+            
+            print v
+            # output: (4.930380657631324e-32, 2.220446049250313e-16, -1.0)
+        \end{lstlisting}
+
+    \bibliography{lib}
+    \bibliographystyle{plain}
+\end{document}
