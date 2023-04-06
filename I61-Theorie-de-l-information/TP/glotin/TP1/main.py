@@ -40,13 +40,12 @@ def build_hyper_cube(OBS:List[Tuple[float]]) -> Dict[Tuple,float]:
 
     hyper_cube = {}
     nb_seq = len(OBS)
-    nb_var = len(OBS[0])
 
-    for col in OBS:
-        if col in hyper_cube.keys():
-            hyper_cube[col] += 1
+    for seq in OBS:
+        if seq in hyper_cube.keys():
+            hyper_cube[seq] += 1
         else:
-            hyper_cube[col] = 1
+            hyper_cube[seq] = 1
 
     for n in hyper_cube.keys():
         hyper_cube[n] /= nb_seq
@@ -70,7 +69,7 @@ def reduce(hyper_cube:Dict[Tuple,float]) -> Dict[Tuple,float]:
             new_hyper_cube[key_reduced] += proba
     return new_hyper_cube
 
-def entropy(probabilities:List[float]):
+def entropy(probabilities:List[float]) -> float:
     """
     Calcul l'entropie de la variable aléatoire
     donnée en paramètre
@@ -93,76 +92,46 @@ def select_last_var_proba(hyper_cube:Dict[Tuple,float]) -> List[float]:
         X_i[index] += hyper_cube[key]
     return X_i
 
-
-def chain_rule2(XN:List[Tuple[float]]) -> float:
-    # Taille de la séquence de variables
-    n = len(XN)
-    s = 0
-    for i in range(n):
-        print("wow",XN)
-        X_i = XN[i] # peut être à changer (dans son ordre)
-        if len(XN) > 0:
-            s += join_entropy(X_i, XN) - chain_rule(XN[:-1])
-        else:
-            s += join_entropy(X_i, XN)
-    return s
-
-def chain_rule3(hyper_cube:List[Tuple[float]]) -> float:
-    """
-    S'appuie sur la propriété suivante:
-        H(X^n) = sum(i, 1, n, H(X_i,X^(i - 1)) - H(X^(i - 1)))
-    """
-    s = 0
-    reduced_hyper_cube = reduce(hyper_cube)
-    for i in range(len(hyper_cube.keys())):
-        if (len(tuple(hyper_cube.keys())[0])) > 1:
-            s += entropy(select_last_var_proba(hyper_cube)) + entropy(reduced_hyper_cube.values()) - chain_rule3(reduced_hyper_cube)
-        else:
-            s += entropy(select_last_var_proba(hyper_cube)) + entropy(reduced_hyper_cube.values())
-    return s
-
-
-def chain_rule(hyper_cube:List[Tuple[float]]) -> float:
-    """
-    S'appuie sur la propriété suivante:
-        H(X^n) = sum(i, 1, n, H(X_i,X^(i - 1)) - H(X^(i - 1)))
-    """
-    reduced_hyper_cube = reduce(hyper_cube)
-    print_dict(reduced_hyper_cube)
-    # Taille de la séquence de variables
-    X_i = [0, 0]
-    for key in hyper_cube.keys():
-        index = key[-1]
-        X_i[index] += hyper_cube[key]
+def chain_rule_real(hyper_cube:Dict[Tuple,float]) -> float:
+    variable_amount = len(tuple(hyper_cube.keys())[0])
+    if variable_amount == 1:
+        return entropy(hyper_cube.values())
 
     s = 0
-    for i in range(len(hyper_cube.keys())):
-        key = tuple(hyper_cube.keys())[i]
-        print(f"key = {key}")
-        if len(key) > 0:
-            s += join_entropy(key, reduced_hyper_cube) - chain_rule(reduced_hyper_cube)
-        else:
-            s += join_entropy(key, reduced_hyper_cube)
-    return s
+    for seq in hyper_cube.keys():
+        s += hyper_cube[seq] * log2(hyper_cube[seq])
+    
+    return -s
+
+def entropy_sequence(hyper_cube:Dict[Tuple,float]) -> float:
+    return entropy(hyper_cube.values())
+
+def info_mutuelle(XN_hc, YN_hc):
+    return entropy_sequence(XN_hc) + entropy_sequence(YN_hc) - 0
 
 if __name__ == "__main__":
-    OBS_1 = [   # Real 1, 2, 3, 4, 5, 6
-                (0, 1, 0, 0, 0, 1, 1), # X1
-                (0, 1, 1, 1, 0, 0, 0), # X2
-                (1, 0, 1, 0, 1, 1, 0), # X3
-                (1, 0, 1, 1, 0, 1, 0), # X4
+    XN = [
+    #    X1 X2 X3 X4
+        (0, 0, 1, 1), # t1
+        (1, 1, 0, 0), # t2
+        (0, 1, 1, 1), # t3
+        (0, 1, 0, 1), # t4
+        (0, 0, 1, 0), # t5
+        (1, 0, 1, 1), # t6
+        (1, 0, 0, 0)  # t7
     ]
 
-    OBS_1 = transpose(OBS_1)
-    hyper_cube = build_hyper_cube(OBS_1)
-    print_dict(hyper_cube)
-    print(chain_rule3(hyper_cube))
+    YN = [
+    #    Y1 Y2 Y3 Y4
+        (0, 1, 0, 1), # t1
+        (1, 0, 0, 1), # t2
+        (0, 0, 1, 1), # t3
+        (0, 0, 1, 1), # t4
+        (0, 1, 1, 0), # t5
+        (1, 0, 1, 0), # t6
+        (1, 0, 1, 0)  # t7
+    ]
 
-    """
-    hyper_cube_1 = build_hyper_cube(OBS_1)
-    print_dict(hyper_cube_1)
-
-    for i in range(6):
-        hyper_cube_1 = reduce(hyper_cube_1)
-        print_dict(hyper_cube_1)
-    """
+    XN_hc = build_hyper_cube(XN)
+    YN_hc = build_hyper_cube(YN)
+    
