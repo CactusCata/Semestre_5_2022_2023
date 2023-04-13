@@ -10,4 +10,4 @@ class Option:
         return self.window_dimensions
 
     def get_fov(self) -> int:
-        return fov
+        return self.fov

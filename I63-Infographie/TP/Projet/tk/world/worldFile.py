@@ -1,20 +1,20 @@
 import utils.fileUtils as fileUtils
 
-from map.map import Map
-from map.blockType import BlockType
+from world.world import World
+from world.blockType import BlockType
 
-def load_map_file(path:str) -> Map:
+def load_world_file(path:str) -> World:
     """
-    Charge une map depuis un fichier
+    Charge une world depuis un fichier
     """
     if not fileUtils.file_exist(path):
         print(f"The file with the path \"{path}\" was not found")
         exit()
 
-    map_matrix = []
+    world_matrix = []
 
-    file_map = open(path, "r")
-    file_lines = file_map.readlines()
+    file_world = open(path, "r")
+    file_lines = file_world.readlines()
     # For each line of file
     for file_line in file_lines:
         line_matrix = []
@@ -23,6 +23,7 @@ def load_map_file(path:str) -> Map:
         # For each character of the line (each char represent a bloc)
         for bloc_character in file_line:
             line_matrix.append(BlockType.get_block_type_from_char(bloc_character))
-        map_matrix.append(line_matrix)
+        world_matrix.append(line_matrix)
+    world = World(world_matrix)
 
-    return map_matrix
+    return world

@@ -1,6 +1,10 @@
-import map.mapFile as mapFile
+import world.worldFile as worldFile
+from world.world import World
 
 class Game:
 
     def __init__(self):
-        self.map = mapFile.load_map_file("../res/maps/map.dat")
+        self.world = worldFile.load_world_file("../res/worlds/world.dat")
+
+    def get_world(self) -> World:
+        return self.world
