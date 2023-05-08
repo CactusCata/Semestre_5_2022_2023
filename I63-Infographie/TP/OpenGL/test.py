@@ -2,6 +2,8 @@ from OpenGL.GL import *  # exception car prefixe systematique
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
+from PIL import Image
+
 from math import sqrt
 
 y = 0.0
@@ -18,6 +20,8 @@ day = 0
 year = 0
 
 bayer = True
+
+texture_id = 0
 
 def create_vect(A, B):
     return (B[0] - A[0], B[1] - A[1], B[2] - A[2])
@@ -55,6 +59,8 @@ def init():
 
     # Permet de rendre les faces avant, arrière ou les deux
     glEnable(GL_CULL_FACE)
+
+    glEnable(GL_TEXTURE_2D)
 
     # Permet l'application d'une matrice de Bayer pour
     # donner l'illusion de smooth pour une bande de couleur
@@ -159,7 +165,7 @@ def draw_pyramid(points):
     #glPushMatrix()
 
     # Exclu les faces arrières
-    glCullFace(GL_BACK)
+    #glCullFace(GL_BACK)
 
     colors = [(1.0, 0.0, 0.0),
               (1.0, 1.0, 0.0),
@@ -185,6 +191,19 @@ def draw_pyramid(points):
 
     #glPopMatrix()
 
+def draw_cube(x, z):
+    glBegin(GL_QUADS)
+    # Front face
+    coef = 0.5
+
+    # Top face
+    glTexCoord2f(0.0, 1.0); glNormal3f(0, 1, 0); glVertex3f(-coef + x,  0, -coef + z)
+    glTexCoord2f(0.0, 0.0); glNormal3f(0, 1, 0); glVertex3f(-coef + x,  0,  coef + z)
+    glTexCoord2f(1.0, 0.0); glNormal3f(0, 1, 0); glVertex3f( coef + x,  0,  coef + z)
+    glTexCoord2f(1.0, 1.0); glNormal3f(0, 1, 0); glVertex3f( coef + x,  0, -coef + z)
+
+    glEnd()
+
 def display():
     # Clear l'ecran
     # Clear le Z-buffer
@@ -193,13 +212,17 @@ def display():
 
     glPushMatrix()
     glTranslatef(x, y, z)
-    draw_plan(-10, 10, 1, 0.02)
+    #draw_plan(-10, 10, 1, 0.02)
     glRotatef(rot_x_cam, 1.0, 0.0, 0.0)
     glRotatef(rot_y_cam, 0.0, 1.0, 0.0)
     glRotatef(rot_z_cam, 0.0, 0.0, 1.0)
     glScalef(0.5, 0.5, 0.5)
-
     
+
+    for a in range(-100, 100):
+        for b in range(-100, 10):
+            draw_cube(a, b)
+    #glBindTexture(GL_TEXTURE_2D, 0) # Détacher la texture
 
     # pour le placement de la lune,
     # il ne  faut pas prendre en compte la
@@ -210,6 +233,7 @@ def display():
     # Avec une pile de matrice, on peut changer
     # l'état de la matrice courante avec un état antérieur
 
+    """
     draw_pyramid([
         (+0.0, +2.0, +0.0),
         (-1.0, +0.0, +1.0),
@@ -225,10 +249,27 @@ def display():
         (+5.5, +2.0, +1.5),
         (+6.5, +2.0, +1.5)
     ])
-
+    """
     glPopMatrix()
+    
+
 
     glutSwapBuffers()
+
+
+
+
+def load_texture(filename):
+    img = Image.open(filename)
+    img_data = img.tobytes("raw", "RGBX", 0, -1)
+    width, height = img.size
+    texture_id = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, texture_id)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img_data)
+    print(texture_id)
+    return texture_id
 
 def keyboard(key, _x, _y):
     global x, y, z, bayer, rot_x_cam, rot_y_cam, rot_z_cam
@@ -280,7 +321,7 @@ def reshape(width, height):
     glLoadIdentity()
     # angle, ratio, near, far
     gluPerspective(100, ar, 0.1, 20)
-    #glMatrixMode(GL_MODELVIEW)
+    glMatrixMode(GL_MODELVIEW)
     #glLoadIdentity()
     #gluLookAt(0.0, 0.0, -5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0)
 
@@ -301,5 +342,7 @@ if __name__ == "__main__":
     glutKeyboardFunc(keyboard)
 
     init()
-
+    texture_id = load_texture("ground_tile.png")
+    glBindTexture(GL_TEXTURE_2D, texture_id)
+    
     glutMainLoop()
