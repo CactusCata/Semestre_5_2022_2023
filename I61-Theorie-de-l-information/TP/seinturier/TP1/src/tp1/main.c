@@ -1,7 +1,7 @@
 #include "main.h"
 
 int main(int argc, char *argv[]) {
-    
+
     uint n = 10;
 
     uint num_1 = 24;
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     Vec *all = vec_possibilities(k);
     printf("Nombres de 0 à %d:\n", (1 << k) - 1);
     matrix_print(all, 1 << k, k);
-    
+
     printf("Encodages:\n");
     for (uint i = 0; i <= (1 << k) - 1; i++) {
         printf("Encoding the vector: ");
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
             printf("Donne le syndrome: \n");
             vec_print(s, n - k);
         }
-        
+
         vec_free(v);
         vec_free(s);
     }
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 
     vec_array[6][0] = 1;
     vec_array[6][2] = 1;
-    vec_array[6][2] = 1;
+    vec_array[6][3] = 1;
 
 
     printf("=======================\n");

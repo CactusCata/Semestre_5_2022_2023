@@ -85,7 +85,7 @@ uint vec_hamming_weight(Vec v, uint n) {
     if (n == 0) {
         return 0;
     }
-    
+
     uint hamming_weight = 0;
     for (uint i = 0; i < n; i++) {
         if (v[i]) {
@@ -139,7 +139,7 @@ uint dist_min(Vec* vecteurs, uint n, uint nb_vect) {
 
 uint capacite_decodage(Vec* vecteurs, uint n, uint nb_vect) {
     uint min_distance = dist_min(vecteurs, n, nb_vect);
-    return (min_distance - 1) >> 1; 
+    return (min_distance - 1) >> 1;
 }
 
 Vec vec_noised(Vec v, uint n, uint b) {

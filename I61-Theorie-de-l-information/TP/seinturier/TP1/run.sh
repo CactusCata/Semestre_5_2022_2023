@@ -1,3 +1,3 @@
 clear
-make
-$1 ./prog.exe
+make -B $1
+$2 $1

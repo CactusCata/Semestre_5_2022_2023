@@ -2,7 +2,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "utils.h"
+#include "../utils.h"
 
 typedef int* Vec;
 
