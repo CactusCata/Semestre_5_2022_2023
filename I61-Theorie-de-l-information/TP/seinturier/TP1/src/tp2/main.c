@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
       printf("\n");
     }
 
-
+    // Exercice 4.2 a continuer
 
     matrix_free(G_generatrice);
 

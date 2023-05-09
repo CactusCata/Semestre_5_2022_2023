@@ -55,5 +55,20 @@ Vec encode(Matrix g, Vec v, uint k, uint n) {
   return res;
 }
 
+Matrix get_matrix_control() {
+  Matrix m = matrix_create(3, 7);
+
+  m[0] = 16 + 4 + 2 + 1;
+  m[1] = 32 + 8 + 4 + 2;
+  m[2] = 64 + 8 + 2 + 1;
+
+  return m;
+}
+
+
+Syndrome syndrome(Matrix h, Vec c, uint k, uint n) {
+
+}
+
 // G = col majeur
 // H = ligne majeur
